@@ -1,6 +1,6 @@
 <script lang="ts">
   import Counter from "./lib/Counter.svelte";
-  import { Block, Icon, work } from "google-apps-script-svelte-components";
+  import { Block, Icon } from "google-apps-script-svelte-components";
   import { parseContext } from "./lib/parseContext";
   import { GoogleAppsScript } from "./gasApi";
   import { onMount } from "svelte";
@@ -13,7 +13,7 @@
 </script>
 
 <main>
-  <h1>Vite + Svelte + AppsScript</h1>
+  <h1>GForms Mirror</h1>
   <Block>
     <h2>I am a Svelte Component</h2>
     <Counter />
@@ -24,7 +24,6 @@
   </Block>
   <Block>
     <h2>I am a Material Icon</h2>
-    <Icon fontSize="32px" icon={work.round} />
   </Block>
   <Block>
     <h2>I am an Apps Script Call</h2>
