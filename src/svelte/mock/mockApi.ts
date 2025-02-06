@@ -11,7 +11,11 @@ export function foo(s: string): number {
 }
 
 export function getAppsScriptUrl(): string {
-  return "http://foo.bar";
+  //return "http://foo.bar";
+  // Actual URL
+  // dev URL needs authentication?
+  //return "https://script.google.com/a/macros/innovationcharter.org/s/AKfycbxYPm-A45TqQlpjnepuhnCNYtZospa3729lw9C9Aj4/dev";
+  return "https://script.google.com/macros/s/AKfycbxMX5zXcqs1j5eYBmeStDXQCW6xhe7BYWqp1iXIgu38oUyll-MCM8sSZrWFYtF3asYT/exec";
 }
 export function getFormData(
   formId: string,
@@ -104,4 +108,9 @@ export function getFormData(
       },
     ],
   };
+}
+
+
+export function getCachedFormData(formId: string, formUrl: string): any {
+  return null; // TODO: Replace with mock return value of type any
 }

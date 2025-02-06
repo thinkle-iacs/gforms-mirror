@@ -42,7 +42,7 @@ export type ScaleFormItem = BaseFormItem & {
 export type RatingFormItem = BaseFormItem & {
   type: "rating";
   max: number;
-  icon: string;
+  icon: "THUMBS_UP" | "HEART" | "STAR";
 };
 
 export type Navigation =
@@ -94,4 +94,15 @@ export type Form = {
   editUrl: string;
   publishedUrl: string;
   items: StandardFormItem[];
+};
+
+export type FormResponse = {
+  id: string;
+  items: { [key: string]: string };
+};
+
+export type FormSubmissionResult = {
+  success: boolean;
+  unrecognizedItems: string[];
+  errors: { itemId: string; message: string }[];
 };

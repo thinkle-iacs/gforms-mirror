@@ -6,6 +6,7 @@ declare namespace google.script {
       withUserObject(object: Object): this;
       getActiveUserEmail(): void;
   getAppsScriptUrl(): void;
+  getCachedFormData(formId: string, formUrl: string): void;
   getFormData(formId: string, formUrl: string): void
   }
   const run : GoogleScriptRun;

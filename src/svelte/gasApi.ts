@@ -19,6 +19,15 @@ export const GoogleAppsScript = {
       });
     },
 
+     getCachedFormData(formId: string, formUrl: string): Promise<any> {
+      return new Promise((resolve, reject) => {
+        google.script.run
+          .withSuccessHandler((result: any) => resolve(result))
+          .withFailureHandler((error: any) => reject(error))
+          .getCachedFormData(formId, formUrl);
+      });
+    },
+
      getFormData(formId: string, formUrl: string): Promise<import("../gas/types").Form> {
       return new Promise((resolve, reject) => {
         google.script.run
