@@ -29,7 +29,7 @@ export type BaseFormItem = {
 export type ChoiceFormItem = BaseFormItem & {
   type: "multipleChoice" | "checkbox" | "list";
   choices: string[];
-  navigation?: string[]; // If navigation logic exists
+  navigation?: Navigation[]; // If navigation logic exists
 };
 
 export type ScaleFormItem = BaseFormItem & {
@@ -44,6 +44,11 @@ export type RatingFormItem = BaseFormItem & {
   max: number;
   icon: string;
 };
+
+export type Navigation =
+  | { type: "page"; id: string }
+  | { type: "submit" }
+  | null; // If no navigation is set
 
 export type GridFormItem = BaseFormItem & {
   type: "grid"; // Multiple Choice Grid (single selection per row)
