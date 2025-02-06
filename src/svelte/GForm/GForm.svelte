@@ -97,38 +97,60 @@
     return json;
   }
 
+  /*
+   * NOTE: Due to CORS restrictions, Google Apps Script does not support direct POST responses.
+   * -> (1) Every form submission includes a unique UUID in the request body.
+   * -> (2) The POST request is sent using `mode: "no-cors"`, which prevents direct response handling.
+   * -> (3) The Google Apps Script backend stores the response temporarily using the UUID.
+   * -> (4) The front-end then makes a GET request with the UUID to retrieve the response.
+   * -> (5) The backend deletes the stored response after returning it.
+   *
+   * This workaround ensures that form submissions are properly processed and retrievable,
+   * despite CORS limitations. If Apps Script ever supports CORS properly in the future,
+   * we can remove this hack and handle responses directly from the POST request.
+   */
   async function submitForm() {
     let formData = new FormData(theFormElement);
-    let formJson = formDataToJson(formData, form.id); // ✅ Include form ID
+    const uuid = crypto.randomUUID(); // Generate a unique ID
+    let formJson = { ...formDataToJson(formData, form.id), uuid }; // Add UUID to form data
 
-    console.log("Submitting form:", formJson);
-
-    if (postUrl) {
-      let body = JSON.stringify(formJson);
-      try {
-        const response = await fetch(postUrl, {
-          method: "POST",
-          redirect: "follow",
-          mode: "no-cors",
-          headers: {
-            "Content-Type": "application/json",
-            "Content-Length": body.length,
-            Host: "script.google.com",
-          },
-          body,
-        });
-
-        if (!response.ok) {
-          console.error("Form submission failed:", response.statusText);
-        } else {
-          console.log("Form submitted successfully");
-        }
-      } catch (error) {
-        console.error("Error submitting form:", error);
-      }
-    } else if (postCallback) {
-      postCallback(formJson);
+    // Step 1: Send no-cors request
+    try {
+      await fetch(postUrl, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formJson),
+      });
+    } catch (error) {
+      console.warn("Expected CORS error, ignoring:", error);
     }
+
+    // Step 2: Poll for response
+    let result = await pollForResponse(uuid);
+    console.log("Final result:", result);
+  }
+
+  async function pollForResponse(uuid) {
+    let attempts = 0;
+    const maxAttempts = 10; // Prevent infinite loops
+    const delay = (ms) => new Promise((res) => setTimeout(res, ms));
+
+    while (attempts < maxAttempts) {
+      console.log(`Checking form submission status (Attempt ${attempts + 1})`);
+
+      let response = await fetch(`${postUrl}?uuid=${uuid}`, { method: "GET" });
+      let data = await response.json();
+
+      if (data.success || data.error) {
+        return data; // ✅ We got a valid response
+      }
+
+      await delay(1000); // ⏳ Wait 1 second before retrying
+      attempts++;
+    }
+
+    return { success: false, error: "Timeout while waiting for response" };
   }
 
   function nextPageOrSubmit(nextPageId: string) {

@@ -6,12 +6,25 @@ import { getCachedFormData } from "./cachedFormData";
 import { processFormSubmission } from "./processFormSubmission";
 
 export function doGet(e) {
-  // Depending on parameters, we either return the form
-  // in a JSON format...
-  if (
-    (e.parameters.formId || e.parameters.formUrl) &&
-    e.parameters.getFormData
-  ) {
+  if (e.parameter.uuid) {
+    const uuid = e.parameter.uuid;
+    const scriptProperties = PropertiesService.getScriptProperties();
+    const responseData = scriptProperties.getProperty(uuid);
+
+    if (responseData) {
+      scriptProperties.deleteProperty(uuid); // Clean up
+      return ContentService.createTextOutput(responseData).setMimeType(
+        ContentService.MimeType.JSON
+      );
+    } else {
+      return ContentService.createTextOutput(
+        JSON.stringify({ success: false, error: "UUID not found or expired" })
+      ).setMimeType(ContentService.MimeType.JSON);
+    }
+  }
+
+  // Otherwise, handle normal form data request
+  if (e.parameters.formId || e.parameters.formUrl) {
     let formId = e.parameters.formId;
     let formUrl = e.parameters.formUrl;
     if (Array.isArray(formId)) {
@@ -25,17 +38,12 @@ export function doGet(e) {
       ContentService.MimeType.JSON
     );
   } else {
-    // Or we return a web-based UI for e.g. generating code that
-    // uses our API...
     return serveFormBuilderUi();
   }
 }
 
-export function doPost(
-  e: GoogleAppsScript.Events.DoPost
-): GoogleAppsScript.Content.TextOutput {
-  let formResponse: FormResponse;
-
+export function doPost(e) {
+  let formResponse;
   try {
     formResponse = JSON.parse(e.postData.contents);
   } catch (error) {
@@ -45,11 +53,37 @@ export function doPost(
     ).setMimeType(ContentService.MimeType.JSON);
   }
 
+  /* NOTE: I could not find any way to get Google Apps Script to work with CORS,
+   * So, I had to use the following workaround:
+   * -> (1) Every post request must include a UUID in the request body
+   * -> (2) The UUID is used to store the response temporarily in script properties
+   * -> (3) The next time we get a GET request with that UUID, we return the response
+   * -> (4) We delete the UUID from script properties after returning the response
+   *
+   * This is a bit nuts, but it's working, so we'll take it for now.
+   * If we find a way to make CORS work in the future, we can remove this workaround.
+   * Oddly, there are forums online that seem to imply that CORS should work with Google Apps Script,
+   * but they use non-existent methods (like addHeader on ContentService) to do so.
+   *  */
+  const uuid = formResponse.uuid;
+  if (!uuid) {
+    return ContentService.createTextOutput(
+      JSON.stringify({ success: false, error: "Missing UUID" })
+    ).setMimeType(ContentService.MimeType.JSON);
+  }
+
+  console.log("Processing form submission with UUID:", uuid);
   const result = processFormSubmission(formResponse);
 
-  return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(
-    ContentService.MimeType.JSON
+  // Store the response temporarily in script properties
+  PropertiesService.getScriptProperties().setProperty(
+    uuid,
+    JSON.stringify(result)
   );
+
+  return ContentService.createTextOutput(
+    JSON.stringify({ success: true, uuid })
+  ).setMimeType(ContentService.MimeType.JSON);
 }
 
 export function serveFormBuilderUi() {
