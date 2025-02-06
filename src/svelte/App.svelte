@@ -23,10 +23,6 @@
     data = await GoogleAppsScript.getFormData(null, formsUrl);
     console.log("Data is ", data);
   }
-
-  $: if (loadMode) {
-    loadData();
-  }
 </script>
 
 <main
@@ -52,21 +48,19 @@
     </label>
 
     <button
-      on:click={() => (loadMode = true)}
+      on:click={() => loadData()}
       class="mt-4 w-full bg-blue-500 text-white py-2 rounded-md font-medium hover:bg-blue-600 transition"
     >
       Load
     </button>
 
-    {#if loadMode}
+    {#if data}
       <div class="mt-6 border-t pt-4">
         <h2>With Data From Apps Script...</h2>
-        {#if data}
-          <GForm form={data} postCallback={console.log} />
-        {:else}
-          <p>Loading...</p>
-        {/if}
+        <GForm form={data} postCallback={console.log} />
       </div>
+    {/if}
+    {#if appsScriptUrl && formsUrl}
       <div class="mt-6 border-t pt-4">
         <h2>With Full Loading...</h2>
         <GFormMirror {appsScriptUrl} {formsUrl} />
