@@ -1,5 +1,10 @@
 import { Form, StandardFormItem, FormType } from "./types";
 
+export type Navigation =
+  | { type: "page"; id: string }
+  | { type: "submit" }
+  | null; // If navigation isn't set
+
 export function getFormData(formId: string, formUrl: string): Form {
   let form: GoogleAppsScript.Forms.Form;
   if (formId) {
@@ -46,13 +51,17 @@ export function getFormData(formId: string, formUrl: string): Form {
         break;
 
       case FormApp.ItemType.MULTIPLE_CHOICE:
+        let multipleChoiceItem = item.asMultipleChoiceItem();
         formItem = {
           ...baseItem,
-          required: item.asMultipleChoiceItem().isRequired(),
-          choices: item
-            .asMultipleChoiceItem()
+          required: multipleChoiceItem.isRequired(),
+          choices: multipleChoiceItem
             .getChoices()
             .map((choice) => choice.getValue()),
+          navigation: multipleChoiceItem.getChoices().map((choice) => {
+            let navType = choice.getPageNavigationType();
+            return parseNavigation(navType, choice);
+          }),
         };
         break;
 
@@ -153,16 +162,24 @@ export function getFormData(formId: string, formUrl: string): Form {
       case FormApp.ItemType.RATING:
         formItem = {
           ...baseItem,
-          required: item.asRatingItem().isRequired(), // Assuming Rating behaves like Scale
+          required: item.asRatingItem().isRequired(),
           type: "rating",
           max: item.asRatingItem().getRatingScaleLevel(),
           icon: item.asRatingItem().getRatingIcon(),
         };
         break;
 
-      // ❌ These items do NOT support "isRequired", so we do NOT include it.
-      case FormApp.ItemType.SECTION_HEADER:
       case FormApp.ItemType.PAGE_BREAK:
+        let pageBreakItem = item.asPageBreakItem();
+        formItem = {
+          ...baseItem,
+          type: "pageBreak",
+          navigation: parseNavigation(pageBreakItem.getGoToPage(), null), // Handles next-page logic
+        };
+        break;
+
+      // ❌ These items do NOT support "isRequired" or navigation.
+      case FormApp.ItemType.SECTION_HEADER:
       case FormApp.ItemType.IMAGE:
       case FormApp.ItemType.VIDEO:
         formItem = baseItem;
@@ -205,4 +222,26 @@ function mapGoogleFormType(
     [FormApp.ItemType.RATING]: "rating",
   };
   return typeMap[itemType] || "text"; // Default to "text" for unknown types
+}
+
+/**
+ * Parses Google Forms navigation into structured objects.
+ */
+function parseNavigation(
+  navType: GoogleAppsScript.Forms.PageNavigationType,
+  choice: GoogleAppsScript.Forms.Choice | null
+): Navigation {
+  if (!navType) return null;
+
+  if (navType === FormApp.PageNavigationType.SUBMIT) {
+    return { type: "submit" };
+  }
+
+  if (navType === FormApp.PageNavigationType.GO_TO_PAGE) {
+    return choice?.getGotoPage()?.getId()
+      ? { type: "page", id: choice.getGotoPage().getId().toString() }
+      : null;
+  }
+
+  return null;
 }
