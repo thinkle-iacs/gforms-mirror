@@ -6,6 +6,7 @@
   export let page: Page;
   export let isActive = false;
   export let isFirst = false;
+  export let isSubmitting = false;
   export let onBack: () => void;
   export let onGoto: (id: string) => void;
 
@@ -81,8 +82,11 @@
     <button
       on:click|preventDefault={handleNext}
       class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+      disabled={isSubmitting}
     >
-      {#if nextPageId === "submit"}
+      {#if isSubmitting}
+        Submitting&hellip;
+      {:else if nextPageId === "submit"}
         Submit
       {:else}
         Next
