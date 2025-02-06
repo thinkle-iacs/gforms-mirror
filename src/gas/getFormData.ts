@@ -58,7 +58,7 @@ export function getFormData(formId: string, formUrl: string): Form {
           choices: multipleChoiceItem
             .getChoices()
             .map((choice) => choice.getValue()),
-          navigation: multipleChoiceItem.getChoices().map((choice) => {
+          choicesNavigation: multipleChoiceItem.getChoices().map((choice) => {
             let navType = choice.getPageNavigationType();
             return parseNavigation(navType, choice);
           }),
@@ -174,7 +174,7 @@ export function getFormData(formId: string, formUrl: string): Form {
         formItem = {
           ...baseItem,
           type: "pageBreak",
-          navigation: parseNavigation(pageBreakItem.getGoToPage(), null), // Handles next-page logic
+          navigation: parsePageBreakNavigation(pageBreakItem.getGoToPage()), // Handles next-page logic
         };
         break;
 
@@ -222,6 +222,22 @@ function mapGoogleFormType(
     [FormApp.ItemType.RATING]: "rating",
   };
   return typeMap[itemType] || "text"; // Default to "text" for unknown types
+}
+
+function parsePageBreakNavigation(
+  goToPage: GoogleAppsScript.Forms.PageBreakItem
+): Navigation {
+  if (goToPage && goToPage.getId()) {
+    return {
+      type: "page",
+      id: goToPage.getId().toString(),
+    };
+  } else if (goToPage) {
+    return {
+      type: "submit",
+      goToPage,
+    };
+  }
 }
 
 /**

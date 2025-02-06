@@ -10,21 +10,21 @@ export const GoogleAppsScript = {
       });
     },
 
-     testMe(number: number): Promise<number> {
+     getAppsScriptUrl(): Promise<string> {
       return new Promise((resolve, reject) => {
         google.script.run
-          .withSuccessHandler((result: number) => resolve(result))
+          .withSuccessHandler((result: string) => resolve(result))
           .withFailureHandler((error: any) => reject(error))
-          .testMe(number);
+          .getAppsScriptUrl();
       });
     },
 
-     foo(s: string): Promise<number> {
+     getFormData(formId: string, formUrl: string): Promise<import("../gas/types").Form> {
       return new Promise((resolve, reject) => {
         google.script.run
-          .withSuccessHandler((result: number) => resolve(result))
+          .withSuccessHandler((result: import("../gas/types").Form) => resolve(result))
           .withFailureHandler((error: any) => reject(error))
-          .foo(s);
+          .getFormData(formId, formUrl);
       });
     }
 }

@@ -29,7 +29,7 @@ export type BaseFormItem = {
 export type ChoiceFormItem = BaseFormItem & {
   type: "multipleChoice" | "checkbox" | "list";
   choices: string[];
-  navigation?: Navigation[]; // If navigation logic exists
+  choicesNavigation?: Navigation[]; // If navigation logic exists
 };
 
 export type ScaleFormItem = BaseFormItem & {
@@ -74,6 +74,7 @@ export type SectionHeaderFormItem = BaseFormItem & {
 
 export type PageBreakFormItem = BaseFormItem & {
   type: "pageBreak";
+  navigation?: Navigation;
 };
 
 export type StandardFormItem =
