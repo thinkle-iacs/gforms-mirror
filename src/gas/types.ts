@@ -105,4 +105,5 @@ export type FormSubmissionResult = {
   success: boolean;
   unrecognizedItems: string[];
   errors: { itemId: string; message: string }[];
+  editResponseUrl?: string;
 };

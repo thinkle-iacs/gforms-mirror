@@ -63,6 +63,7 @@ export function processFormSubmission(
 
     if (result.errors.length === 0) {
       response.submit();
+      result.editResponseUrl = response.getEditResponseUrl();
     } else {
       result.success = false;
     }
