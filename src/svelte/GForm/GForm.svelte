@@ -104,11 +104,18 @@
     console.log("Submitting form:", formJson);
 
     if (postUrl) {
+      let body = JSON.stringify(formJson);
       try {
         const response = await fetch(postUrl, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formJson),
+          redirect: "follow",
+          mode: "no-cors",
+          headers: {
+            "Content-Type": "application/json",
+            "Content-Length": body.length,
+            Host: "script.google.com",
+          },
+          body,
         });
 
         if (!response.ok) {
