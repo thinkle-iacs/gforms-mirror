@@ -1,19 +1,20 @@
 <script lang="ts">
+  import GPage from "./GPage.svelte";
+
   import type {
     Form,
     StandardFormItem,
     ChoiceFormItem,
   } from "./../../gas/types.ts";
+  import type { Page } from "./types";
+
   export let form: Form;
+  // We can provide a function OR just a URL to post standard form data to
+  export let postUrl: string = "";
+  export let postCallback: (data: any) => void | null = null;
+
   $: console.log("GForm got", form);
 
-  type Page = {
-    id: string;
-    items: StandardFormItem[];
-    title?: string;
-    description?: string;
-    defaultNextPage: string | null;
-  };
   let pages: Page[];
 
   function parsePages(form: Form): Page[] {
@@ -70,86 +71,84 @@
     pages.find((page) => page.id === currentPageId)?.defaultNextPage ||
     "submit";
 
-  function setChoice(item: ChoiceFormItem, idx: number) {
-    if (!item.choicesNavigation) {
-      return;
-    }
-    console.log("Setting choice for", item, idx);
-    if (item.choicesNavigation[idx].type == "page") {
-      nextPageId = item.choicesNavigation[idx].id;
-    } else if (item.choicesNavigation[idx].type == "submit") {
-      nextPageId = "submit";
-    }
-  }
-
   let pageHistory = [];
 
-  function goBack(e) {
+  function goBack() {
     if (pageHistory.length > 0) {
       currentPageId = pageHistory.pop();
       pageHistory = pageHistory;
     }
-    e.preventDefault();
   }
 
-  function nextPageOrSubmit(e) {
+  function formDataToJson(formData: FormData) {
+    const json: Record<string, any> = {};
+
+    formData.forEach((value, key) => {
+      if (json[key] !== undefined) {
+        if (!Array.isArray(json[key])) {
+          json[key] = [json[key]]; // Convert existing value into an array
+        }
+        json[key].push(value); // Add new value to the array
+      } else {
+        json[key] = value; // Store as a string if it's the first occurrence
+      }
+    });
+
+    return json;
+  }
+
+  async function submitForm() {
+    let formData = new FormData(theFormElement);
+    console.log("Submitting form:", formData);
+
+    if (postUrl) {
+      try {
+        const response = await fetch(postUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" }, // 🔥 Use JSON instead
+          body: JSON.stringify(formDataToJson(formData)), // Convert FormData to JSON
+        });
+
+        if (!response.ok) {
+          console.error("Form submission failed:", response.statusText);
+        } else {
+          console.log("Form submitted successfully");
+        }
+      } catch (error) {
+        console.error("Error submitting form:", error);
+      }
+    } else if (postCallback) {
+      postCallback(formDataToJson(formData));
+    }
+  }
+
+  function nextPageOrSubmit(nextPageId: string) {
     if (nextPageId == "submit") {
-      window.alert("submit!");
+      submitForm();
     } else {
       pageHistory.push(currentPageId);
       pageHistory = pageHistory;
       currentPageId = nextPageId;
     }
-    e.preventDefault();
   }
+
+  let theFormElement: HTMLFormElement;
 </script>
 
 {#if form}
-  <form>
+  <form bind:this={theFormElement}>
     <p>We have {form.items.length} items total...</p>
     {#each pages as page}
-      <div class="page" class:active={currentPageId == page.id}>
-        Page: ${page.id}
-
-        {#each page.items as item}
-          <h2>{item.title}</h2>
-          ({item.type})
-          {#if item.description}<div>{item.description}</div>{/if}
-          {#if item.type == "checkbox"}
-            <div>
-              {#each item.choices as choice}
-                <label>
-                  <input type="checkbox" name={item.id} value={choice} />
-                  {choice}
-                </label>
-              {/each}
-            </div>
-          {:else if item.type == "multipleChoice"}
-            <div>
-              {#each item.choices as choice, idx}
-                <label>
-                  <input
-                    type="radio"
-                    name={item.id}
-                    value={choice}
-                    on:click={() => setChoice(item, idx)}
-                  />
-                  {choice}
-                </label>
-              {/each}
-            </div>
-          {:else if item.type == "text"}
-            <input type="text" name={item.id} />
-          {:else if item.type == "paragraph"}
-            <textarea name={item.id}></textarea>
-          {/if}
-        {/each}
-      </div>
+      <GPage
+        isFirst={pageHistory.length === 0}
+        isActive={currentPageId === page.id}
+        {page}
+        onBack={goBack}
+        onGoto={(id) => {
+          nextPageOrSubmit(id);
+        }}
+      ></GPage>
     {/each}
-    {#if pageHistory.length}
-      <button on:click={goBack} type="button">Back</button>
-    {/if}
-    <button on:click={nextPageOrSubmit} type="submit">Continue</button>
   </form>
 {/if}
 

@@ -62,7 +62,7 @@
       <div class="mt-6 border-t pt-4">
         <h2>With Data From Apps Script...</h2>
         {#if data}
-          <GForm form={data} />
+          <GForm form={data} postCallback={console.log} />
         {:else}
           <p>Loading...</p>
         {/if}
