@@ -15,6 +15,7 @@
 
   function setChoice(item: ChoiceFormItem, idx: number) {
     if (!item.choicesNavigation) return;
+    if (!item.choicesNavigation[idx]) return;
     nextPageId =
       item.choicesNavigation[idx].type === "page"
         ? item.choicesNavigation[idx].id
@@ -56,8 +57,10 @@
   class="max-w-2xl mx-auto p-6 bg-white shadow-md rounded-md page"
   class:active={isActive}
 >
-  <h2 class="text-2xl font-semibold">{page.title}</h2>
-  <p class="text-gray-600 mb-4">{page.description}</p>
+  {#if page.title}<h2 class="text-2xl font-semibold">{page.title}</h2>{/if}
+  {#if page.description}<p class="text-gray-600 mb-4">
+      {page.description}
+    </p>{/if}
 
   {#each page.items as item}
     <GFormItem {item} {onInputChange} {setChoice} />

@@ -5,6 +5,7 @@
     Form,
     StandardFormItem,
     ChoiceFormItem,
+    FormResponse,
   } from "./../../gas/types.ts";
   import type { Page } from "./types";
 
@@ -79,18 +80,17 @@
       pageHistory = pageHistory;
     }
   }
-
-  function formDataToJson(formData: FormData) {
-    const json: Record<string, any> = {};
+  function formDataToJson(formData: FormData, formId: string): FormResponse {
+    const json: Record<string, any> = { id: formId, items: {} };
 
     formData.forEach((value, key) => {
-      if (json[key] !== undefined) {
-        if (!Array.isArray(json[key])) {
-          json[key] = [json[key]]; // Convert existing value into an array
+      if (json.items[key] !== undefined) {
+        if (!Array.isArray(json.items[key])) {
+          json.items[key] = [json.items[key]]; // Convert existing value into an array
         }
-        json[key].push(value); // Add new value to the array
+        json.items[key].push(value); // Add new value to the array
       } else {
-        json[key] = value; // Store as a string if it's the first occurrence
+        json.items[key] = value; // Store as a string if it's the first occurrence
       }
     });
 
@@ -99,14 +99,16 @@
 
   async function submitForm() {
     let formData = new FormData(theFormElement);
-    console.log("Submitting form:", formData);
+    let formJson = formDataToJson(formData, form.id); // ✅ Include form ID
+
+    console.log("Submitting form:", formJson);
 
     if (postUrl) {
       try {
         const response = await fetch(postUrl, {
           method: "POST",
-          headers: { "Content-Type": "application/json" }, // 🔥 Use JSON instead
-          body: JSON.stringify(formDataToJson(formData)), // Convert FormData to JSON
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formJson),
         });
 
         if (!response.ok) {
@@ -118,7 +120,7 @@
         console.error("Error submitting form:", error);
       }
     } else if (postCallback) {
-      postCallback(formDataToJson(formData));
+      postCallback(formJson);
     }
   }
 
@@ -137,6 +139,10 @@
 
 {#if form}
   <form bind:this={theFormElement}>
+    <h1 class="text-3xl font-semibold">{form.title}</h1>
+    <a class="text-blue-600 hover:underline" href={form.publishedUrl}
+      >(complete in Google Forms)</a
+    >
     <p>We have {form.items.length} items total...</p>
     {#each pages as page}
       <GPage
