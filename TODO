@@ -1,0 +1,31 @@
+Next up, we're working towards this:
+
+    < gforms - mirror id = "my-form" appsScriptUrl = "https://script.google.com/macros/s/XYZ/exec" ></gforms - mirror >
+
+<script src="https://mycdn.com/gforms-mirror.js"></script>
+
+<script>
+  customElements.whenDefined("gforms-mirror").then(() => {
+    const formElement = document.getElementById("my-form");
+
+    // Hardcoded form data
+    formElement.form = {
+      id: "123",
+      title: "Customer Feedback Form",
+      description: "Please let us know your thoughts.",
+      items: [
+        { id: "q1", type: "text", title: "Your Name", required: true },
+        { id: "q2", type: "multiple-choice", title: "Rate our service", choices: ["Great", "Good", "Okay", "Bad"] }
+      ]
+    };
+
+    // Hardcoded translations
+    formElement.translations = {
+      es: { "Submit": "Enviar", "Your Name": "Tu Nombre", "Rate our service": "Califica nuestro servicio" },
+      fr: { "Submit": "Soumettre", "Your Name": "Votre nom", "Rate our service": "Évaluez notre service" }
+    };
+
+    // Hardcoded submit URL
+    formElement.postUrl = "https://script.google.com/macros/s/XYZ/exec";
+  });
+</script>
