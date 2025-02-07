@@ -1,4 +1,23 @@
-# Google Apps Script + Svelte
+# GFormsMirror
+
+A Google-Apps-Script + Custom Web Element Project to allow "Mirroring" Google Forms in a more modern looking forms interface. Our immediate goal is to support better translation, here's the full suite of services this would allow:
+
+* Improved Translation Support / UX
+* Improved Styling/Integration with other web pages
+* Custom validation / auto-fill support.
+
+## Technical Details
+
+### Submitting Forms
+
+Submitting forms happens by hitting a custom Google Apps Script URI which handles posting form responses. This works around issues with posting directly to google forms, and prevents us from relying on reverse-engineering Google Forms built-in behavior which is designed to prevent automated form-filling-out.
+
+### Performance
+
+The most *convenient* solution is to just point a custom element at a google apps script URL with a form ID and call it a day. HOWEVER, Google Apps Script is not exactly performant, so if you want your form to load quickly, you'll want to hard-code the form data and translations onto your webpage. That way, you don't have to wait for an Apps Script call before your users see the form.
+
+
+## Google Apps Script + Svelte (Template used for this project...)
 
 I love Google Apps Script for whipping together projects for our Google Apps School, and I love svelte development in Visual Studio, but before now, I haven't been able to  bring them together. This repo will give me a recipe for fixing that!
 
