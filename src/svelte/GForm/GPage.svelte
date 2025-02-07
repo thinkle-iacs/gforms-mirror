@@ -1,7 +1,9 @@
 <script lang="ts">
+  import { getText } from "./translate.ts";
   import type { StandardFormItem, ChoiceFormItem } from "./../../gas/types.ts";
   import type { Page } from "./types";
   import GFormItem from "./GFormItem.svelte";
+  import T from "./T.svelte";
 
   export let page: Page;
   export let isActive = false;
@@ -9,6 +11,8 @@
   export let isSubmitting = false;
   export let onBack: () => void;
   export let onGoto: (id: string) => void;
+  export let lang = "en";
+  export let translations = {};
 
   let nextPageId = page.defaultNextPage;
   let formState: Record<string, any> = {}; // Stores form values
@@ -37,7 +41,11 @@
         item.required &&
         (!formState[item.id] || formState[item.id].length === 0)
       ) {
-        formErrors[item.id] = "This field is required.";
+        formErrors[item.id] = getText(
+          "This field is required.",
+          translations,
+          lang
+        );
         isValid = false;
       }
     }
@@ -64,7 +72,7 @@
     </p>{/if}
 
   {#each page.items as item}
-    <GFormItem {item} {onInputChange} {setChoice} />
+    <GFormItem {item} {onInputChange} {setChoice} {lang} {translations} />
     {#if formErrors[item.id]}
       <p class="text-red-500 text-sm">{formErrors[item.id]}</p>
     {/if}
@@ -76,7 +84,7 @@
         on:click|preventDefault={onBack}
         class="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 transition"
       >
-        Back
+        <T text="Back" {lang} {translations} />
       </button>
     {/if}
     <button
@@ -85,11 +93,11 @@
       disabled={isSubmitting}
     >
       {#if isSubmitting}
-        Submitting&hellip;
+        <T text="Submitting" {lang} {translations} />
       {:else if nextPageId === "submit"}
-        Submit
+        <T text="Submit" {lang} {translations} />
       {:else}
-        Next
+        <T text="Next" {lang} {translations} />
       {/if}
     </button>
   </div>

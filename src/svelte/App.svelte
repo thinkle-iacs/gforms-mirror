@@ -1,4 +1,5 @@
 <script lang="ts">
+  import TranslationTest from "./TranslationTest.svelte";
   import GFormMirror from "./GForm/GFormMirror.svelte";
   import GForm from "./GForm/GForm.svelte";
   import { parseContext } from "./lib/parseContext";
@@ -10,7 +11,8 @@
   let context = parseContext(contextString);
   let appsScriptUrl = "";
   import { ALL_TESTS } from "../gas/consts";
-  let formsUrl = ALL_TESTS[0];
+  let formsUrl =
+    "https://docs.google.com/forms/d/1xh9cSzZvDqV9cm0n5ph4L4KwFx00ZQPkY8O3X6-nNLY/edit";
   onMount(async () => {
     email = await GoogleAppsScript.getActiveUserEmail();
     appsScriptUrl = await GoogleAppsScript.getAppsScriptUrl();
@@ -53,6 +55,7 @@
     >
       Load
     </button>
+    <TranslationTest />
 
     {#if data}
       <div class="mt-6 border-t pt-4">

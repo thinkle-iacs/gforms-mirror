@@ -1,9 +1,11 @@
 <script lang="ts">
-  import type { Form } from "../../gas/types";
+  import type { Form, Translations } from "../../gas/types";
   import GForm from "./GForm.svelte";
   export let formsUrl: string = "";
   export let formsId: string = "";
   export let appsScriptUrl: string = "";
+  export let translations: Translations = {};
+  export let translationsUrl: string = "";
 
   let data: Form;
 
@@ -33,6 +35,30 @@
     } finally {
       loading = false;
     }
+    if (translationsUrl) {
+      loading = true;
+      try {
+        const response = await fetch(translationsUrl, {
+          method: "GET",
+          redirect: "follow", // ✅ Ensures it follows redirects
+        });
+
+        if (!response.ok) {
+          throw new Error(
+            `Failed to load translations: ${response.statusText}`
+          );
+        }
+
+        translations = await response.json(); // ✅ Parse JSON response
+        console.log("Translations Loaded:", translations);
+      } catch (error) {
+        console.error(
+          "Error loading translations from URL",
+          translationsUrl,
+          error
+        );
+      }
+    }
   }
   let loading = false;
 </script>
@@ -48,5 +74,5 @@
   on:click={loadForm}>Load</button
 >
 {#if data}
-  <GForm form={data} postUrl={appsScriptUrl} />
+  <GForm form={data} postUrl={appsScriptUrl} {translations} lang="en" />
 {/if}

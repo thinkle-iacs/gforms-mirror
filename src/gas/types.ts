@@ -107,3 +107,9 @@ export type FormSubmissionResult = {
   errors: { itemId: string; message: string }[];
   editResponseUrl?: string;
 };
+
+export type Translations = {
+  [key: string]: {
+    [key: string]: string;
+  };
+};

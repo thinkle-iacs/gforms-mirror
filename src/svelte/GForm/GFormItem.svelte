@@ -1,11 +1,18 @@
 <script lang="ts">
-  import type { StandardFormItem, ChoiceFormItem } from "./../../gas/types.ts";
+  import type {
+    StandardFormItem,
+    ChoiceFormItem,
+    Translations,
+  } from "./../../gas/types.ts";
   import RatingItem from "./components/RatingItem.svelte";
 
   export let item: StandardFormItem;
   export let onInputChange: (id: string, value: any) => void;
   export let setChoice: (item: ChoiceFormItem, idx: number) => void;
+  export let lang = "en";
+  export let translations: Translations = {};
   import { getRowIdentifier } from "../../util";
+  import T from "./T.svelte";
   function handleChange(event) {
     onInputChange(item.id, event.target.value);
   }
@@ -13,9 +20,13 @@
 </script>
 
 <div class="mb-6">
-  <h3 class="text-lg font-semibold">{item.title}</h3>
+  <h3 class="text-lg font-semibold">
+    <T text={item.title} {lang} {translations} />
+  </h3>
   {#if item.description}
-    <p class="text-sm text-gray-600 mb-2">{item.description}</p>
+    <p class="text-sm text-gray-600 mb-2">
+      <T text={item.description} {lang} {translations} />
+    </p>
   {/if}
 
   {#if item.type === "checkbox"}
@@ -28,7 +39,9 @@
           class="h-5 w-5 text-blue-500 focus:ring focus:ring-blue-300"
           on:change={handleChange}
         />
-        <span class="text-gray-800">{choice}</span>
+        <span class="text-gray-800">
+          <T text={choice} {lang} {translations} />
+        </span>
       </label>
     {/each}
   {:else if item.type === "multipleChoice"}
@@ -44,7 +57,9 @@
             setChoice(item, idx);
           }}
         />
-        <span class="text-gray-800">{choice}</span>
+        <span class="text-gray-800">
+          <T text={choice} {lang} {translations} />
+        </span>
       </label>
     {/each}
   {:else if item.type === "text"}

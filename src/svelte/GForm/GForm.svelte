@@ -1,15 +1,18 @@
 <script lang="ts">
+  import TranslationSelector from "./TranslationSelector.svelte";
   import GPage from "./GPage.svelte";
-
+  import T from "./T.svelte";
   import type {
     Form,
     StandardFormItem,
     ChoiceFormItem,
     FormResponse,
+    Translations,
   } from "./../../gas/types.ts";
   import type { Page } from "./types";
 
   export let form: Form;
+  export let translations: Translations = {};
   export let postUrl: string = "";
   export let postCallback: (data: any) => void | null = null;
   export let postedMessage = `Form submitted successfully!`;
@@ -193,14 +196,29 @@
   }
 
   let theFormElement: HTMLFormElement;
+
+  export let lang = "en";
+
+  function onLanguageChange(newLang: string, useGoogle: boolean) {
+    console.log(
+      "Language changed to",
+      lang,
+      "using Google Translate?",
+      useGoogle
+    );
+    lang = newLang;
+  }
 </script>
 
 {#if form}
+  <TranslationSelector {translations} {form} onChange={onLanguageChange} />
   <form bind:this={theFormElement} class:hidden={submitted}>
-    <h1 class="text-3xl font-semibold">{form.title}</h1>
-    <a class="text-blue-600 hover:underline text-xs" href={form.publishedUrl}
-      >(complete in Google Forms)</a
-    >
+    <h1 class="text-3xl font-semibold">
+      <T text={form.title} {lang} {translations} />
+    </h1>
+    <a class="text-blue-600 hover:underline text-xs" href={form.publishedUrl}>
+      (<T text="Complete in Google Forms" {lang} {translations} />)
+    </a>
 
     {#each pages as page}
       <GPage
@@ -208,6 +226,8 @@
         isActive={currentPageId === page.id}
         isSubmitting={submitting}
         {page}
+        {lang}
+        {translations}
         onBack={goBack}
         onGoto={(id) => {
           nextPageOrSubmit(id);
@@ -215,6 +235,11 @@
       ></GPage>
     {/each}
   </form>
+  {#if submissionError}
+    <div class="text-red-600">
+      <T text={submissionError} {lang} {translations} />
+    </div>
+  {/if}
 
   {#if submitted}
     <div class="text-center p-6 border border-gray-300 rounded-md shadow-md">
@@ -227,7 +252,11 @@
             target="_blank"
             class="text-blue-500 underline hover:text-blue-700"
           >
-            Click here to edit your response in Google Forms
+            <T
+              text="Click here to edit your response in Google Forms"
+              {lang}
+              {translations}
+            />
           </a>
         </p>
       {/if}
@@ -237,7 +266,7 @@
           on:click={resetForm}
           class="mt-4 px-6 py-2 text-white bg-blue-500 rounded hover:bg-blue-600"
         >
-          {postAgainText}
+          <T text={postAgainText} {lang} {translations} />
         </button>
       {/if}
     </div>
