@@ -20,61 +20,79 @@
 </script>
 
 <div class="mb-6">
-  <h3 class="text-lg font-semibold">
+  <!-- Question Title -->
+  <h3 class="text-lg font-semibold text-text">
     <T text={item.title} {lang} {translations} />
   </h3>
+
+  <!-- Question Description -->
   {#if item.description}
-    <p class="text-sm text-gray-600 mb-2">
+    <p class="text-sm text-muted mb-2">
       <T text={item.description} {lang} {translations} />
     </p>
   {/if}
 
+  <!-- Checkbox Inputs -->
   {#if item.type === "checkbox"}
-    {#each item.choices as choice}
-      <label class="flex items-center space-x-2">
-        <input
-          type="checkbox"
-          name={item.id}
-          value={choice}
-          class="h-5 w-5 text-blue-500 focus:ring focus:ring-blue-300"
-          on:change={handleChange}
-        />
-        <span class="text-gray-800">
-          <T text={choice} {lang} {translations} />
-        </span>
-      </label>
-    {/each}
+    <div class="space-y-2">
+      {#each item.choices as choice}
+        <label class="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            name={item.id}
+            value={choice}
+            class="h-5 w-5 text-primary focus-visible:ring focus-visible:ring-inputFocus"
+            on:change={handleChange}
+          />
+          <span class="text-text">
+            <T text={choice} {lang} {translations} />
+          </span>
+        </label>
+      {/each}
+    </div>
+
+    <!-- Radio Inputs -->
   {:else if item.type === "multipleChoice"}
-    {#each item.choices as choice, idx}
-      <label class="flex items-center space-x-2">
-        <input
-          type="radio"
-          name={item.id}
-          value={choice}
-          class="h-5 w-5 text-blue-500 focus:ring focus:ring-blue-300"
-          on:change={(event) => {
-            handleChange(event);
-            setChoice(item, idx);
-          }}
-        />
-        <span class="text-gray-800">
-          <T text={choice} {lang} {translations} />
-        </span>
-      </label>
-    {/each}
+    <div class="space-y-2">
+      {#each item.choices as choice, idx}
+        <label class="flex items-center space-x-2">
+          <input
+            type="radio"
+            name={item.id}
+            value={choice}
+            class="h-5 w-5 text-primary focus-visible:ring focus-visible:ring-inputFocus"
+            on:change={(event) => {
+              handleChange(event);
+              setChoice(item, idx);
+            }}
+          />
+          <span class="text-text">
+            <T text={choice} {lang} {translations} />
+          </span>
+        </label>
+      {/each}
+    </div>
+
+    <!-- Text Input -->
   {:else if item.type === "text"}
     <input
       type="text"
       name={item.id}
-      class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+      class="w-full p-2 border border-inputBorder rounded bg-input text-inputText font-input
+             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inputFocus"
       on:input={handleChange}
     />
+
+    <!-- Paragraph (Textarea) -->
   {:else if item.type === "paragraph"}
     <textarea
       name={item.id}
-      class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+      class="w-full p-2 border border-inputBorder rounded bg-input text-inputText font-input
+             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inputFocus"
       on:input={handleChange}
     ></textarea>
+
+    <!-- Rating Item -->
   {:else if item.type == "rating"}
     <RatingItem
       name={item.id}
@@ -82,6 +100,8 @@
       max={item.max}
       on:input={handleChange}
     />
+
+    <!-- Scale Input -->
   {:else if item.type == "scale"}
     <input
       type="range"
@@ -89,14 +109,18 @@
       min={item.min}
       max={item.max}
       step={item.step}
-      class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+      class="w-full p-2 border border-inputBorder rounded bg-input text-inputText
+             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inputFocus"
       on:input={handleChange}
       on:change={handleChange}
     />
+
+    <!-- Dropdown List -->
   {:else if item.type == "list"}
     <select
       name={item.id}
-      class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+      class="w-full p-2 border border-inputBorder rounded bg-input text-inputText
+             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inputFocus"
       on:change={handleChange}
     >
       <option value="">Select an option</option>
@@ -104,52 +128,44 @@
         <option value={choice}>{choice}</option>
       {/each}
     </select>
-  {:else if item.type == "date"}
+
+    <!-- Date, Time, and Datetime Inputs -->
+  {:else if item.type == "date" || item.type == "time" || item.type == "datetime"}
     <input
-      type="date"
+      type={item.type}
       name={item.id}
-      class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+      class="w-full p-2 border border-inputBorder rounded bg-input text-inputText font-input
+             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inputFocus"
       on:input={handleChange}
       on:change={handleChange}
     />
-  {:else if item.type == "time"}
-    <input
-      type="time"
-      name={item.id}
-      class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-      on:input={handleChange}
-      on:change={handleChange}
-    />
-  {:else if item.type == "datetime"}
-    <input
-      type="datetime-local"
-      name={item.id}
-      class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-      on:input={handleChange}
-      on:change={handleChange}
-    />
+
+    <!-- Duration Input -->
   {:else if item.type == "duration"}
     <input
       type="number"
       name={item.id}
-      class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+      class="w-full p-2 border border-inputBorder rounded bg-input text-inputText font-input
+             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inputFocus"
       on:input={handleChange}
       on:change={handleChange}
     />
+
+    <!-- Grid & Checkbox Grid -->
   {:else if item.type === "grid" || item.type === "checkboxGrid"}
-    <table class="w-full border border-gray-300 rounded-md shadow-sm">
-      <thead class="bg-gray-100">
+    <table class="w-full border border-inputBorder rounded-md shadow-sm">
+      <thead class="bg-backgroundLight">
         <tr>
           <th class="p-2 text-left border-b"></th>
           {#each item.columns as col}
-            <th class="p-2 text-center border-b">{col}</th>
+            <th class="p-2 text-center border-b text-text">{col}</th>
           {/each}
         </tr>
       </thead>
       <tbody>
         {#each item.rows as row}
-          <tr class="border-b hover:bg-gray-50">
-            <th class="p-2 text-left font-medium">{row}</th>
+          <tr class="border-b hover:bg-hoverBackground">
+            <th class="p-2 text-left font-medium text-text">{row}</th>
             {#each item.columns as col}
               <td class="p-2 text-center">
                 <label class="flex items-center justify-center cursor-pointer">
@@ -157,7 +173,7 @@
                     type={item.type === "grid" ? "radio" : "checkbox"}
                     name={getRowIdentifier(item.id, row)}
                     value={col}
-                    class="h-5 w-5 text-blue-500 focus:ring focus:ring-blue-300"
+                    class="h-5 w-5 text-primary focus-visible:ring focus-visible:ring-inputFocus"
                     on:change={handleChange}
                   />
                 </label>

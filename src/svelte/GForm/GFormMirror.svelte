@@ -70,7 +70,7 @@
 </div>
 <button
   disabled={loading}
-  class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+  class="bg-primary hover:bg-primaryDark text-white font-bold py-2 px-4 rounded"
   on:click={loadForm}>Load</button
 >
 {#if data}

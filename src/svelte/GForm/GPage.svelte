@@ -62,34 +62,50 @@
   }
 </script>
 
+<!-- Page Wrapper -->
 <div
-  class="max-w-2xl mx-auto p-6 bg-white shadow-md rounded-md page"
-  class:active={isActive}
+  class="max-w-2xl mx-auto p-6 bg-background text-text shadow-md rounded-md
+         transition-opacity duration-300 ease-in-out"
+  class:hidden={!isActive}
 >
-  {#if page.title}<h2 class="text-2xl font-semibold">{page.title}</h2>{/if}
-  {#if page.description}<p class="text-gray-600 mb-4">
-      {page.description}
-    </p>{/if}
+  <!-- Page Title -->
+  {#if page.title}
+    <h2 class="text-2xl font-semibold text-text">{page.title}</h2>
+  {/if}
 
+  <!-- Page Description -->
+  {#if page.description}
+    <p class="text-muted mb-4">{page.description}</p>
+  {/if}
+
+  <!-- Form Items -->
   {#each page.items as item}
     <GFormItem {item} {onInputChange} {setChoice} {lang} {translations} />
     {#if formErrors[item.id]}
-      <p class="text-red-500 text-sm">{formErrors[item.id]}</p>
+      <p
+        class="text-error bg-errorBg border border-error p-2 rounded-md text-sm mt-2"
+      >
+        {formErrors[item.id]}
+      </p>
     {/if}
   {/each}
 
+  <!-- Navigation Buttons -->
   <div class="flex justify-between mt-6">
     {#if !isFirst}
       <button
         on:click|preventDefault={onBack}
-        class="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 transition"
+        class="px-4 py-2 bg-muted text-text rounded-md hover:bg-mutedHover transition
+               focus:outline-none focus-visible:ring-2 focus-visible:ring-inputFocus"
       >
         <T text="Back" {lang} {translations} />
       </button>
     {/if}
+
     <button
       on:click|preventDefault={handleNext}
-      class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+      class="px-4 py-2 bg-primary text-white rounded-md hover:bg-opacity-80 transition
+             focus:outline-none focus-visible:ring-2 focus-visible:ring-inputFocus"
       disabled={isSubmitting}
     >
       {#if isSubmitting}
@@ -102,12 +118,3 @@
     </button>
   </div>
 </div>
-
-<style>
-  .page {
-    display: none;
-  }
-  .page.active {
-    display: block;
-  }
-</style>

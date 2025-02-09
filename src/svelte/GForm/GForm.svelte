@@ -212,45 +212,70 @@
 
 {#if form}
   <TranslationSelector {translations} {form} onChange={onLanguageChange} />
-  <form bind:this={theFormElement} class:hidden={submitted}>
-    <h1 class="text-3xl font-semibold">
+
+  <form
+    bind:this={theFormElement}
+    class="bg-background text-text font-ui p-6 rounded-md shadow-md space-y-6"
+    class:hidden={submitted}
+  >
+    <!-- Form Title -->
+    <h1 class="text-3xl font-semibold text-primary">
       <T text={form.title} {lang} {translations} />
     </h1>
-    <a class="text-blue-600 hover:underline text-xs" href={form.publishedUrl}>
+
+    <a class="text-link hover:underline text-sm" href={form.publishedUrl}>
       (<T text="Complete in Google Forms" {lang} {translations} />)
     </a>
 
-    {#each pages as page}
-      <GPage
-        isFirst={pageHistory.length === 0}
-        isActive={currentPageId === page.id}
-        isSubmitting={submitting}
-        {page}
-        {lang}
-        {translations}
-        onBack={goBack}
-        onGoto={(id) => {
-          nextPageOrSubmit(id);
-        }}
-      ></GPage>
-    {/each}
+    <!-- Pages -->
+    <div class="space-y-6">
+      {#each pages as page}
+        <GPage
+          isFirst={pageHistory.length === 0}
+          isActive={currentPageId === page.id}
+          isSubmitting={submitting}
+          {page}
+          {lang}
+          {translations}
+          onBack={goBack}
+          onGoto={(id) => {
+            nextPageOrSubmit(id);
+          }}
+        />
+      {/each}
+    </div>
+
+    <!-- Submit Button -->
+    <div class="flex justify-end">
+      <button
+        type="submit"
+        class="px-6 py-2 text-white bg-primary rounded hover:bg-primaryDark transition focus:outline-none focus:ring-2 focus:ring-inputFocus"
+      >
+        <T text="Submit" {lang} {translations} />
+      </button>
+    </div>
   </form>
+
+  <!-- Submission Error -->
   {#if submissionError}
-    <div class="text-red-600">
+    <div class="mt-4 text-error bg-red-100 border border-error p-3 rounded-md">
       <T text={submissionError} {lang} {translations} />
     </div>
   {/if}
 
+  <!-- Success Message -->
   {#if submitted}
-    <div class="text-center p-6 border border-gray-300 rounded-md shadow-md">
-      <h2 class="text-2xl font-semibold text-green-600">{postedMessage}</h2>
+    <div
+      class="text-center p-6 border border-gray-300 rounded-md shadow-md bg-background text-text"
+    >
+      <h2 class="text-2xl font-semibold text-success">{postedMessage}</h2>
 
       {#if editResponseUrl}
         <p class="mt-2">
           <a
             href={editResponseUrl}
             target="_blank"
-            class="text-blue-500 underline hover:text-blue-700"
+            class="text-link underline hover:text-secondary"
           >
             <T
               text="Click here to edit your response in Google Forms"
@@ -264,7 +289,7 @@
       {#if allowPostAgain}
         <button
           on:click={resetForm}
-          class="mt-4 px-6 py-2 text-white bg-blue-500 rounded hover:bg-blue-600"
+          class="mt-4 px-6 py-2 text-white bg-primary rounded hover:bg-primaryDark focus:outline-none focus:ring-2 focus:ring-inputFocus transition"
         >
           <T text={postAgainText} {lang} {translations} />
         </button>
@@ -272,3 +297,47 @@
     </div>
   {/if}
 {/if}
+
+<style>
+  :host,
+  :root {
+    --primary-color: #2563eb; /* Tailwind blue-600 */
+    --secondary-color: #9333ea; /* Purple-600 */
+    --success-color: #16a34a; /* Green-600 */
+    --error-color: #dc2626; /* Red-600 */
+    --primary-dark: color-mix(in srgb, var(--primary-color) 80%, black 20%);
+    --secondary-dark: color-mix(in srgb, var(--secondary-color) 80%, black 20%);
+
+    --bg-color: #ffffff; /* Form background */
+    --text-color: #1f2937; /* Dark gray text */
+    --muted-text: color-mix(in srgb, var(--text-color) 70%, white 30%);
+
+    /* Input-specific theming */
+    --input-bg-color: #f9fafb; /* Light gray */
+    --input-text-color: #111827; /* Black */
+    --input-border-color: #d1d5db; /* Gray-300 */
+    --input-focus-color: #2563eb; /* Blue-600 */
+    --input-placeholder-color: #9ca3af; /* Gray-400 */
+
+    --font-family: "Inter", sans-serif;
+    --input-font: "Inter", sans-serif;
+  }
+
+  /* Dark Mode Theme */
+  :global([data-theme="dark"]) {
+    --bg-color: #1f2937;
+    --text-color: #e5e7eb;
+    --muted-text: color-mix(in srgb, var(--text-color) 70%, black 30%);
+
+    --input-bg-color: #374151;
+    --input-text-color: #f3f4f6;
+    --input-border-color: #4b5563;
+    --input-focus-color: #60a5fa;
+  }
+
+  /* Transparent Mode */
+  :global([data-theme="transparent"]) {
+    --bg-color: transparent;
+    --text-color: inherit;
+  }
+</style>

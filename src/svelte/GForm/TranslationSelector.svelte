@@ -95,28 +95,34 @@
       }).of(sourceLanguage)}
       <button
         on:click={() => setLanguage(sourceLanguage)}
-        class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition text-sm capitalize notranslate"
+        class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primaryDark transition text-sm capitalize notranslate
+              focus:outline-none focus:ring-2 focus:ring-inputFocus"
       >
         <T lang={selectedLang} {translations} text={langName} />
       </button>
     {/if}
+
     {#each Object.keys(translations) as lang}
       {@const langName = new Intl.DisplayNames([lang], { type: "language" }).of(
         lang
       )}
       <button
         on:click={() => setLanguage(lang)}
-        class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition text-sm capitalize notranslate"
+        class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primaryDark transition text-sm capitalize notranslate
+              focus:outline-none focus:ring-2 focus:ring-inputFocus"
       >
         {langName}
       </button>
     {/each}
+
+    <!-- Toggle Google Translate -->
     <button
       on:click={() => {
-        setLanguage(sourceLanguage); // remove any translations in place
-        showAllLanguages = !showAllLanguages; // toggle the visibility of the google translate element
+        setLanguage(sourceLanguage); // Reset to source language
+        showAllLanguages = !showAllLanguages; // Toggle translation UI
       }}
-      class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition text-sm"
+      class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition text-sm
+            focus:outline-none focus:ring-2 focus:ring-gray-400"
     >
       {#if Object.keys(translations).length}
         <T lang={selectedLang} {translations} text="Other Languages" />
@@ -126,6 +132,8 @@
     </button>
   </div>
 </div>
+
+<!-- Google Translate Element -->
 <div class:hidden={!showAllLanguages} id="google_translate_element"></div>
 
 <style>
