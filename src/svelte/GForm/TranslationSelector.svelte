@@ -57,7 +57,6 @@
   }
 
   function hasCompleteTranslations(lang: string) {
-    debugger;
     let translation = translations[lang];
     if (!translation) return false;
     // Now crawl the form for strings...
