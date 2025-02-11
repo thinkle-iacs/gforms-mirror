@@ -2,44 +2,84 @@ const IDX = "index.html"; // file name for svelte output
 const APPNAME = `My App`;
 
 import { getAddOnEnvironment } from "./addOn";
-import { getCachedFormData } from "./cachedFormData";
+import { getCachedFormData, getFormIdFromUrl } from "./cachedFormData";
 import { processFormSubmission } from "./processFormSubmission";
+import { getTranslations, setupTranslationsSpreadsheet } from "./translations";
 
+/**
+ * Handles HTTP GET requests.
+ *
+ * @param {GoogleAppsScript.Events.DoGet} e - The event parameter containing request information.
+ * @returns {GoogleAppsScript.Content.TextOutput} The response to be returned to the client.
+ *
+ * If the request contains a `uuid` parameter, it returns the response from `returnPostResponse`.
+ * If the request contains `formId` or `formUrl` parameters, it returns either the form data or translations based on the presence of the `translations` parameter.
+ * If none of the above conditions are met, it serves the form builder UI.
+ */
 export function doGet(e) {
   if (e.parameter.uuid) {
-    const uuid = e.parameter.uuid;
-    const scriptProperties = PropertiesService.getScriptProperties();
-    const responseData = scriptProperties.getProperty(uuid);
-
-    if (responseData) {
-      scriptProperties.deleteProperty(uuid); // Clean up
-      return ContentService.createTextOutput(responseData).setMimeType(
-        ContentService.MimeType.JSON
-      );
-    } else {
-      return ContentService.createTextOutput(
-        JSON.stringify({ success: false, error: "UUID not found or expired" })
-      ).setMimeType(ContentService.MimeType.JSON);
-    }
+    return returnPostResponse(e.parameter.uuid);
   }
 
   // Otherwise, handle normal form data request
   if (e.parameters.formId || e.parameters.formUrl) {
-    let formId = e.parameters.formId;
-    let formUrl = e.parameters.formUrl;
-    if (Array.isArray(formId)) {
-      formId = formId[0];
+    if (e.parameters.translations) {
+      return doGetTranslations(e);
+    } else {
+      return doGetFormData(e);
     }
-    if (Array.isArray(formUrl)) {
-      formUrl = formUrl[0];
-    }
-    let data = getCachedFormData(formId, formUrl);
-    return ContentService.createTextOutput(JSON.stringify(data)).setMimeType(
-      ContentService.MimeType.JSON
-    );
   } else {
     return serveFormBuilderUi();
   }
+}
+
+function doGetFormData(e) {
+  let formId = e.parameters.formId;
+  let formUrl = e.parameters.formUrl;
+  if (Array.isArray(formId)) {
+    formId = formId[0];
+  }
+  if (Array.isArray(formUrl)) {
+    formUrl = formUrl[0];
+  }
+  let data = getCachedFormData(formId, formUrl);
+  return ContentService.createTextOutput(JSON.stringify(data)).setMimeType(
+    ContentService.MimeType.JSON
+  );
+}
+
+/**
+ * Handles the GET request to fetch or create translations for a Google Form.
+ *
+ * @param {GoogleAppsScript.Events.DoGet} e - The event parameter containing request parameters.
+ * @param {Object} e.parameters - The parameters from the GET request.
+ * @param {string | string[]} e.parameters.languages - A comma-separated list of languages.
+ * @param {boolean | boolean[]} e.parameters.create - A boolean indicating whether to create a new translations spreadsheet.
+ * @param {string | string[]} e.parameters.formId - The ID of the Google Form.
+ * @param {string | string[]} e.parameters.formUrl - The URL of the Google Form.
+ * @returns {GoogleAppsScript.Content.TextOutput} - The JSON response containing the result of the operation.
+ */
+function doGetTranslations(e) {
+  let languages = e.parameters.languages; // comma-separated list of languages
+  let create = e.parameters.create; // boolean
+  let formId = e.parameters.formId;
+  let formUrl = e.parameters.formUrl;
+  if (Array.isArray(formId)) {
+    formId = formId[0];
+  }
+  if (Array.isArray(formUrl)) {
+    formUrl = formUrl[0];
+  }
+  formId = formId || getFormIdFromUrl(formUrl!);
+  let result: any;
+  if (create) {
+    result = setupTranslationsSpreadsheet(formId, languages);
+  } else {
+    result = getTranslations(formId);
+  }
+  return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(
+    ContentService.MimeType.JSON
+  );
 }
 
 export function doPost(e) {
@@ -84,6 +124,22 @@ export function doPost(e) {
   return ContentService.createTextOutput(
     JSON.stringify({ success: true, uuid })
   ).setMimeType(ContentService.MimeType.JSON);
+}
+
+function returnPostResponse(uuid: string) {
+  const scriptProperties = PropertiesService.getScriptProperties();
+  const responseData = scriptProperties.getProperty(uuid);
+
+  if (responseData) {
+    scriptProperties.deleteProperty(uuid); // Clean up
+    return ContentService.createTextOutput(responseData).setMimeType(
+      ContentService.MimeType.JSON
+    );
+  } else {
+    return ContentService.createTextOutput(
+      JSON.stringify({ success: false, error: "UUID not found or expired" })
+    ).setMimeType(ContentService.MimeType.JSON);
+  }
 }
 
 export function serveFormBuilderUi() {
