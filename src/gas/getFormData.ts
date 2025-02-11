@@ -5,7 +5,7 @@ export type Navigation =
   | { type: "submit" }
   | null; // If navigation isn't set
 
-export function getFormData(formId: string, formUrl: string): Form {
+export function getFormData(formId: string, formUrl: string = ""): Form {
   let form: GoogleAppsScript.Forms.Form;
   if (formId) {
     form = FormApp.openById(formId);
@@ -20,6 +20,8 @@ export function getFormData(formId: string, formUrl: string): Form {
   let formObject: Form = {
     id: form.getId(),
     title: form.getTitle(),
+    description: form.getDescription(),
+    confirmationMessage: form.getConfirmationMessage(),
     editUrl: form.getEditUrl(),
     publishedUrl: form.getPublishedUrl(),
     items: [],
