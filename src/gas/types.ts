@@ -91,6 +91,8 @@ export type StandardFormItem =
 export type Form = {
   id: string;
   title: string;
+  description: string;
+  confirmationMessage: string; // Message shown after submission
   editUrl: string;
   publishedUrl: string;
   items: StandardFormItem[];
@@ -112,4 +114,13 @@ export type Translations = {
   [key: string]: {
     [key: string]: string;
   };
+};
+
+export type Settings = {
+  theme?: undefined | "dark" | "light"; // maybe some set of predefined themes here eventually...
+  styleVars: {
+    [key: string]: string;
+  };
+  embedData: boolean;
+  embedTranslations: boolean;
 };
