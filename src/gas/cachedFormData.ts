@@ -97,7 +97,7 @@ function setupGlobalTrigger() {
 /**
  * Converts a form URL to a form ID.
  */
-function getFormIdFromUrl(formUrl: string): string {
+export function getFormIdFromUrl(formUrl: string): string {
   const match = formUrl.match(/\/d\/([a-zA-Z0-9_-]+)\//);
   if (!match) {
     throw new Error("Invalid Google Form URL");
