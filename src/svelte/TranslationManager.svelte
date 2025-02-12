@@ -1,6 +1,7 @@
 <script lang="ts">
   import LanguageSelector from "./LanguageSelector.svelte";
   import type { Translations } from "../gas/types";
+  import { GoogleAppsScript } from "./gasApi";
 
   export let appsScriptUrl: string;
   export let formId: string;
@@ -48,6 +49,20 @@
 
   function updateSelectedLanguages(langs: string[]) {
     selectedLanguages = langs;
+  }
+
+  $: if (translations) {
+    for (let key in translations) {
+      if (selectedLanguages.indexOf(key) === -1) {
+        selectedLanguages = [...selectedLanguages, key];
+      }
+    }
+    if (!spreadsheetUrl && formId) {
+      GoogleAppsScript.getTranslationsSpreadsheetUrl(
+        formId,
+        selectedLanguages
+      ).then((url) => (spreadsheetUrl = url));
+    }
   }
 </script>
 
