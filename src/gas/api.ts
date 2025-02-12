@@ -3,6 +3,8 @@ google.script.run here -- this will allow our type
 definition magic to work, so in your svelte side code
 you get clean autocomplete for google.script.run */
 
+export { getFormIdFromUrl } from "./cachedFormData";
+
 export { getCachedFormData } from "./cachedFormData";
 
 export function getActiveUserEmail() {
@@ -13,5 +15,11 @@ export function getActiveUserEmail() {
 export function getAppsScriptUrl() {
   return ScriptApp.getService().getUrl();
 }
+
+export {
+  getTranslationsSpreadsheetUrl,
+  setupTranslationsSpreadsheet,
+  getTranslations,
+} from "./translations";
 
 export { getFormData } from "./getFormData";
