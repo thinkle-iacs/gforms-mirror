@@ -24,7 +24,14 @@ export function doGet(e) {
   // Otherwise, handle normal form data request
   if (e.parameters.formId || e.parameters.formUrl) {
     if (e.parameters.translations) {
-      return doGetTranslations(e);
+      try {
+        return doGetTranslations(e);
+      } catch (error) {
+        console.error("Error in doGetTranslations:", error);
+        return ContentService.createTextOutput(
+          JSON.stringify({ success: false, error: error.message })
+        ).setMimeType(ContentService.MimeType.JSON);
+      }
     } else {
       return doGetFormData(e);
     }
@@ -60,7 +67,7 @@ function doGetFormData(e) {
  * @returns {GoogleAppsScript.Content.TextOutput} - The JSON response containing the result of the operation.
  */
 function doGetTranslations(e) {
-  let languages = e.parameters.languages; // comma-separated list of languages
+  let languages = e.parameters.language; // comma-separated list of languages
   let create = e.parameters.create; // boolean
   let formId = e.parameters.formId;
   let formUrl = e.parameters.formUrl;
