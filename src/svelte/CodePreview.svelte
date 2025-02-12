@@ -8,6 +8,18 @@
   export let settings: Settings;
   export let cdnUrl: string = "https://fixme.com";
 
+  /* Arguments force svelte reactivity... */
+  function updateEmbedCode(
+    cdnUrl,
+    formsUrl,
+    appsScriptUrl,
+    settings,
+    data,
+    translations
+  ) {
+    return generateEmbedCode();
+  }
+
   function generateEmbedCode() {
     let embedCode = `
   <script src="${cdnUrl}"><\/script>
@@ -59,7 +71,16 @@
   <h3 class="text-lg font-semibold">Embed Code</h3>
   <pre
     class="bg-gray-800 text-green-300 p-3 rounded-md overflow-x-auto text-sm">
-    {@html escapeHtml(generateEmbedCode())}
+    {@html escapeHtml(
+      updateEmbedCode(
+        cdnUrl,
+        formsUrl,
+        appsScriptUrl,
+        settings,
+        data,
+        translations
+      )
+    )}
   </pre>
   <button
     on:click={copyToClipboard}
