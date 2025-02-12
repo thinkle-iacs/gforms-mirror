@@ -1,456 +1,621 @@
-var vt = Object.defineProperty;
-var wt = (t, e, n) => e in t ? vt(t, e, { enumerable: !0, configurable: !0, writable: !0, value: n }) : t[e] = n;
-var Z = (t, e, n) => (wt(t, typeof e != "symbol" ? e + "" : e, n), n);
-function D() {
+var __defProp = Object.defineProperty;
+var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __publicField = (obj, key, value) => {
+  __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
+  return value;
+};
+function noop() {
 }
-function ct(t) {
-  return t();
+function run(fn) {
+  return fn();
 }
-function Ge() {
+function blank_object() {
   return /* @__PURE__ */ Object.create(null);
 }
-function ne(t) {
-  t.forEach(ct);
+function run_all(fns) {
+  fns.forEach(run);
 }
-function Se(t) {
-  return typeof t == "function";
+function is_function(thing) {
+  return typeof thing === "function";
 }
-function le(t, e) {
-  return t != t ? e == e : t !== e || t && typeof t == "object" || typeof t == "function";
+function safe_not_equal(a, b) {
+  return a != a ? b == b : a !== b || a && typeof a === "object" || typeof a === "function";
 }
-let he;
-function Ft(t, e) {
-  return t === e ? !0 : (he || (he = document.createElement("a")), he.href = e, t === he.href);
+let src_url_equal_anchor;
+function src_url_equal(element_src, url) {
+  if (element_src === url)
+    return true;
+  if (!src_url_equal_anchor) {
+    src_url_equal_anchor = document.createElement("a");
+  }
+  src_url_equal_anchor.href = url;
+  return element_src === src_url_equal_anchor.href;
 }
-function Ct(t) {
-  return Object.keys(t).length === 0;
+function not_equal(a, b) {
+  return a != a ? b == b : a !== b;
 }
-function $(t, e) {
-  t.appendChild(e);
+function is_empty(obj) {
+  return Object.keys(obj).length === 0;
 }
-function be(t, e, n) {
-  const i = yt(t);
-  if (!i.getElementById(e)) {
-    const s = k("style");
-    s.id = e, s.textContent = n, St(i, s);
+function append(target, node) {
+  target.appendChild(node);
+}
+function append_styles(target, style_sheet_id, styles) {
+  const append_styles_to = get_root_for_style(target);
+  if (!append_styles_to.getElementById(style_sheet_id)) {
+    const style = element("style");
+    style.id = style_sheet_id;
+    style.textContent = styles;
+    append_stylesheet(append_styles_to, style);
   }
 }
-function yt(t) {
-  if (!t)
+function get_root_for_style(node) {
+  if (!node)
     return document;
-  const e = t.getRootNode ? t.getRootNode() : t.ownerDocument;
-  return e && /** @type {ShadowRoot} */
-  e.host ? (
-    /** @type {ShadowRoot} */
-    e
-  ) : t.ownerDocument;
+  const root = node.getRootNode ? node.getRootNode() : node.ownerDocument;
+  if (root && /** @type {ShadowRoot} */
+  root.host) {
+    return (
+      /** @type {ShadowRoot} */
+      root
+    );
+  }
+  return node.ownerDocument;
 }
-function St(t, e) {
-  return $(
+function append_stylesheet(node, style) {
+  append(
     /** @type {Document} */
-    t.head || t,
-    e
-  ), e.sheet;
+    node.head || node,
+    style
+  );
+  return style.sheet;
 }
-function T(t, e, n) {
-  t.insertBefore(e, n || null);
+function insert(target, node, anchor) {
+  target.insertBefore(node, anchor || null);
 }
-function S(t) {
-  t.parentNode && t.parentNode.removeChild(t);
+function detach(node) {
+  if (node.parentNode) {
+    node.parentNode.removeChild(node);
+  }
 }
-function te(t, e) {
-  for (let n = 0; n < t.length; n += 1)
-    t[n] && t[n].d(e);
+function destroy_each(iterations, detaching) {
+  for (let i = 0; i < iterations.length; i += 1) {
+    if (iterations[i])
+      iterations[i].d(detaching);
+  }
 }
-function k(t) {
-  return document.createElement(t);
+function element(name) {
+  return document.createElement(name);
 }
-function X(t) {
-  return document.createTextNode(t);
+function text(data) {
+  return document.createTextNode(data);
 }
-function j() {
-  return X(" ");
+function space() {
+  return text(" ");
 }
-function $e() {
-  return X("");
+function empty() {
+  return text("");
 }
-function H(t, e, n, i) {
-  return t.addEventListener(e, n, i), () => t.removeEventListener(e, n, i);
+function listen(node, event, handler, options) {
+  node.addEventListener(event, handler, options);
+  return () => node.removeEventListener(event, handler, options);
 }
-function mt(t) {
-  return function(e) {
-    return e.preventDefault(), t.call(this, e);
+function prevent_default(fn) {
+  return function(event) {
+    event.preventDefault();
+    return fn.call(this, event);
   };
 }
-function g(t, e, n) {
-  n == null ? t.removeAttribute(e) : t.getAttribute(e) !== n && t.setAttribute(e, n);
+function attr(node, attribute, value) {
+  if (value == null)
+    node.removeAttribute(attribute);
+  else if (node.getAttribute(attribute) !== value)
+    node.setAttribute(attribute, value);
 }
-function Tt(t) {
-  let e;
+function init_binding_group(group) {
+  let _inputs;
   return {
     /* push */
-    p(...n) {
-      e = n, e.forEach((i) => t.push(i));
+    p(...inputs) {
+      _inputs = inputs;
+      _inputs.forEach((input) => group.push(input));
     },
     /* remove */
     r() {
-      e.forEach((n) => t.splice(t.indexOf(n), 1));
+      _inputs.forEach((input) => group.splice(group.indexOf(input), 1));
     }
   };
 }
-function Gt(t) {
-  return Array.from(t.childNodes);
+function children(element2) {
+  return Array.from(element2.childNodes);
 }
-function ie(t, e) {
-  e = "" + e, t.data !== e && (t.data = /** @type {string} */
-  e);
-}
-function _e(t, e) {
-  t.value = e ?? "";
-}
-function x(t, e, n) {
-  t.classList.toggle(e, !!n);
-}
-function Et(t) {
-  const e = {};
-  return t.childNodes.forEach(
-    /** @param {Element} node */
-    (n) => {
-      e[n.slot || "default"] = !0;
-    }
-  ), e;
-}
-let ge;
-function me(t) {
-  ge = t;
-}
-function At() {
-  if (!ge)
-    throw new Error("Function called outside component initialization");
-  return ge;
-}
-function gt(t) {
-  At().$$.on_mount.push(t);
-}
-function Ut(t, e) {
-  const n = t.$$.callbacks[e.type];
-  n && n.slice().forEach((i) => i.call(this, e));
-}
-const fe = [], Fe = [];
-let ce = [];
-const Ee = [], It = /* @__PURE__ */ Promise.resolve();
-let Ce = !1;
-function Lt() {
-  Ce || (Ce = !0, It.then(I));
-}
-function ye(t) {
-  ce.push(t);
-}
-const ke = /* @__PURE__ */ new Set();
-let ue = 0;
-function I() {
-  if (ue !== 0)
+function set_data(text2, data) {
+  data = "" + data;
+  if (text2.data === data)
     return;
-  const t = ge;
-  do {
-    try {
-      for (; ue < fe.length; ) {
-        const e = fe[ue];
-        ue++, me(e), qt(e.$$);
-      }
-    } catch (e) {
-      throw fe.length = 0, ue = 0, e;
-    }
-    for (me(null), fe.length = 0, ue = 0; Fe.length; )
-      Fe.pop()();
-    for (let e = 0; e < ce.length; e += 1) {
-      const n = ce[e];
-      ke.has(n) || (ke.add(n), n());
-    }
-    ce.length = 0;
-  } while (fe.length);
-  for (; Ee.length; )
-    Ee.pop()();
-  Ce = !1, ke.clear(), me(t);
+  text2.data = /** @type {string} */
+  data;
 }
-function qt(t) {
-  if (t.fragment !== null) {
-    t.update(), ne(t.before_update);
-    const e = t.dirty;
-    t.dirty = [-1], t.fragment && t.fragment.p(t.ctx, e), t.after_update.forEach(ye);
+function set_input_value(input, value) {
+  input.value = value == null ? "" : value;
+}
+function toggle_class(element2, name, toggle) {
+  element2.classList.toggle(name, !!toggle);
+}
+function get_custom_elements_slots(element2) {
+  const result = {};
+  element2.childNodes.forEach(
+    /** @param {Element} node */
+    (node) => {
+      result[node.slot || "default"] = true;
+    }
+  );
+  return result;
+}
+let current_component;
+function set_current_component(component) {
+  current_component = component;
+}
+function get_current_component() {
+  if (!current_component)
+    throw new Error("Function called outside component initialization");
+  return current_component;
+}
+function onMount(fn) {
+  get_current_component().$$.on_mount.push(fn);
+}
+function bubble(component, event) {
+  const callbacks = component.$$.callbacks[event.type];
+  if (callbacks) {
+    callbacks.slice().forEach((fn) => fn.call(this, event));
   }
 }
-function Bt(t) {
-  const e = [], n = [];
-  ce.forEach((i) => t.indexOf(i) === -1 ? e.push(i) : n.push(i)), n.forEach((i) => i()), ce = e;
+const dirty_components = [];
+const binding_callbacks = [];
+let render_callbacks = [];
+const flush_callbacks = [];
+const resolved_promise = /* @__PURE__ */ Promise.resolve();
+let update_scheduled = false;
+function schedule_update() {
+  if (!update_scheduled) {
+    update_scheduled = true;
+    resolved_promise.then(flush);
+  }
 }
-const de = /* @__PURE__ */ new Set();
-let se;
-function K() {
-  se = {
+function add_render_callback(fn) {
+  render_callbacks.push(fn);
+}
+const seen_callbacks = /* @__PURE__ */ new Set();
+let flushidx = 0;
+function flush() {
+  if (flushidx !== 0) {
+    return;
+  }
+  const saved_component = current_component;
+  do {
+    try {
+      while (flushidx < dirty_components.length) {
+        const component = dirty_components[flushidx];
+        flushidx++;
+        set_current_component(component);
+        update(component.$$);
+      }
+    } catch (e) {
+      dirty_components.length = 0;
+      flushidx = 0;
+      throw e;
+    }
+    set_current_component(null);
+    dirty_components.length = 0;
+    flushidx = 0;
+    while (binding_callbacks.length)
+      binding_callbacks.pop()();
+    for (let i = 0; i < render_callbacks.length; i += 1) {
+      const callback = render_callbacks[i];
+      if (!seen_callbacks.has(callback)) {
+        seen_callbacks.add(callback);
+        callback();
+      }
+    }
+    render_callbacks.length = 0;
+  } while (dirty_components.length);
+  while (flush_callbacks.length) {
+    flush_callbacks.pop()();
+  }
+  update_scheduled = false;
+  seen_callbacks.clear();
+  set_current_component(saved_component);
+}
+function update($$) {
+  if ($$.fragment !== null) {
+    $$.update();
+    run_all($$.before_update);
+    const dirty = $$.dirty;
+    $$.dirty = [-1];
+    $$.fragment && $$.fragment.p($$.ctx, dirty);
+    $$.after_update.forEach(add_render_callback);
+  }
+}
+function flush_render_callbacks(fns) {
+  const filtered = [];
+  const targets = [];
+  render_callbacks.forEach((c) => fns.indexOf(c) === -1 ? filtered.push(c) : targets.push(c));
+  targets.forEach((c) => c());
+  render_callbacks = filtered;
+}
+const outroing = /* @__PURE__ */ new Set();
+let outros;
+function group_outros() {
+  outros = {
     r: 0,
     c: [],
-    p: se
+    p: outros
     // parent group
   };
 }
-function Q() {
-  se.r || ne(se.c), se = se.p;
+function check_outros() {
+  if (!outros.r) {
+    run_all(outros.c);
+  }
+  outros = outros.p;
 }
-function _(t, e) {
-  t && t.i && (de.delete(t), t.i(e));
+function transition_in(block, local) {
+  if (block && block.i) {
+    outroing.delete(block);
+    block.i(local);
+  }
 }
-function F(t, e, n, i) {
-  if (t && t.o) {
-    if (de.has(t))
+function transition_out(block, local, detach2, callback) {
+  if (block && block.o) {
+    if (outroing.has(block))
       return;
-    de.add(t), se.c.push(() => {
-      de.delete(t), i && (n && t.d(1), i());
-    }), t.o(e);
-  } else
-    i && i();
+    outroing.add(block);
+    outros.c.push(() => {
+      outroing.delete(block);
+      if (callback) {
+        if (detach2)
+          block.d(1);
+        callback();
+      }
+    });
+    block.o(local);
+  } else if (callback) {
+    callback();
+  }
 }
-function V(t) {
-  return (t == null ? void 0 : t.length) !== void 0 ? t : Array.from(t);
+function ensure_array_like(array_like_or_iterator) {
+  return (array_like_or_iterator == null ? void 0 : array_like_or_iterator.length) !== void 0 ? array_like_or_iterator : Array.from(array_like_or_iterator);
 }
-function M(t) {
-  t && t.c();
+function create_component(block) {
+  block && block.c();
 }
-function O(t, e, n) {
-  const { fragment: i, after_update: s } = t.$$;
-  i && i.m(e, n), ye(() => {
-    const l = t.$$.on_mount.map(ct).filter(Se);
-    t.$$.on_destroy ? t.$$.on_destroy.push(...l) : ne(l), t.$$.on_mount = [];
-  }), s.forEach(ye);
+function mount_component(component, target, anchor) {
+  const { fragment, after_update } = component.$$;
+  fragment && fragment.m(target, anchor);
+  add_render_callback(() => {
+    const new_on_destroy = component.$$.on_mount.map(run).filter(is_function);
+    if (component.$$.on_destroy) {
+      component.$$.on_destroy.push(...new_on_destroy);
+    } else {
+      run_all(new_on_destroy);
+    }
+    component.$$.on_mount = [];
+  });
+  after_update.forEach(add_render_callback);
 }
-function R(t, e) {
-  const n = t.$$;
-  n.fragment !== null && (Bt(n.after_update), ne(n.on_destroy), n.fragment && n.fragment.d(e), n.on_destroy = n.fragment = null, n.ctx = []);
+function destroy_component(component, detaching) {
+  const $$ = component.$$;
+  if ($$.fragment !== null) {
+    flush_render_callbacks($$.after_update);
+    run_all($$.on_destroy);
+    $$.fragment && $$.fragment.d(detaching);
+    $$.on_destroy = $$.fragment = null;
+    $$.ctx = [];
+  }
 }
-function Nt(t, e) {
-  t.$$.dirty[0] === -1 && (fe.push(t), Lt(), t.$$.dirty.fill(0)), t.$$.dirty[e / 31 | 0] |= 1 << e % 31;
+function make_dirty(component, i) {
+  if (component.$$.dirty[0] === -1) {
+    dirty_components.push(component);
+    schedule_update();
+    component.$$.dirty.fill(0);
+  }
+  component.$$.dirty[i / 31 | 0] |= 1 << i % 31;
 }
-function oe(t, e, n, i, s, l, o = null, a = [-1]) {
-  const r = ge;
-  me(t);
-  const u = t.$$ = {
+function init(component, options, instance2, create_fragment2, not_equal2, props, append_styles2 = null, dirty = [-1]) {
+  const parent_component = current_component;
+  set_current_component(component);
+  const $$ = component.$$ = {
     fragment: null,
     ctx: [],
     // state
-    props: l,
-    update: D,
-    not_equal: s,
-    bound: Ge(),
+    props,
+    update: noop,
+    not_equal: not_equal2,
+    bound: blank_object(),
     // lifecycle
     on_mount: [],
     on_destroy: [],
     on_disconnect: [],
     before_update: [],
     after_update: [],
-    context: new Map(e.context || (r ? r.$$.context : [])),
+    context: new Map(options.context || (parent_component ? parent_component.$$.context : [])),
     // everything else
-    callbacks: Ge(),
-    dirty: a,
-    skip_bound: !1,
-    root: e.target || r.$$.root
+    callbacks: blank_object(),
+    dirty,
+    skip_bound: false,
+    root: options.target || parent_component.$$.root
   };
-  o && o(u.root);
-  let c = !1;
-  if (u.ctx = n ? n(t, e.props || {}, (f, h, ...m) => {
-    const d = m.length ? m[0] : h;
-    return u.ctx && s(u.ctx[f], u.ctx[f] = d) && (!u.skip_bound && u.bound[f] && u.bound[f](d), c && Nt(t, f)), h;
-  }) : [], u.update(), c = !0, ne(u.before_update), u.fragment = i ? i(u.ctx) : !1, e.target) {
-    if (e.hydrate) {
-      const f = Gt(e.target);
-      u.fragment && u.fragment.l(f), f.forEach(S);
-    } else
-      u.fragment && u.fragment.c();
-    e.intro && _(t.$$.fragment), O(t, e.target, e.anchor), I();
+  append_styles2 && append_styles2($$.root);
+  let ready = false;
+  $$.ctx = instance2 ? instance2(component, options.props || {}, (i, ret, ...rest) => {
+    const value = rest.length ? rest[0] : ret;
+    if ($$.ctx && not_equal2($$.ctx[i], $$.ctx[i] = value)) {
+      if (!$$.skip_bound && $$.bound[i])
+        $$.bound[i](value);
+      if (ready)
+        make_dirty(component, i);
+    }
+    return ret;
+  }) : [];
+  $$.update();
+  ready = true;
+  run_all($$.before_update);
+  $$.fragment = create_fragment2 ? create_fragment2($$.ctx) : false;
+  if (options.target) {
+    if (options.hydrate) {
+      const nodes = children(options.target);
+      $$.fragment && $$.fragment.l(nodes);
+      nodes.forEach(detach);
+    } else {
+      $$.fragment && $$.fragment.c();
+    }
+    if (options.intro)
+      transition_in(component.$$.fragment);
+    mount_component(component, options.target, options.anchor);
+    flush();
   }
-  me(r);
+  set_current_component(parent_component);
 }
-let ht;
-typeof HTMLElement == "function" && (ht = class extends HTMLElement {
-  constructor(e, n, i) {
-    super();
-    /** The Svelte component constructor */
-    Z(this, "$$ctor");
-    /** Slots */
-    Z(this, "$$s");
-    /** The Svelte component instance */
-    Z(this, "$$c");
-    /** Whether or not the custom element is connected */
-    Z(this, "$$cn", !1);
-    /** Component props data */
-    Z(this, "$$d", {});
-    /** `true` if currently in the process of reflecting component props back to attributes */
-    Z(this, "$$r", !1);
-    /** @type {Record<string, CustomElementPropDefinition>} Props definition (name, reflected, type etc) */
-    Z(this, "$$p_d", {});
-    /** @type {Record<string, Function[]>} Event listeners */
-    Z(this, "$$l", {});
-    /** @type {Map<Function, Function>} Event listener unsubscribe functions */
-    Z(this, "$$l_u", /* @__PURE__ */ new Map());
-    this.$$ctor = e, this.$$s = n, i && this.attachShadow({ mode: "open" });
-  }
-  addEventListener(e, n, i) {
-    if (this.$$l[e] = this.$$l[e] || [], this.$$l[e].push(n), this.$$c) {
-      const s = this.$$c.$on(e, n);
-      this.$$l_u.set(n, s);
+let SvelteElement;
+if (typeof HTMLElement === "function") {
+  SvelteElement = class extends HTMLElement {
+    constructor($$componentCtor, $$slots, use_shadow_dom) {
+      super();
+      /** The Svelte component constructor */
+      __publicField(this, "$$ctor");
+      /** Slots */
+      __publicField(this, "$$s");
+      /** The Svelte component instance */
+      __publicField(this, "$$c");
+      /** Whether or not the custom element is connected */
+      __publicField(this, "$$cn", false);
+      /** Component props data */
+      __publicField(this, "$$d", {});
+      /** `true` if currently in the process of reflecting component props back to attributes */
+      __publicField(this, "$$r", false);
+      /** @type {Record<string, CustomElementPropDefinition>} Props definition (name, reflected, type etc) */
+      __publicField(this, "$$p_d", {});
+      /** @type {Record<string, Function[]>} Event listeners */
+      __publicField(this, "$$l", {});
+      /** @type {Map<Function, Function>} Event listener unsubscribe functions */
+      __publicField(this, "$$l_u", /* @__PURE__ */ new Map());
+      this.$$ctor = $$componentCtor;
+      this.$$s = $$slots;
+      if (use_shadow_dom) {
+        this.attachShadow({ mode: "open" });
+      }
     }
-    super.addEventListener(e, n, i);
-  }
-  removeEventListener(e, n, i) {
-    if (super.removeEventListener(e, n, i), this.$$c) {
-      const s = this.$$l_u.get(n);
-      s && (s(), this.$$l_u.delete(n));
+    addEventListener(type, listener, options) {
+      this.$$l[type] = this.$$l[type] || [];
+      this.$$l[type].push(listener);
+      if (this.$$c) {
+        const unsub = this.$$c.$on(type, listener);
+        this.$$l_u.set(listener, unsub);
+      }
+      super.addEventListener(type, listener, options);
     }
-  }
-  async connectedCallback() {
-    if (this.$$cn = !0, !this.$$c) {
-      let e = function(l) {
-        return () => {
-          let o;
-          return {
-            c: function() {
-              o = k("slot"), l !== "default" && g(o, "name", l);
-            },
-            /**
-             * @param {HTMLElement} target
-             * @param {HTMLElement} [anchor]
-             */
-            m: function(u, c) {
-              T(u, o, c);
-            },
-            d: function(u) {
-              u && S(o);
-            }
+    removeEventListener(type, listener, options) {
+      super.removeEventListener(type, listener, options);
+      if (this.$$c) {
+        const unsub = this.$$l_u.get(listener);
+        if (unsub) {
+          unsub();
+          this.$$l_u.delete(listener);
+        }
+      }
+    }
+    async connectedCallback() {
+      this.$$cn = true;
+      if (!this.$$c) {
+        let create_slot = function(name) {
+          return () => {
+            let node;
+            const obj = {
+              c: function create() {
+                node = element("slot");
+                if (name !== "default") {
+                  attr(node, "name", name);
+                }
+              },
+              /**
+               * @param {HTMLElement} target
+               * @param {HTMLElement} [anchor]
+               */
+              m: function mount(target, anchor) {
+                insert(target, node, anchor);
+              },
+              d: function destroy(detaching) {
+                if (detaching) {
+                  detach(node);
+                }
+              }
+            };
+            return obj;
           };
         };
-      };
-      if (await Promise.resolve(), !this.$$cn || this.$$c)
-        return;
-      const n = {}, i = Et(this);
-      for (const l of this.$$s)
-        l in i && (n[l] = [e(l)]);
-      for (const l of this.attributes) {
-        const o = this.$$g_p(l.name);
-        o in this.$$d || (this.$$d[o] = pe(o, l.value, this.$$p_d, "toProp"));
-      }
-      for (const l in this.$$p_d)
-        !(l in this.$$d) && this[l] !== void 0 && (this.$$d[l] = this[l], delete this[l]);
-      this.$$c = new this.$$ctor({
-        target: this.shadowRoot || this,
-        props: {
-          ...this.$$d,
-          $$slots: n,
-          $$scope: {
-            ctx: []
+        await Promise.resolve();
+        if (!this.$$cn || this.$$c) {
+          return;
+        }
+        const $$slots = {};
+        const existing_slots = get_custom_elements_slots(this);
+        for (const name of this.$$s) {
+          if (name in existing_slots) {
+            $$slots[name] = [create_slot(name)];
           }
+        }
+        for (const attribute of this.attributes) {
+          const name = this.$$g_p(attribute.name);
+          if (!(name in this.$$d)) {
+            this.$$d[name] = get_custom_element_value(name, attribute.value, this.$$p_d, "toProp");
+          }
+        }
+        for (const key in this.$$p_d) {
+          if (!(key in this.$$d) && this[key] !== void 0) {
+            this.$$d[key] = this[key];
+            delete this[key];
+          }
+        }
+        this.$$c = new this.$$ctor({
+          target: this.shadowRoot || this,
+          props: {
+            ...this.$$d,
+            $$slots,
+            $$scope: {
+              ctx: []
+            }
+          }
+        });
+        const reflect_attributes = () => {
+          this.$$r = true;
+          for (const key in this.$$p_d) {
+            this.$$d[key] = this.$$c.$$.ctx[this.$$c.$$.props[key]];
+            if (this.$$p_d[key].reflect) {
+              const attribute_value = get_custom_element_value(
+                key,
+                this.$$d[key],
+                this.$$p_d,
+                "toAttribute"
+              );
+              if (attribute_value == null) {
+                this.removeAttribute(this.$$p_d[key].attribute || key);
+              } else {
+                this.setAttribute(this.$$p_d[key].attribute || key, attribute_value);
+              }
+            }
+          }
+          this.$$r = false;
+        };
+        this.$$c.$$.after_update.push(reflect_attributes);
+        reflect_attributes();
+        for (const type in this.$$l) {
+          for (const listener of this.$$l[type]) {
+            const unsub = this.$$c.$on(type, listener);
+            this.$$l_u.set(listener, unsub);
+          }
+        }
+        this.$$l = {};
+      }
+    }
+    // We don't need this when working within Svelte code, but for compatibility of people using this outside of Svelte
+    // and setting attributes through setAttribute etc, this is helpful
+    attributeChangedCallback(attr2, _oldValue, newValue) {
+      var _a;
+      if (this.$$r)
+        return;
+      attr2 = this.$$g_p(attr2);
+      this.$$d[attr2] = get_custom_element_value(attr2, newValue, this.$$p_d, "toProp");
+      (_a = this.$$c) == null ? void 0 : _a.$set({ [attr2]: this.$$d[attr2] });
+    }
+    disconnectedCallback() {
+      this.$$cn = false;
+      Promise.resolve().then(() => {
+        if (!this.$$cn && this.$$c) {
+          this.$$c.$destroy();
+          this.$$c = void 0;
         }
       });
-      const s = () => {
-        this.$$r = !0;
-        for (const l in this.$$p_d)
-          if (this.$$d[l] = this.$$c.$$.ctx[this.$$c.$$.props[l]], this.$$p_d[l].reflect) {
-            const o = pe(
-              l,
-              this.$$d[l],
-              this.$$p_d,
-              "toAttribute"
-            );
-            o == null ? this.removeAttribute(this.$$p_d[l].attribute || l) : this.setAttribute(this.$$p_d[l].attribute || l, o);
-          }
-        this.$$r = !1;
-      };
-      this.$$c.$$.after_update.push(s), s();
-      for (const l in this.$$l)
-        for (const o of this.$$l[l]) {
-          const a = this.$$c.$on(l, o);
-          this.$$l_u.set(o, a);
-        }
-      this.$$l = {};
     }
-  }
-  // We don't need this when working within Svelte code, but for compatibility of people using this outside of Svelte
-  // and setting attributes through setAttribute etc, this is helpful
-  attributeChangedCallback(e, n, i) {
-    var s;
-    this.$$r || (e = this.$$g_p(e), this.$$d[e] = pe(e, i, this.$$p_d, "toProp"), (s = this.$$c) == null || s.$set({ [e]: this.$$d[e] }));
-  }
-  disconnectedCallback() {
-    this.$$cn = !1, Promise.resolve().then(() => {
-      !this.$$cn && this.$$c && (this.$$c.$destroy(), this.$$c = void 0);
-    });
-  }
-  $$g_p(e) {
-    return Object.keys(this.$$p_d).find(
-      (n) => this.$$p_d[n].attribute === e || !this.$$p_d[n].attribute && n.toLowerCase() === e
-    ) || e;
-  }
-});
-function pe(t, e, n, i) {
-  var l;
-  const s = (l = n[t]) == null ? void 0 : l.type;
-  if (e = s === "Boolean" && typeof e != "boolean" ? e != null : e, !i || !n[t])
-    return e;
-  if (i === "toAttribute")
-    switch (s) {
-      case "Object":
-      case "Array":
-        return e == null ? null : JSON.stringify(e);
-      case "Boolean":
-        return e ? "" : null;
-      case "Number":
-        return e ?? null;
-      default:
-        return e;
+    $$g_p(attribute_name) {
+      return Object.keys(this.$$p_d).find(
+        (key) => this.$$p_d[key].attribute === attribute_name || !this.$$p_d[key].attribute && key.toLowerCase() === attribute_name
+      ) || attribute_name;
     }
-  else
-    switch (s) {
-      case "Object":
-      case "Array":
-        return e && JSON.parse(e);
-      case "Boolean":
-        return e;
-      case "Number":
-        return e != null ? +e : e;
-      default:
-        return e;
-    }
+  };
 }
-function re(t, e, n, i, s, l) {
-  let o = class extends ht {
+function get_custom_element_value(prop, value, props_definition, transform) {
+  var _a;
+  const type = (_a = props_definition[prop]) == null ? void 0 : _a.type;
+  value = type === "Boolean" && typeof value !== "boolean" ? value != null : value;
+  if (!transform || !props_definition[prop]) {
+    return value;
+  } else if (transform === "toAttribute") {
+    switch (type) {
+      case "Object":
+      case "Array":
+        return value == null ? null : JSON.stringify(value);
+      case "Boolean":
+        return value ? "" : null;
+      case "Number":
+        return value == null ? null : value;
+      default:
+        return value;
+    }
+  } else {
+    switch (type) {
+      case "Object":
+      case "Array":
+        return value && JSON.parse(value);
+      case "Boolean":
+        return value;
+      case "Number":
+        return value != null ? +value : value;
+      default:
+        return value;
+    }
+  }
+}
+function create_custom_element(Component, props_definition, slots, accessors, use_shadow_dom, extend) {
+  let Class = class extends SvelteElement {
     constructor() {
-      super(t, n, s), this.$$p_d = e;
+      super(Component, slots, use_shadow_dom);
+      this.$$p_d = props_definition;
     }
     static get observedAttributes() {
-      return Object.keys(e).map(
-        (a) => (e[a].attribute || a).toLowerCase()
+      return Object.keys(props_definition).map(
+        (key) => (props_definition[key].attribute || key).toLowerCase()
       );
     }
   };
-  return Object.keys(e).forEach((a) => {
-    Object.defineProperty(o.prototype, a, {
+  Object.keys(props_definition).forEach((prop) => {
+    Object.defineProperty(Class.prototype, prop, {
       get() {
-        return this.$$c && a in this.$$c ? this.$$c[a] : this.$$d[a];
+        return this.$$c && prop in this.$$c ? this.$$c[prop] : this.$$d[prop];
       },
-      set(r) {
-        var u;
-        r = pe(a, r, e), this.$$d[a] = r, (u = this.$$c) == null || u.$set({ [a]: r });
+      set(value) {
+        var _a;
+        value = get_custom_element_value(prop, value, props_definition);
+        this.$$d[prop] = value;
+        (_a = this.$$c) == null ? void 0 : _a.$set({ [prop]: value });
       }
     });
-  }), i.forEach((a) => {
-    Object.defineProperty(o.prototype, a, {
+  });
+  accessors.forEach((accessor) => {
+    Object.defineProperty(Class.prototype, accessor, {
       get() {
-        var r;
-        return (r = this.$$c) == null ? void 0 : r[a];
+        var _a;
+        return (_a = this.$$c) == null ? void 0 : _a[accessor];
       }
     });
-  }), l && (o = l(o)), t.element = /** @type {any} */
-  o, o;
+  });
+  if (extend) {
+    Class = extend(Class);
+  }
+  Component.element = /** @type {any} */
+  Class;
+  return Class;
 }
-class ae {
+class SvelteComponent {
   constructor() {
     /**
      * ### PRIVATE API
@@ -459,7 +624,7 @@ class ae {
      *
      * @type {any}
      */
-    Z(this, "$$");
+    __publicField(this, "$$");
     /**
      * ### PRIVATE API
      *
@@ -467,11 +632,12 @@ class ae {
      *
      * @type {any}
      */
-    Z(this, "$$set");
+    __publicField(this, "$$set");
   }
   /** @returns {void} */
   $destroy() {
-    R(this, 1), this.$destroy = D;
+    destroy_component(this, 1);
+    this.$destroy = noop;
   }
   /**
    * @template {Extract<keyof Events, string>} K
@@ -479,26 +645,34 @@ class ae {
    * @param {((e: Events[K]) => void) | null | undefined} callback
    * @returns {() => void}
    */
-  $on(e, n) {
-    if (!Se(n))
-      return D;
-    const i = this.$$.callbacks[e] || (this.$$.callbacks[e] = []);
-    return i.push(n), () => {
-      const s = i.indexOf(n);
-      s !== -1 && i.splice(s, 1);
+  $on(type, callback) {
+    if (!is_function(callback)) {
+      return noop;
+    }
+    const callbacks = this.$$.callbacks[type] || (this.$$.callbacks[type] = []);
+    callbacks.push(callback);
+    return () => {
+      const index = callbacks.indexOf(callback);
+      if (index !== -1)
+        callbacks.splice(index, 1);
     };
   }
   /**
    * @param {Partial<Props>} props
    * @returns {void}
    */
-  $set(e) {
-    this.$$set && !Ct(e) && (this.$$.skip_bound = !0, this.$$set(e), this.$$.skip_bound = !1);
+  $set(props) {
+    if (this.$$set && !is_empty(props)) {
+      this.$$.skip_bound = true;
+      this.$$set(props);
+      this.$$.skip_bound = false;
+    }
   }
 }
-const jt = "4";
-typeof window < "u" && (window.__svelte || (window.__svelte = { v: /* @__PURE__ */ new Set() })).v.add(jt);
-const ve = {
+const PUBLIC_VERSION = "4";
+if (typeof window !== "undefined")
+  (window.__svelte || (window.__svelte = { v: /* @__PURE__ */ new Set() })).v.add(PUBLIC_VERSION);
+const builtInTranslations = {
   en: {
     "This field is required": "This field is required",
     Submit: "Submit",
@@ -599,3000 +773,4458 @@ const ve = {
     "There was an error submitting the form.": "提交表单时发生错误。",
     "Complete in Google Forms": "在 Google Forms 中完成"
   }
-}, dt = (t, e, n = "en") => e[n] && e[n][t] ? e[n][t] : ve[n] && ve[n][t] ? ve[n][t] : t;
-function zt(t) {
-  be(t, "svelte-f2gsno", "span.svelte-f2gsno{display:contents}");
+};
+const getText = (word, translations, lang = "en") => {
+  if (translations[lang] && translations[lang][word]) {
+    return translations[lang][word];
+  } else if (builtInTranslations[lang] && builtInTranslations[lang][word]) {
+    return builtInTranslations[lang][word];
+  } else {
+    return word;
+  }
+};
+function add_css$5(target) {
+  append_styles(target, "svelte-f2gsno", "span.svelte-f2gsno{display:contents}");
 }
-function Pt(t) {
-  let e, n;
+function create_fragment$6(ctx) {
+  let span;
+  let t;
   return {
     c() {
-      e = k("span"), n = X(
+      span = element("span");
+      t = text(
         /*translatedText*/
-        t[1]
-      ), g(
-        e,
+        ctx[1]
+      );
+      attr(
+        span,
         "data-original-text",
         /*text*/
-        t[0]
-      ), g(e, "class", "svelte-f2gsno"), x(
-        e,
+        ctx[0]
+      );
+      attr(span, "class", "svelte-f2gsno");
+      toggle_class(
+        span,
         "notranslate",
         /*haveTranslation*/
-        t[2]
+        ctx[2]
       );
     },
-    m(i, s) {
-      T(i, e, s), $(e, n);
+    m(target, anchor) {
+      insert(target, span, anchor);
+      append(span, t);
     },
-    p(i, [s]) {
-      s & /*translatedText*/
-      2 && ie(
-        n,
-        /*translatedText*/
-        i[1]
-      ), s & /*text*/
-      1 && g(
-        e,
-        "data-original-text",
-        /*text*/
-        i[0]
-      ), s & /*haveTranslation*/
-      4 && x(
-        e,
-        "notranslate",
-        /*haveTranslation*/
-        i[2]
-      );
+    p(ctx2, [dirty]) {
+      if (dirty & /*translatedText*/
+      2)
+        set_data(
+          t,
+          /*translatedText*/
+          ctx2[1]
+        );
+      if (dirty & /*text*/
+      1) {
+        attr(
+          span,
+          "data-original-text",
+          /*text*/
+          ctx2[0]
+        );
+      }
+      if (dirty & /*haveTranslation*/
+      4) {
+        toggle_class(
+          span,
+          "notranslate",
+          /*haveTranslation*/
+          ctx2[2]
+        );
+      }
     },
-    i: D,
-    o: D,
-    d(i) {
-      i && S(e);
+    i: noop,
+    o: noop,
+    d(detaching) {
+      if (detaching) {
+        detach(span);
+      }
     }
   };
 }
-function Ot(t, e, n) {
-  let { text: i } = e, { lang: s = "en" } = e, { translations: l = {} } = e, o = i, a = !1;
-  return t.$$set = (r) => {
-    "text" in r && n(0, i = r.text), "lang" in r && n(3, s = r.lang), "translations" in r && n(4, l = r.translations);
-  }, t.$$.update = () => {
-    t.$$.dirty & /*translations, lang, text*/
-    25 && (n(2, a = !!(l[s] && l[s][i])), n(1, o = dt(i, l, s)));
-  }, [i, o, a, s, l];
+function instance$6($$self, $$props, $$invalidate) {
+  let { text: text2 } = $$props;
+  let { lang = "en" } = $$props;
+  let { translations = {} } = $$props;
+  let translatedText = text2;
+  let haveTranslation = false;
+  $$self.$$set = ($$props2) => {
+    if ("text" in $$props2)
+      $$invalidate(0, text2 = $$props2.text);
+    if ("lang" in $$props2)
+      $$invalidate(3, lang = $$props2.lang);
+    if ("translations" in $$props2)
+      $$invalidate(4, translations = $$props2.translations);
+  };
+  $$self.$$.update = () => {
+    if ($$self.$$.dirty & /*translations, lang, text*/
+    25) {
+      {
+        $$invalidate(2, haveTranslation = !!(translations[lang] && translations[lang][text2]));
+        $$invalidate(1, translatedText = getText(text2, translations, lang));
+      }
+    }
+  };
+  return [text2, translatedText, haveTranslation, lang, translations];
 }
-class J extends ae {
-  constructor(e) {
-    super(), oe(this, e, Ot, Pt, le, { text: 0, lang: 3, translations: 4 }, zt);
+class T extends SvelteComponent {
+  constructor(options) {
+    super();
+    init(this, options, instance$6, create_fragment$6, safe_not_equal, { text: 0, lang: 3, translations: 4 }, add_css$5);
   }
   get text() {
     return this.$$.ctx[0];
   }
-  set text(e) {
-    this.$$set({ text: e }), I();
+  set text(text2) {
+    this.$$set({ text: text2 });
+    flush();
   }
   get lang() {
     return this.$$.ctx[3];
   }
-  set lang(e) {
-    this.$$set({ lang: e }), I();
+  set lang(lang) {
+    this.$$set({ lang });
+    flush();
   }
   get translations() {
     return this.$$.ctx[4];
   }
-  set translations(e) {
-    this.$$set({ translations: e }), I();
+  set translations(translations) {
+    this.$$set({ translations });
+    flush();
   }
 }
-re(J, { text: {}, lang: {}, translations: {} }, [], [], !0);
-function Rt(t) {
-  be(t, "svelte-t16d3j", ".translate.svelte-t16d3j{margin-bottom:10px}.hidden.svelte-t16d3j{display:none}button.svelte-t16d3j{text-transform:capitalize}");
+create_custom_element(T, { "text": {}, "lang": {}, "translations": {} }, [], [], true);
+function add_css$4(target) {
+  append_styles(target, "svelte-lni2oa", ".translation-container.svelte-lni2oa{margin-top:1rem}.button-group.svelte-lni2oa{display:flex;flex-wrap:wrap;gap:0.5rem}.lang-button.svelte-lni2oa{padding:0.5rem 1rem;font-size:0.875rem;border:none;border-radius:6px;cursor:pointer;transition:background 0.2s ease-in-out,\n      transform 0.1s ease-in-out;text-transform:capitalize}.lang-button.primary.svelte-lni2oa{background-color:var(--primary-color, #2563eb);color:white}.lang-button.primary.svelte-lni2oa:hover{background-color:var(--primary-dark, #1d4ed8);transform:scale(1.05)}.lang-button.secondary.svelte-lni2oa{background-color:var(--text-color, #6b7280);color:white}.lang-button.secondary.svelte-lni2oa:hover{background-color:var(--muted-text, #4b5563);transform:scale(1.05)}.google-translate-container.svelte-lni2oa{margin-top:1rem}.hidden.svelte-lni2oa{display:none}");
 }
-function Ae(t, e, n) {
-  const i = t.slice();
-  i[17] = e[n];
-  const s = new Intl.DisplayNames([
+function get_each_context$4(ctx, list, i) {
+  const child_ctx = ctx.slice();
+  child_ctx[17] = list[i];
+  const constants_0 = new Intl.DisplayNames([
     /*lang*/
-    i[17]
+    child_ctx[17]
   ], { type: "language" }).of(
     /*lang*/
-    i[17]
+    child_ctx[17]
   );
-  return i[18] = s, i;
+  child_ctx[18] = constants_0;
+  return child_ctx;
 }
-function we(t) {
-  const e = t.slice(), n = new Intl.DisplayNames([
+function get_if_ctx(ctx) {
+  const child_ctx = ctx.slice();
+  const constants_0 = new Intl.DisplayNames([
     /*sourceLanguage*/
-    e[1]
+    child_ctx[1]
   ], { type: "language" }).of(
     /*sourceLanguage*/
-    e[1]
+    child_ctx[1]
   );
-  return e[18] = n, e;
+  child_ctx[18] = constants_0;
+  return child_ctx;
 }
-function Ue(t) {
-  let e, n, i, s, l;
-  return n = new J({
+function create_if_block_1$4(ctx) {
+  let button;
+  let t;
+  let current;
+  let mounted;
+  let dispose;
+  t = new T({
     props: {
       lang: (
         /*selectedLang*/
-        t[2]
+        ctx[2]
       ),
       translations: (
         /*translations*/
-        t[0]
+        ctx[0]
       ),
       text: (
         /*langName*/
-        t[18]
+        ctx[18]
       )
     }
-  }), {
+  });
+  return {
     c() {
-      e = k("button"), M(n.$$.fragment), g(e, "class", "px-4 py-2 bg-primary text-white rounded-md hover:bg-primaryDark transition text-sm capitalize notranslate focus:outline-none focus:ring-2 focus:ring-inputFocus svelte-t16d3j");
+      button = element("button");
+      create_component(t.$$.fragment);
+      attr(button, "class", "lang-button primary svelte-lni2oa");
     },
-    m(o, a) {
-      T(o, e, a), O(n, e, null), i = !0, s || (l = H(
-        e,
-        "click",
-        /*click_handler*/
-        t[9]
-      ), s = !0);
+    m(target, anchor) {
+      insert(target, button, anchor);
+      mount_component(t, button, null);
+      current = true;
+      if (!mounted) {
+        dispose = listen(
+          button,
+          "click",
+          /*click_handler*/
+          ctx[9]
+        );
+        mounted = true;
+      }
     },
-    p(o, a) {
-      const r = {};
-      a & /*selectedLang*/
-      4 && (r.lang = /*selectedLang*/
-      o[2]), a & /*translations*/
-      1 && (r.translations = /*translations*/
-      o[0]), a & /*sourceLanguage*/
-      2 && (r.text = /*langName*/
-      o[18]), n.$set(r);
+    p(ctx2, dirty) {
+      const t_changes = {};
+      if (dirty & /*selectedLang*/
+      4)
+        t_changes.lang = /*selectedLang*/
+        ctx2[2];
+      if (dirty & /*translations*/
+      1)
+        t_changes.translations = /*translations*/
+        ctx2[0];
+      if (dirty & /*sourceLanguage*/
+      2)
+        t_changes.text = /*langName*/
+        ctx2[18];
+      t.$set(t_changes);
     },
-    i(o) {
-      i || (_(n.$$.fragment, o), i = !0);
+    i(local) {
+      if (current)
+        return;
+      transition_in(t.$$.fragment, local);
+      current = true;
     },
-    o(o) {
-      F(n.$$.fragment, o), i = !1;
+    o(local) {
+      transition_out(t.$$.fragment, local);
+      current = false;
     },
-    d(o) {
-      o && S(e), R(n), s = !1, l();
+    d(detaching) {
+      if (detaching) {
+        detach(button);
+      }
+      destroy_component(t);
+      mounted = false;
+      dispose();
     }
   };
 }
-function Ie(t) {
-  let e, n = (
+function create_each_block$4(ctx) {
+  let button;
+  let t0_value = (
     /*langName*/
-    t[18] + ""
-  ), i, s, l, o;
-  function a() {
+    ctx[18] + ""
+  );
+  let t0;
+  let t1;
+  let mounted;
+  let dispose;
+  function click_handler_1() {
     return (
       /*click_handler_1*/
-      t[10](
+      ctx[10](
         /*lang*/
-        t[17]
+        ctx[17]
       )
     );
   }
   return {
     c() {
-      e = k("button"), i = X(n), s = j(), g(e, "class", "px-4 py-2 bg-primary text-white rounded-md hover:bg-primaryDark transition text-sm capitalize notranslate focus:outline-none focus:ring-2 focus:ring-inputFocus svelte-t16d3j");
+      button = element("button");
+      t0 = text(t0_value);
+      t1 = space();
+      attr(button, "class", "lang-button primary svelte-lni2oa");
     },
-    m(r, u) {
-      T(r, e, u), $(e, i), $(e, s), l || (o = H(e, "click", a), l = !0);
+    m(target, anchor) {
+      insert(target, button, anchor);
+      append(button, t0);
+      append(button, t1);
+      if (!mounted) {
+        dispose = listen(button, "click", click_handler_1);
+        mounted = true;
+      }
     },
-    p(r, u) {
-      t = r, u & /*translations*/
-      1 && n !== (n = /*langName*/
-      t[18] + "") && ie(i, n);
+    p(new_ctx, dirty) {
+      ctx = new_ctx;
+      if (dirty & /*translations*/
+      1 && t0_value !== (t0_value = /*langName*/
+      ctx[18] + ""))
+        set_data(t0, t0_value);
     },
-    d(r) {
-      r && S(e), l = !1, o();
+    d(detaching) {
+      if (detaching) {
+        detach(button);
+      }
+      mounted = false;
+      dispose();
     }
   };
 }
-function Mt(t) {
-  let e, n;
-  return e = new J({
+function create_else_block$1(ctx) {
+  let t;
+  let current;
+  t = new T({
     props: {
       lang: (
         /*selectedLang*/
-        t[2]
+        ctx[2]
       ),
       translations: (
         /*translations*/
-        t[0]
+        ctx[0]
       ),
       text: "Translate"
     }
-  }), {
+  });
+  return {
     c() {
-      M(e.$$.fragment);
+      create_component(t.$$.fragment);
     },
-    m(i, s) {
-      O(e, i, s), n = !0;
+    m(target, anchor) {
+      mount_component(t, target, anchor);
+      current = true;
     },
-    p(i, s) {
-      const l = {};
-      s & /*selectedLang*/
-      4 && (l.lang = /*selectedLang*/
-      i[2]), s & /*translations*/
-      1 && (l.translations = /*translations*/
-      i[0]), e.$set(l);
+    p(ctx2, dirty) {
+      const t_changes = {};
+      if (dirty & /*selectedLang*/
+      4)
+        t_changes.lang = /*selectedLang*/
+        ctx2[2];
+      if (dirty & /*translations*/
+      1)
+        t_changes.translations = /*translations*/
+        ctx2[0];
+      t.$set(t_changes);
     },
-    i(i) {
-      n || (_(e.$$.fragment, i), n = !0);
+    i(local) {
+      if (current)
+        return;
+      transition_in(t.$$.fragment, local);
+      current = true;
     },
-    o(i) {
-      F(e.$$.fragment, i), n = !1;
+    o(local) {
+      transition_out(t.$$.fragment, local);
+      current = false;
     },
-    d(i) {
-      R(e, i);
+    d(detaching) {
+      destroy_component(t, detaching);
     }
   };
 }
-function Dt(t) {
-  let e, n;
-  return e = new J({
+function create_if_block$4(ctx) {
+  let t;
+  let current;
+  t = new T({
     props: {
       lang: (
         /*selectedLang*/
-        t[2]
+        ctx[2]
       ),
       translations: (
         /*translations*/
-        t[0]
+        ctx[0]
       ),
       text: "Other Languages"
     }
-  }), {
+  });
+  return {
     c() {
-      M(e.$$.fragment);
+      create_component(t.$$.fragment);
     },
-    m(i, s) {
-      O(e, i, s), n = !0;
+    m(target, anchor) {
+      mount_component(t, target, anchor);
+      current = true;
     },
-    p(i, s) {
-      const l = {};
-      s & /*selectedLang*/
-      4 && (l.lang = /*selectedLang*/
-      i[2]), s & /*translations*/
-      1 && (l.translations = /*translations*/
-      i[0]), e.$set(l);
+    p(ctx2, dirty) {
+      const t_changes = {};
+      if (dirty & /*selectedLang*/
+      4)
+        t_changes.lang = /*selectedLang*/
+        ctx2[2];
+      if (dirty & /*translations*/
+      1)
+        t_changes.translations = /*translations*/
+        ctx2[0];
+      t.$set(t_changes);
     },
-    i(i) {
-      n || (_(e.$$.fragment, i), n = !0);
+    i(local) {
+      if (current)
+        return;
+      transition_in(t.$$.fragment, local);
+      current = true;
     },
-    o(i) {
-      F(e.$$.fragment, i), n = !1;
+    o(local) {
+      transition_out(t.$$.fragment, local);
+      current = false;
     },
-    d(i) {
-      R(e, i);
+    d(detaching) {
+      destroy_component(t, detaching);
     }
   };
 }
-function Ht(t) {
-  let e, n, i, s, l, o, a, r, u, c, f, h, m, d, L, y, A = (
+function create_fragment$5(ctx) {
+  let script;
+  let script_src_value;
+  let t0;
+  let div1;
+  let div0;
+  let t1;
+  let t2;
+  let button;
+  let show_if;
+  let current_block_type_index;
+  let if_block1;
+  let t3;
+  let div2;
+  let current;
+  let mounted;
+  let dispose;
+  let if_block0 = (
     /*selectedLang*/
-    t[2] !== /*sourceLanguage*/
-    t[1] && Ue(we(t))
-  ), v = V(Object.keys(
+    ctx[2] !== /*sourceLanguage*/
+    ctx[1] && create_if_block_1$4(get_if_ctx(ctx))
+  );
+  let each_value = ensure_array_like(Object.keys(
     /*translations*/
-    t[0]
-  )), U = [];
-  for (let p = 0; p < v.length; p += 1)
-    U[p] = Ie(Ae(t, v, p));
-  const E = [Dt, Mt], B = [];
-  function C(p, z) {
-    return z & /*translations*/
-    1 && (u = null), u == null && (u = !!Object.keys(
-      /*translations*/
-      p[0]
-    ).length), u ? 0 : 1;
+    ctx[0]
+  ));
+  let each_blocks = [];
+  for (let i = 0; i < each_value.length; i += 1) {
+    each_blocks[i] = create_each_block$4(get_each_context$4(ctx, each_value, i));
   }
-  return c = C(t, -1), f = B[c] = E[c](t), {
+  const if_block_creators = [create_if_block$4, create_else_block$1];
+  const if_blocks = [];
+  function select_block_type(ctx2, dirty) {
+    if (dirty & /*translations*/
+    1)
+      show_if = null;
+    if (show_if == null)
+      show_if = !!Object.keys(
+        /*translations*/
+        ctx2[0]
+      ).length;
+    if (show_if)
+      return 0;
+    return 1;
+  }
+  current_block_type_index = select_block_type(ctx, -1);
+  if_block1 = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
+  return {
     c() {
-      e = k("script"), e.innerHTML = "", i = j(), s = k("div"), l = k("div"), A && A.c(), o = j();
-      for (let p = 0; p < U.length; p += 1)
-        U[p].c();
-      a = j(), r = k("button"), f.c(), h = j(), m = k("div"), Ft(e.src, n = "https://translate.google.com/translate_a/element.js?cb=googleTranslateLoaded") || g(e, "src", n), g(r, "class", "px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition text-sm focus:outline-none focus:ring-2 focus:ring-gray-400 svelte-t16d3j"), g(l, "class", "flex flex-wrap gap-2"), g(s, "class", "translate space-y-2 mt-4 svelte-t16d3j"), g(m, "id", "google_translate_element"), g(m, "class", "svelte-t16d3j"), x(m, "hidden", !/*showAllLanguages*/
-      t[3]);
-    },
-    m(p, z) {
-      $(document.head, e), T(p, i, z), T(p, s, z), $(s, l), A && A.m(l, null), $(l, o);
-      for (let G = 0; G < U.length; G += 1)
-        U[G] && U[G].m(l, null);
-      $(l, a), $(l, r), B[c].m(r, null), T(p, h, z), T(p, m, z), d = !0, L || (y = H(
-        r,
-        "click",
-        /*click_handler_2*/
-        t[11]
-      ), L = !0);
-    },
-    p(p, [z]) {
-      if (/*selectedLang*/
-      p[2] !== /*sourceLanguage*/
-      p[1] ? A ? (A.p(we(p), z), z & /*selectedLang, sourceLanguage*/
-      6 && _(A, 1)) : (A = Ue(we(p)), A.c(), _(A, 1), A.m(l, o)) : A && (K(), F(A, 1, 1, () => {
-        A = null;
-      }), Q()), z & /*setLanguage, Object, translations, Intl*/
-      17) {
-        v = V(Object.keys(
-          /*translations*/
-          p[0]
-        ));
-        let q;
-        for (q = 0; q < v.length; q += 1) {
-          const w = Ae(p, v, q);
-          U[q] ? U[q].p(w, z) : (U[q] = Ie(w), U[q].c(), U[q].m(l, a));
-        }
-        for (; q < U.length; q += 1)
-          U[q].d(1);
-        U.length = v.length;
+      script = element("script");
+      script.innerHTML = ``;
+      t0 = space();
+      div1 = element("div");
+      div0 = element("div");
+      if (if_block0)
+        if_block0.c();
+      t1 = space();
+      for (let i = 0; i < each_blocks.length; i += 1) {
+        each_blocks[i].c();
       }
-      let G = c;
-      c = C(p, z), c === G ? B[c].p(p, z) : (K(), F(B[G], 1, 1, () => {
-        B[G] = null;
-      }), Q(), f = B[c], f ? f.p(p, z) : (f = B[c] = E[c](p), f.c()), _(f, 1), f.m(r, null)), (!d || z & /*showAllLanguages*/
-      8) && x(m, "hidden", !/*showAllLanguages*/
-      p[3]);
+      t2 = space();
+      button = element("button");
+      if_block1.c();
+      t3 = space();
+      div2 = element("div");
+      if (!src_url_equal(script.src, script_src_value = "https://translate.google.com/translate_a/element.js?cb=googleTranslateLoaded"))
+        attr(script, "src", script_src_value);
+      attr(button, "class", "lang-button secondary svelte-lni2oa");
+      attr(div0, "class", "button-group svelte-lni2oa");
+      attr(div1, "class", "translation-container svelte-lni2oa");
+      attr(div2, "class", "google-translate-container svelte-lni2oa");
+      attr(div2, "id", "google_translate_element");
+      toggle_class(div2, "hidden", !/*showAllLanguages*/
+      ctx[3]);
     },
-    i(p) {
-      d || (_(A), _(f), d = !0);
+    m(target, anchor) {
+      append(document.head, script);
+      insert(target, t0, anchor);
+      insert(target, div1, anchor);
+      append(div1, div0);
+      if (if_block0)
+        if_block0.m(div0, null);
+      append(div0, t1);
+      for (let i = 0; i < each_blocks.length; i += 1) {
+        if (each_blocks[i]) {
+          each_blocks[i].m(div0, null);
+        }
+      }
+      append(div0, t2);
+      append(div0, button);
+      if_blocks[current_block_type_index].m(button, null);
+      insert(target, t3, anchor);
+      insert(target, div2, anchor);
+      current = true;
+      if (!mounted) {
+        dispose = listen(
+          button,
+          "click",
+          /*click_handler_2*/
+          ctx[11]
+        );
+        mounted = true;
+      }
     },
-    o(p) {
-      F(A), F(f), d = !1;
+    p(ctx2, [dirty]) {
+      if (
+        /*selectedLang*/
+        ctx2[2] !== /*sourceLanguage*/
+        ctx2[1]
+      ) {
+        if (if_block0) {
+          if_block0.p(get_if_ctx(ctx2), dirty);
+          if (dirty & /*selectedLang, sourceLanguage*/
+          6) {
+            transition_in(if_block0, 1);
+          }
+        } else {
+          if_block0 = create_if_block_1$4(get_if_ctx(ctx2));
+          if_block0.c();
+          transition_in(if_block0, 1);
+          if_block0.m(div0, t1);
+        }
+      } else if (if_block0) {
+        group_outros();
+        transition_out(if_block0, 1, 1, () => {
+          if_block0 = null;
+        });
+        check_outros();
+      }
+      if (dirty & /*setLanguage, Object, translations, Intl*/
+      17) {
+        each_value = ensure_array_like(Object.keys(
+          /*translations*/
+          ctx2[0]
+        ));
+        let i;
+        for (i = 0; i < each_value.length; i += 1) {
+          const child_ctx = get_each_context$4(ctx2, each_value, i);
+          if (each_blocks[i]) {
+            each_blocks[i].p(child_ctx, dirty);
+          } else {
+            each_blocks[i] = create_each_block$4(child_ctx);
+            each_blocks[i].c();
+            each_blocks[i].m(div0, t2);
+          }
+        }
+        for (; i < each_blocks.length; i += 1) {
+          each_blocks[i].d(1);
+        }
+        each_blocks.length = each_value.length;
+      }
+      let previous_block_index = current_block_type_index;
+      current_block_type_index = select_block_type(ctx2, dirty);
+      if (current_block_type_index === previous_block_index) {
+        if_blocks[current_block_type_index].p(ctx2, dirty);
+      } else {
+        group_outros();
+        transition_out(if_blocks[previous_block_index], 1, 1, () => {
+          if_blocks[previous_block_index] = null;
+        });
+        check_outros();
+        if_block1 = if_blocks[current_block_type_index];
+        if (!if_block1) {
+          if_block1 = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx2);
+          if_block1.c();
+        } else {
+          if_block1.p(ctx2, dirty);
+        }
+        transition_in(if_block1, 1);
+        if_block1.m(button, null);
+      }
+      if (!current || dirty & /*showAllLanguages*/
+      8) {
+        toggle_class(div2, "hidden", !/*showAllLanguages*/
+        ctx2[3]);
+      }
     },
-    d(p) {
-      p && (S(i), S(s), S(h), S(m)), S(e), A && A.d(), te(U, p), B[c].d(), L = !1, y();
+    i(local) {
+      if (current)
+        return;
+      transition_in(if_block0);
+      transition_in(if_block1);
+      current = true;
+    },
+    o(local) {
+      transition_out(if_block0);
+      transition_out(if_block1);
+      current = false;
+    },
+    d(detaching) {
+      if (detaching) {
+        detach(t0);
+        detach(div1);
+        detach(t3);
+        detach(div2);
+      }
+      detach(script);
+      if (if_block0)
+        if_block0.d();
+      destroy_each(each_blocks, detaching);
+      if_blocks[current_block_type_index].d();
+      mounted = false;
+      dispose();
     }
   };
 }
-function Vt(t, e, n) {
-  let { translations: i = {} } = e, { sourceLanguage: s = "en" } = e, { onChange: l } = e, { form: o } = e, a = s, r = !1, u = !1;
-  function c() {
-    new google.translate.TranslateElement({ pageLanguage: s }, "google_translate_element");
+function instance$5($$self, $$props, $$invalidate) {
+  let { translations = {} } = $$props;
+  let { sourceLanguage = "en" } = $$props;
+  let { onChange } = $$props;
+  let { form } = $$props;
+  let selectedLang = sourceLanguage;
+  let useGoogleTranslate = false;
+  let googleTranslateIsReady = false;
+  let showAllLanguages = false;
+  function googleTranslateElementInit() {
+    new google.translate.TranslateElement({ pageLanguage: sourceLanguage }, "google_translate_element");
   }
-  function f() {
-    n(8, u = !0);
+  function googleTranslateLoaded() {
+    $$invalidate(8, googleTranslateIsReady = true);
   }
-  function h(E) {
-    let B = E.match(/googtrans\((\w+)\|(\w+)\)/);
-    B && (n(2, a = B[2]), n(7, r = !0));
+  function detectGoogleTranslateLanguage(hash) {
+    let match = hash.match(/googtrans\((\w+)\|(\w+)\)/);
+    if (match) {
+      $$invalidate(2, selectedLang = match[2]);
+      $$invalidate(7, useGoogleTranslate = true);
+    }
   }
-  gt(() => {
-    h(window.location.hash), window.googleTranslateLoaded = f, window.addEventListener("hashchange", () => {
-      h(window.location.hash);
+  onMount(() => {
+    detectGoogleTranslateLanguage(window.location.hash);
+    window.googleTranslateLoaded = googleTranslateLoaded;
+    window.addEventListener("hashchange", () => {
+      detectGoogleTranslateLanguage(window.location.hash);
     });
   });
-  function m(E) {
-    n(2, a = E);
-    let B = s !== E && !L(E);
-    n(7, r = B), B ? d(E) : window.location.hash = "";
+  function setLanguage(lang) {
+    $$invalidate(2, selectedLang = lang);
+    let useGoogle = sourceLanguage !== lang && !hasCompleteTranslations(lang);
+    $$invalidate(7, useGoogleTranslate = useGoogle);
+    if (useGoogle) {
+      triggerGoogleTranslate(lang);
+    } else {
+      window.location.hash = "";
+    }
   }
-  function d(E) {
-    window.location.hash = `#googtrans(${s}|${E})`, location.reload();
+  function triggerGoogleTranslate(lang) {
+    window.location.hash = `#googtrans(${sourceLanguage}|${lang})`;
+    location.reload();
   }
-  function L(E) {
-    let B = i[E];
-    if (!B || o.title && !B[o.title] || o.description && !B[o.description])
-      return !1;
-    for (let C of o.items) {
-      if (!B[C.title] || C.description && !B[C.description])
-        return !1;
-      if (C.choices) {
-        for (let p of C.choices)
-          if (!B[p])
-            return !1;
+  function hasCompleteTranslations(lang) {
+    let translation = translations[lang];
+    if (!translation)
+      return false;
+    if (form.title && !translation[form.title])
+      return false;
+    if (form.description && !translation[form.description])
+      return false;
+    for (let item of form.items) {
+      if (!translation[item.title])
+        return false;
+      if (item.description && !translation[item.description])
+        return false;
+      if (item.choices) {
+        for (let choice of item.choices) {
+          if (!translation[choice])
+            return false;
+        }
       }
     }
-    return !0;
+    return true;
   }
-  let y = !1;
-  const A = () => m(s), v = (E) => m(E), U = () => {
-    m(s), n(3, y = !y);
+  const click_handler = () => setLanguage(sourceLanguage);
+  const click_handler_1 = (lang) => setLanguage(lang);
+  const click_handler_2 = () => {
+    setLanguage(sourceLanguage);
+    $$invalidate(3, showAllLanguages = !showAllLanguages);
   };
-  return t.$$set = (E) => {
-    "translations" in E && n(0, i = E.translations), "sourceLanguage" in E && n(1, s = E.sourceLanguage), "onChange" in E && n(5, l = E.onChange), "form" in E && n(6, o = E.form);
-  }, t.$$.update = () => {
-    t.$$.dirty & /*useGoogleTranslate, showAllLanguages, googleTranslateIsReady*/
-    392 && (r || y) && u && c(), t.$$.dirty & /*onChange, selectedLang, useGoogleTranslate*/
-    164 && l(a, r);
-  }, [
-    i,
-    s,
-    a,
-    y,
-    m,
-    l,
-    o,
-    r,
-    u,
-    A,
-    v,
-    U
+  $$self.$$set = ($$props2) => {
+    if ("translations" in $$props2)
+      $$invalidate(0, translations = $$props2.translations);
+    if ("sourceLanguage" in $$props2)
+      $$invalidate(1, sourceLanguage = $$props2.sourceLanguage);
+    if ("onChange" in $$props2)
+      $$invalidate(5, onChange = $$props2.onChange);
+    if ("form" in $$props2)
+      $$invalidate(6, form = $$props2.form);
+  };
+  $$self.$$.update = () => {
+    if ($$self.$$.dirty & /*useGoogleTranslate, showAllLanguages, googleTranslateIsReady*/
+    392) {
+      if ((useGoogleTranslate || showAllLanguages) && googleTranslateIsReady) {
+        googleTranslateElementInit();
+      }
+    }
+    if ($$self.$$.dirty & /*onChange, selectedLang, useGoogleTranslate*/
+    164) {
+      onChange(selectedLang, useGoogleTranslate);
+    }
+  };
+  return [
+    translations,
+    sourceLanguage,
+    selectedLang,
+    showAllLanguages,
+    setLanguage,
+    onChange,
+    form,
+    useGoogleTranslate,
+    googleTranslateIsReady,
+    click_handler,
+    click_handler_1,
+    click_handler_2
   ];
 }
-class pt extends ae {
-  constructor(e) {
-    super(), oe(
+class TranslationSelector extends SvelteComponent {
+  constructor(options) {
+    super();
+    init(
       this,
-      e,
-      Vt,
-      Ht,
-      le,
+      options,
+      instance$5,
+      create_fragment$5,
+      safe_not_equal,
       {
         translations: 0,
         sourceLanguage: 1,
         onChange: 5,
         form: 6
       },
-      Rt
+      add_css$4
     );
   }
   get translations() {
     return this.$$.ctx[0];
   }
-  set translations(e) {
-    this.$$set({ translations: e }), I();
+  set translations(translations) {
+    this.$$set({ translations });
+    flush();
   }
   get sourceLanguage() {
     return this.$$.ctx[1];
   }
-  set sourceLanguage(e) {
-    this.$$set({ sourceLanguage: e }), I();
+  set sourceLanguage(sourceLanguage) {
+    this.$$set({ sourceLanguage });
+    flush();
   }
   get onChange() {
     return this.$$.ctx[5];
   }
-  set onChange(e) {
-    this.$$set({ onChange: e }), I();
+  set onChange(onChange) {
+    this.$$set({ onChange });
+    flush();
   }
   get form() {
     return this.$$.ctx[6];
   }
-  set form(e) {
-    this.$$set({ form: e }), I();
+  set form(form) {
+    this.$$set({ form });
+    flush();
   }
 }
-re(pt, { translations: {}, sourceLanguage: {}, onChange: {}, form: {} }, [], [], !0);
-function Jt(t) {
-  be(t, "svelte-zcceq9", ".sr-only.svelte-zcceq9.svelte-zcceq9{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0, 0, 0, 0);white-space:nowrap;border-width:0}span.svelte-zcceq9.svelte-zcceq9{display:inline-block;transform:scale(0.5);transition:transform 200ms}.selected.svelte-zcceq9 span.svelte-zcceq9{transform:scale(1)}label.svelte-zcceq9:hover span.svelte-zcceq9,.unselected.svelte-zcceq9.svelte-zcceq9:has(~ label:hover span){transform:scale(1.1)}label.svelte-zcceq9:hover~label.selected.svelte-zcceq9{transform:scale(0.75)}.peer.svelte-zcceq9:focus-visible+span.svelte-zcceq9{outline:2px solid #4f46e5;outline-offset:2px}");
+create_custom_element(TranslationSelector, { "translations": {}, "sourceLanguage": {}, "onChange": {}, "form": {} }, [], [], true);
+function add_css$3(target) {
+  append_styles(target, "svelte-zcceq9", ".sr-only.svelte-zcceq9.svelte-zcceq9{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0, 0, 0, 0);white-space:nowrap;border-width:0}span.svelte-zcceq9.svelte-zcceq9{display:inline-block;transform:scale(0.5);transition:transform 200ms}.selected.svelte-zcceq9 span.svelte-zcceq9{transform:scale(1)}label.svelte-zcceq9:hover span.svelte-zcceq9,.unselected.svelte-zcceq9.svelte-zcceq9:has(~ label:hover span){transform:scale(1.1)}label.svelte-zcceq9:hover~label.selected.svelte-zcceq9{transform:scale(0.75)}.peer.svelte-zcceq9:focus-visible+span.svelte-zcceq9{outline:2px solid #4f46e5;outline-offset:2px}");
 }
-function Le(t, e, n) {
-  const i = t.slice();
-  return i[8] = e[n], i[10] = n, i;
+function get_each_context$3(ctx, list, i) {
+  const child_ctx = ctx.slice();
+  child_ctx[8] = list[i];
+  child_ctx[10] = i;
+  return child_ctx;
 }
-function qe(t) {
-  let e, n, i, s, l = (
+function create_each_block$3(ctx) {
+  let label;
+  let input;
+  let t0;
+  let span;
+  let t1_value = (
     /*iconMap*/
-    t[4][
+    ctx[4][
       /*icon*/
-      t[2]
+      ctx[2]
     ] + ""
-  ), o, a, r, u, c;
-  return r = Tt(
+  );
+  let t1;
+  let t2;
+  let binding_group;
+  let mounted;
+  let dispose;
+  binding_group = init_binding_group(
     /*$$binding_groups*/
-    t[7][0]
-  ), {
-    c() {
-      e = k("label"), n = k("input"), i = j(), s = k("span"), o = X(l), a = j(), g(n, "type", "radio"), g(
-        n,
-        "name",
-        /*name*/
-        t[3]
-      ), n.__value = /*i*/
-      t[10] + 1, _e(n, n.__value), g(n, "class", "sr-only peer svelte-zcceq9"), g(s, "class", "text-2xl transition-transform duration-200 ease-in-out svelte-zcceq9"), g(s, "aria-hidden", "true"), g(e, "class", "cursor-pointer relative svelte-zcceq9"), x(
-        e,
-        "selected",
-        /*value*/
-        t[0] > /*i*/
-        t[10]
-      ), x(
-        e,
-        "unselected",
-        /*value*/
-        t[0] <= /*i*/
-        t[10]
-      ), r.p(n);
-    },
-    m(f, h) {
-      T(f, e, h), $(e, n), n.checked = n.__value === /*value*/
-      t[0], $(e, i), $(e, s), $(s, o), $(e, a), u || (c = [
-        H(
-          n,
-          "change",
-          /*input_change_handler*/
-          t[6]
-        ),
-        H(
-          n,
-          "input",
-          /*input_handler*/
-          t[5]
-        )
-      ], u = !0);
-    },
-    p(f, h) {
-      h & /*name*/
-      8 && g(
-        n,
-        "name",
-        /*name*/
-        f[3]
-      ), h & /*value, max*/
-      3 && (n.checked = n.__value === /*value*/
-      f[0]), h & /*icon*/
-      4 && l !== (l = /*iconMap*/
-      f[4][
-        /*icon*/
-        f[2]
-      ] + "") && ie(o, l), h & /*value*/
-      1 && x(
-        e,
-        "selected",
-        /*value*/
-        f[0] > /*i*/
-        f[10]
-      ), h & /*value*/
-      1 && x(
-        e,
-        "unselected",
-        /*value*/
-        f[0] <= /*i*/
-        f[10]
-      );
-    },
-    d(f) {
-      f && S(e), r.r(), u = !1, ne(c);
-    }
-  };
-}
-function Kt(t) {
-  let e, n = V(Array(
-    /*max*/
-    t[1]
-  ).fill(0)), i = [];
-  for (let s = 0; s < n.length; s += 1)
-    i[s] = qe(Le(t, n, s));
+    ctx[7][0]
+  );
   return {
     c() {
-      e = k("div");
-      for (let s = 0; s < i.length; s += 1)
-        i[s].c();
-      g(e, "class", "flex space-x-1");
+      label = element("label");
+      input = element("input");
+      t0 = space();
+      span = element("span");
+      t1 = text(t1_value);
+      t2 = space();
+      attr(input, "type", "radio");
+      attr(
+        input,
+        "name",
+        /*name*/
+        ctx[3]
+      );
+      input.__value = /*i*/
+      ctx[10] + 1;
+      set_input_value(input, input.__value);
+      attr(input, "class", "sr-only peer svelte-zcceq9");
+      attr(span, "class", "text-2xl transition-transform duration-200 ease-in-out svelte-zcceq9");
+      attr(span, "aria-hidden", "true");
+      attr(label, "class", "cursor-pointer relative svelte-zcceq9");
+      toggle_class(
+        label,
+        "selected",
+        /*value*/
+        ctx[0] > /*i*/
+        ctx[10]
+      );
+      toggle_class(
+        label,
+        "unselected",
+        /*value*/
+        ctx[0] <= /*i*/
+        ctx[10]
+      );
+      binding_group.p(input);
     },
-    m(s, l) {
-      T(s, e, l);
-      for (let o = 0; o < i.length; o += 1)
-        i[o] && i[o].m(e, null);
-    },
-    p(s, [l]) {
-      if (l & /*value, iconMap, icon, name, max*/
-      31) {
-        n = V(Array(
-          /*max*/
-          s[1]
-        ).fill(0));
-        let o;
-        for (o = 0; o < n.length; o += 1) {
-          const a = Le(s, n, o);
-          i[o] ? i[o].p(a, l) : (i[o] = qe(a), i[o].c(), i[o].m(e, null));
-        }
-        for (; o < i.length; o += 1)
-          i[o].d(1);
-        i.length = n.length;
+    m(target, anchor) {
+      insert(target, label, anchor);
+      append(label, input);
+      input.checked = input.__value === /*value*/
+      ctx[0];
+      append(label, t0);
+      append(label, span);
+      append(span, t1);
+      append(label, t2);
+      if (!mounted) {
+        dispose = [
+          listen(
+            input,
+            "change",
+            /*input_change_handler*/
+            ctx[6]
+          ),
+          listen(
+            input,
+            "input",
+            /*input_handler*/
+            ctx[5]
+          )
+        ];
+        mounted = true;
       }
     },
-    i: D,
-    o: D,
-    d(s) {
-      s && S(e), te(i, s);
+    p(ctx2, dirty) {
+      if (dirty & /*name*/
+      8) {
+        attr(
+          input,
+          "name",
+          /*name*/
+          ctx2[3]
+        );
+      }
+      if (dirty & /*value, max*/
+      3) {
+        input.checked = input.__value === /*value*/
+        ctx2[0];
+      }
+      if (dirty & /*icon*/
+      4 && t1_value !== (t1_value = /*iconMap*/
+      ctx2[4][
+        /*icon*/
+        ctx2[2]
+      ] + ""))
+        set_data(t1, t1_value);
+      if (dirty & /*value*/
+      1) {
+        toggle_class(
+          label,
+          "selected",
+          /*value*/
+          ctx2[0] > /*i*/
+          ctx2[10]
+        );
+      }
+      if (dirty & /*value*/
+      1) {
+        toggle_class(
+          label,
+          "unselected",
+          /*value*/
+          ctx2[0] <= /*i*/
+          ctx2[10]
+        );
+      }
+    },
+    d(detaching) {
+      if (detaching) {
+        detach(label);
+      }
+      binding_group.r();
+      mounted = false;
+      run_all(dispose);
     }
   };
 }
-function Qt(t, e, n) {
-  let { max: i = 5 } = e, { icon: s = "STAR" } = e, { value: l = 0 } = e, { name: o = "rating" } = e;
-  const a = {
+function create_fragment$4(ctx) {
+  let div;
+  let each_value = ensure_array_like(Array(
+    /*max*/
+    ctx[1]
+  ).fill(0));
+  let each_blocks = [];
+  for (let i = 0; i < each_value.length; i += 1) {
+    each_blocks[i] = create_each_block$3(get_each_context$3(ctx, each_value, i));
+  }
+  return {
+    c() {
+      div = element("div");
+      for (let i = 0; i < each_blocks.length; i += 1) {
+        each_blocks[i].c();
+      }
+      attr(div, "class", "flex space-x-1");
+    },
+    m(target, anchor) {
+      insert(target, div, anchor);
+      for (let i = 0; i < each_blocks.length; i += 1) {
+        if (each_blocks[i]) {
+          each_blocks[i].m(div, null);
+        }
+      }
+    },
+    p(ctx2, [dirty]) {
+      if (dirty & /*value, iconMap, icon, name, max*/
+      31) {
+        each_value = ensure_array_like(Array(
+          /*max*/
+          ctx2[1]
+        ).fill(0));
+        let i;
+        for (i = 0; i < each_value.length; i += 1) {
+          const child_ctx = get_each_context$3(ctx2, each_value, i);
+          if (each_blocks[i]) {
+            each_blocks[i].p(child_ctx, dirty);
+          } else {
+            each_blocks[i] = create_each_block$3(child_ctx);
+            each_blocks[i].c();
+            each_blocks[i].m(div, null);
+          }
+        }
+        for (; i < each_blocks.length; i += 1) {
+          each_blocks[i].d(1);
+        }
+        each_blocks.length = each_value.length;
+      }
+    },
+    i: noop,
+    o: noop,
+    d(detaching) {
+      if (detaching) {
+        detach(div);
+      }
+      destroy_each(each_blocks, detaching);
+    }
+  };
+}
+function instance$4($$self, $$props, $$invalidate) {
+  let { max = 5 } = $$props;
+  let { icon = "STAR" } = $$props;
+  let { value = 0 } = $$props;
+  let { name = "rating" } = $$props;
+  const iconMap = {
     STAR: "⭐",
     HEART: "❤️",
     THUMBS_UP: "👍"
-  }, r = [[]];
-  function u(f) {
-    Ut.call(this, t, f);
+  };
+  const $$binding_groups = [[]];
+  function input_handler(event) {
+    bubble.call(this, $$self, event);
   }
-  function c() {
-    l = this.__value, n(0, l);
+  function input_change_handler() {
+    value = this.__value;
+    $$invalidate(0, value);
   }
-  return t.$$set = (f) => {
-    "max" in f && n(1, i = f.max), "icon" in f && n(2, s = f.icon), "value" in f && n(0, l = f.value), "name" in f && n(3, o = f.name);
-  }, [
-    l,
-    i,
-    s,
-    o,
-    a,
-    u,
-    c,
-    r
+  $$self.$$set = ($$props2) => {
+    if ("max" in $$props2)
+      $$invalidate(1, max = $$props2.max);
+    if ("icon" in $$props2)
+      $$invalidate(2, icon = $$props2.icon);
+    if ("value" in $$props2)
+      $$invalidate(0, value = $$props2.value);
+    if ("name" in $$props2)
+      $$invalidate(3, name = $$props2.name);
+  };
+  return [
+    value,
+    max,
+    icon,
+    name,
+    iconMap,
+    input_handler,
+    input_change_handler,
+    $$binding_groups
   ];
 }
-class _t extends ae {
-  constructor(e) {
-    super(), oe(this, e, Qt, Kt, le, { max: 1, icon: 2, value: 0, name: 3 }, Jt);
+class RatingItem extends SvelteComponent {
+  constructor(options) {
+    super();
+    init(this, options, instance$4, create_fragment$4, safe_not_equal, { max: 1, icon: 2, value: 0, name: 3 }, add_css$3);
   }
   get max() {
     return this.$$.ctx[1];
   }
-  set max(e) {
-    this.$$set({ max: e }), I();
+  set max(max) {
+    this.$$set({ max });
+    flush();
   }
   get icon() {
     return this.$$.ctx[2];
   }
-  set icon(e) {
-    this.$$set({ icon: e }), I();
+  set icon(icon) {
+    this.$$set({ icon });
+    flush();
   }
   get value() {
     return this.$$.ctx[0];
   }
-  set value(e) {
-    this.$$set({ value: e }), I();
+  set value(value) {
+    this.$$set({ value });
+    flush();
   }
   get name() {
     return this.$$.ctx[3];
   }
-  set name(e) {
-    this.$$set({ name: e }), I();
+  set name(name) {
+    this.$$set({ name });
+    flush();
   }
 }
-re(_t, { max: {}, icon: {}, value: {}, name: {} }, [], [], !0);
-function Wt(t) {
-  return t.replace("|", "\\|");
+create_custom_element(RatingItem, { "max": {}, "icon": {}, "value": {}, "name": {} }, [], [], true);
+function add_css$2(target) {
+  append_styles(target, "svelte-qmvkct", ".form-item.svelte-qmvkct{margin-bottom:1.5rem}.question-title.svelte-qmvkct{font-size:1.125rem;font-weight:600;color:var(--text-color, #1f2937);margin-bottom:0.5rem}.question-description.svelte-qmvkct{font-size:0.875rem;color:var(--muted-text, #6b7280);margin-bottom:0.75rem}.checkbox-group.svelte-qmvkct,.radio-group.svelte-qmvkct{display:flex;flex-direction:column;gap:0.5rem}.checkbox-label.svelte-qmvkct,.radio-label.svelte-qmvkct{display:flex;align-items:center;gap:0.5rem;cursor:pointer}.choice-text.svelte-qmvkct{color:var(--text-color, #1f2937)}.checkbox-input.svelte-qmvkct,.radio-input.svelte-qmvkct{width:1.25rem;height:1.25rem;border:2px solid var(--input-border-color, #d1d5db);border-radius:50%;cursor:pointer;transition:transform 0.2s ease-in-out}.checkbox-input.svelte-qmvkct:hover,.radio-input.svelte-qmvkct:hover{transform:scale(1.1)}.checkbox-input.svelte-qmvkct:checked,.radio-input.svelte-qmvkct:checked{background-color:var(--primary-color, #2563eb);border-color:var(--primary-color, #2563eb);box-shadow:0 0 5px var(--primary-color, #2563eb)}.input-field.svelte-qmvkct{width:100%;padding:0.6rem;border:1px solid var(--input-border-color, #d1d5db);border-radius:6px;background-color:var(--input-bg-color, #f9fafb);color:var(--input-text-color, #111827);font-family:var(--input-font, sans-serif);transition:all 0.2s ease-in-out}.input-field.svelte-qmvkct:focus{outline:none;border-color:var(--input-focus-color, #2563eb);box-shadow:0 0 6px var(--input-focus-color, #2563eb)}.textarea-field.svelte-qmvkct{min-height:100px;resize:vertical}.input-range.svelte-qmvkct{width:100%;padding:0.5rem;border:none;cursor:pointer}.dropdown.svelte-qmvkct{width:100%;padding:0.6rem;border:1px solid var(--input-border-color, #d1d5db);border-radius:6px;background-color:var(--input-bg-color, #f9fafb);color:var(--input-text-color, #111827);font-family:var(--input-font, sans-serif);appearance:none}.dropdown.svelte-qmvkct:focus{outline:none;border-color:var(--input-focus-color, #2563eb);box-shadow:0 0 6px var(--input-focus-color, #2563eb)}.input-field.svelte-qmvkct:hover,.dropdown.svelte-qmvkct:hover{border-color:var(--primary-dark, #1d4ed8)}.input-field.svelte-qmvkct:focus,.dropdown.svelte-qmvkct:focus{border-color:var(--primary-color, #2563eb)}");
 }
-function Be(t, e) {
-  return `${t}|${Wt(e)}`;
+function get_each_context_2(ctx, list, i) {
+  const child_ctx = ctx.slice();
+  child_ctx[7] = list[i];
+  return child_ctx;
 }
-function Ne(t, e, n) {
-  const i = t.slice();
-  return i[14] = e[n], i;
+function get_each_context_1(ctx, list, i) {
+  const child_ctx = ctx.slice();
+  child_ctx[7] = list[i];
+  child_ctx[11] = i;
+  return child_ctx;
 }
-function je(t, e, n) {
-  const i = t.slice();
-  return i[17] = e[n], i;
+function get_each_context$2(ctx, list, i) {
+  const child_ctx = ctx.slice();
+  child_ctx[7] = list[i];
+  return child_ctx;
 }
-function ze(t, e, n) {
-  const i = t.slice();
-  return i[17] = e[n], i;
-}
-function Pe(t, e, n) {
-  const i = t.slice();
-  return i[7] = e[n], i;
-}
-function Oe(t, e, n) {
-  const i = t.slice();
-  return i[7] = e[n], i[11] = n, i;
-}
-function Re(t, e, n) {
-  const i = t.slice();
-  return i[7] = e[n], i;
-}
-function Me(t) {
-  let e, n, i;
-  return n = new J({
+function create_if_block_7(ctx) {
+  let p;
+  let t;
+  let current;
+  t = new T({
     props: {
       text: (
         /*item*/
-        t[0].description
+        ctx[0].description
       ),
       lang: (
         /*lang*/
-        t[2]
+        ctx[2]
       ),
       translations: (
         /*translations*/
-        t[3]
+        ctx[3]
       )
     }
-  }), {
+  });
+  return {
     c() {
-      e = k("p"), M(n.$$.fragment), g(e, "class", "text-sm text-muted mb-2");
+      p = element("p");
+      create_component(t.$$.fragment);
+      attr(p, "class", "question-description svelte-qmvkct");
     },
-    m(s, l) {
-      T(s, e, l), O(n, e, null), i = !0;
+    m(target, anchor) {
+      insert(target, p, anchor);
+      mount_component(t, p, null);
+      current = true;
     },
-    p(s, l) {
-      const o = {};
-      l & /*item*/
-      1 && (o.text = /*item*/
-      s[0].description), l & /*lang*/
-      4 && (o.lang = /*lang*/
-      s[2]), l & /*translations*/
-      8 && (o.translations = /*translations*/
-      s[3]), n.$set(o);
+    p(ctx2, dirty) {
+      const t_changes = {};
+      if (dirty & /*item*/
+      1)
+        t_changes.text = /*item*/
+        ctx2[0].description;
+      if (dirty & /*lang*/
+      4)
+        t_changes.lang = /*lang*/
+        ctx2[2];
+      if (dirty & /*translations*/
+      8)
+        t_changes.translations = /*translations*/
+        ctx2[3];
+      t.$set(t_changes);
     },
-    i(s) {
-      i || (_(n.$$.fragment, s), i = !0);
+    i(local) {
+      if (current)
+        return;
+      transition_in(t.$$.fragment, local);
+      current = true;
     },
-    o(s) {
-      F(n.$$.fragment, s), i = !1;
+    o(local) {
+      transition_out(t.$$.fragment, local);
+      current = false;
     },
-    d(s) {
-      s && S(e), R(n);
+    d(detaching) {
+      if (detaching) {
+        detach(p);
+      }
+      destroy_component(t);
     }
   };
 }
-function Xt(t) {
-  let e, n, i, s, l, o, a, r = V(
+function create_if_block_6(ctx) {
+  let select;
+  let option;
+  let select_name_value;
+  let mounted;
+  let dispose;
+  let each_value_2 = ensure_array_like(
     /*item*/
-    t[0].columns
-  ), u = [];
-  for (let h = 0; h < r.length; h += 1)
-    u[h] = De(ze(t, r, h));
-  let c = V(
-    /*item*/
-    t[0].rows
-  ), f = [];
-  for (let h = 0; h < c.length; h += 1)
-    f[h] = Ve(Ne(t, c, h));
+    ctx[0].choices
+  );
+  let each_blocks = [];
+  for (let i = 0; i < each_value_2.length; i += 1) {
+    each_blocks[i] = create_each_block_2(get_each_context_2(ctx, each_value_2, i));
+  }
   return {
     c() {
-      e = k("table"), n = k("thead"), i = k("tr"), s = k("th"), l = j();
-      for (let h = 0; h < u.length; h += 1)
-        u[h].c();
-      o = j(), a = k("tbody");
-      for (let h = 0; h < f.length; h += 1)
-        f[h].c();
-      g(s, "class", "p-2 text-left border-b"), g(n, "class", "bg-backgroundLight"), g(e, "class", "w-full border border-inputBorder rounded-md shadow-sm");
+      select = element("select");
+      option = element("option");
+      option.textContent = "Select an option";
+      for (let i = 0; i < each_blocks.length; i += 1) {
+        each_blocks[i].c();
+      }
+      option.__value = "";
+      set_input_value(option, option.__value);
+      attr(select, "name", select_name_value = /*item*/
+      ctx[0].id);
+      attr(select, "class", "dropdown svelte-qmvkct");
     },
-    m(h, m) {
-      T(h, e, m), $(e, n), $(n, i), $(i, s), $(i, l);
-      for (let d = 0; d < u.length; d += 1)
-        u[d] && u[d].m(i, null);
-      $(e, o), $(e, a);
-      for (let d = 0; d < f.length; d += 1)
-        f[d] && f[d].m(a, null);
+    m(target, anchor) {
+      insert(target, select, anchor);
+      append(select, option);
+      for (let i = 0; i < each_blocks.length; i += 1) {
+        if (each_blocks[i]) {
+          each_blocks[i].m(select, null);
+        }
+      }
+      if (!mounted) {
+        dispose = listen(
+          select,
+          "change",
+          /*handleChange*/
+          ctx[4]
+        );
+        mounted = true;
+      }
     },
-    p(h, m) {
-      if (m & /*item*/
+    p(ctx2, dirty) {
+      if (dirty & /*item*/
       1) {
-        r = V(
+        each_value_2 = ensure_array_like(
           /*item*/
-          h[0].columns
+          ctx2[0].choices
         );
-        let d;
-        for (d = 0; d < r.length; d += 1) {
-          const L = ze(h, r, d);
-          u[d] ? u[d].p(L, m) : (u[d] = De(L), u[d].c(), u[d].m(i, null));
+        let i;
+        for (i = 0; i < each_value_2.length; i += 1) {
+          const child_ctx = get_each_context_2(ctx2, each_value_2, i);
+          if (each_blocks[i]) {
+            each_blocks[i].p(child_ctx, dirty);
+          } else {
+            each_blocks[i] = create_each_block_2(child_ctx);
+            each_blocks[i].c();
+            each_blocks[i].m(select, null);
+          }
         }
-        for (; d < u.length; d += 1)
-          u[d].d(1);
-        u.length = r.length;
+        for (; i < each_blocks.length; i += 1) {
+          each_blocks[i].d(1);
+        }
+        each_blocks.length = each_value_2.length;
       }
-      if (m & /*item, handleChange*/
-      17) {
-        c = V(
-          /*item*/
-          h[0].rows
-        );
-        let d;
-        for (d = 0; d < c.length; d += 1) {
-          const L = Ne(h, c, d);
-          f[d] ? f[d].p(L, m) : (f[d] = Ve(L), f[d].c(), f[d].m(a, null));
-        }
-        for (; d < f.length; d += 1)
-          f[d].d(1);
-        f.length = c.length;
+      if (dirty & /*item*/
+      1 && select_name_value !== (select_name_value = /*item*/
+      ctx2[0].id)) {
+        attr(select, "name", select_name_value);
       }
     },
-    i: D,
-    o: D,
-    d(h) {
-      h && S(e), te(u, h), te(f, h);
-    }
-  };
-}
-function Yt(t) {
-  let e, n, i, s;
-  return {
-    c() {
-      e = k("input"), g(e, "type", "number"), g(e, "name", n = /*item*/
-      t[0].id), g(e, "class", "w-full p-2 border border-inputBorder rounded bg-input text-inputText font-input focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inputFocus");
-    },
-    m(l, o) {
-      T(l, e, o), i || (s = [
-        H(
-          e,
-          "input",
-          /*handleChange*/
-          t[4]
-        ),
-        H(
-          e,
-          "change",
-          /*handleChange*/
-          t[4]
-        )
-      ], i = !0);
-    },
-    p(l, o) {
-      o & /*item*/
-      1 && n !== (n = /*item*/
-      l[0].id) && g(e, "name", n);
-    },
-    i: D,
-    o: D,
-    d(l) {
-      l && S(e), i = !1, ne(s);
-    }
-  };
-}
-function Zt(t) {
-  let e, n, i, s, l;
-  return {
-    c() {
-      e = k("input"), g(e, "type", n = /*item*/
-      t[0].type), g(e, "name", i = /*item*/
-      t[0].id), g(e, "class", "w-full p-2 border border-inputBorder rounded bg-input text-inputText font-input focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inputFocus");
-    },
-    m(o, a) {
-      T(o, e, a), s || (l = [
-        H(
-          e,
-          "input",
-          /*handleChange*/
-          t[4]
-        ),
-        H(
-          e,
-          "change",
-          /*handleChange*/
-          t[4]
-        )
-      ], s = !0);
-    },
-    p(o, a) {
-      a & /*item*/
-      1 && n !== (n = /*item*/
-      o[0].type) && g(e, "type", n), a & /*item*/
-      1 && i !== (i = /*item*/
-      o[0].id) && g(e, "name", i);
-    },
-    i: D,
-    o: D,
-    d(o) {
-      o && S(e), s = !1, ne(l);
-    }
-  };
-}
-function xt(t) {
-  let e, n, i, s, l, o = V(
-    /*item*/
-    t[0].choices
-  ), a = [];
-  for (let r = 0; r < o.length; r += 1)
-    a[r] = Je(Pe(t, o, r));
-  return {
-    c() {
-      e = k("select"), n = k("option"), n.textContent = "Select an option";
-      for (let r = 0; r < a.length; r += 1)
-        a[r].c();
-      n.__value = "", _e(n, n.__value), g(e, "name", i = /*item*/
-      t[0].id), g(e, "class", "w-full p-2 border border-inputBorder rounded bg-input text-inputText focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inputFocus");
-    },
-    m(r, u) {
-      T(r, e, u), $(e, n);
-      for (let c = 0; c < a.length; c += 1)
-        a[c] && a[c].m(e, null);
-      s || (l = H(
-        e,
-        "change",
-        /*handleChange*/
-        t[4]
-      ), s = !0);
-    },
-    p(r, u) {
-      if (u & /*item*/
-      1) {
-        o = V(
-          /*item*/
-          r[0].choices
-        );
-        let c;
-        for (c = 0; c < o.length; c += 1) {
-          const f = Pe(r, o, c);
-          a[c] ? a[c].p(f, u) : (a[c] = Je(f), a[c].c(), a[c].m(e, null));
-        }
-        for (; c < a.length; c += 1)
-          a[c].d(1);
-        a.length = o.length;
+    i: noop,
+    o: noop,
+    d(detaching) {
+      if (detaching) {
+        detach(select);
       }
-      u & /*item*/
-      1 && i !== (i = /*item*/
-      r[0].id) && g(e, "name", i);
-    },
-    i: D,
-    o: D,
-    d(r) {
-      r && S(e), te(a, r), s = !1, l();
+      destroy_each(each_blocks, detaching);
+      mounted = false;
+      dispose();
     }
   };
 }
-function en(t) {
-  let e, n, i, s, l, o, a;
+function create_if_block_5$2(ctx) {
+  let input;
+  let input_name_value;
+  let input_min_value;
+  let input_max_value;
+  let input_step_value;
+  let mounted;
+  let dispose;
   return {
     c() {
-      e = k("input"), g(e, "type", "range"), g(e, "name", n = /*item*/
-      t[0].id), g(e, "min", i = /*item*/
-      t[0].min), g(e, "max", s = /*item*/
-      t[0].max), g(e, "step", l = /*item*/
-      t[0].step), g(e, "class", "w-full p-2 border border-inputBorder rounded bg-input text-inputText focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inputFocus");
+      input = element("input");
+      attr(input, "type", "range");
+      attr(input, "name", input_name_value = /*item*/
+      ctx[0].id);
+      attr(input, "min", input_min_value = /*item*/
+      ctx[0].min);
+      attr(input, "max", input_max_value = /*item*/
+      ctx[0].max);
+      attr(input, "step", input_step_value = /*item*/
+      ctx[0].step);
+      attr(input, "class", "input-range svelte-qmvkct");
     },
-    m(r, u) {
-      T(r, e, u), o || (a = [
-        H(
-          e,
-          "input",
-          /*handleChange*/
-          t[4]
-        ),
-        H(
-          e,
-          "change",
-          /*handleChange*/
-          t[4]
-        )
-      ], o = !0);
+    m(target, anchor) {
+      insert(target, input, anchor);
+      if (!mounted) {
+        dispose = [
+          listen(
+            input,
+            "input",
+            /*handleChange*/
+            ctx[4]
+          ),
+          listen(
+            input,
+            "change",
+            /*handleChange*/
+            ctx[4]
+          )
+        ];
+        mounted = true;
+      }
     },
-    p(r, u) {
-      u & /*item*/
-      1 && n !== (n = /*item*/
-      r[0].id) && g(e, "name", n), u & /*item*/
-      1 && i !== (i = /*item*/
-      r[0].min) && g(e, "min", i), u & /*item*/
-      1 && s !== (s = /*item*/
-      r[0].max) && g(e, "max", s), u & /*item*/
-      1 && l !== (l = /*item*/
-      r[0].step) && g(e, "step", l);
+    p(ctx2, dirty) {
+      if (dirty & /*item*/
+      1 && input_name_value !== (input_name_value = /*item*/
+      ctx2[0].id)) {
+        attr(input, "name", input_name_value);
+      }
+      if (dirty & /*item*/
+      1 && input_min_value !== (input_min_value = /*item*/
+      ctx2[0].min)) {
+        attr(input, "min", input_min_value);
+      }
+      if (dirty & /*item*/
+      1 && input_max_value !== (input_max_value = /*item*/
+      ctx2[0].max)) {
+        attr(input, "max", input_max_value);
+      }
+      if (dirty & /*item*/
+      1 && input_step_value !== (input_step_value = /*item*/
+      ctx2[0].step)) {
+        attr(input, "step", input_step_value);
+      }
     },
-    i: D,
-    o: D,
-    d(r) {
-      r && S(e), o = !1, ne(a);
+    i: noop,
+    o: noop,
+    d(detaching) {
+      if (detaching) {
+        detach(input);
+      }
+      mounted = false;
+      run_all(dispose);
     }
   };
 }
-function tn(t) {
-  let e, n;
-  return e = new _t({
+function create_if_block_4$2(ctx) {
+  let ratingitem;
+  let current;
+  ratingitem = new RatingItem({
     props: {
       name: (
         /*item*/
-        t[0].id
+        ctx[0].id
       ),
       icon: (
         /*item*/
-        t[0].icon
+        ctx[0].icon
       ),
       max: (
         /*item*/
-        t[0].max
+        ctx[0].max
       )
     }
-  }), e.$on(
+  });
+  ratingitem.$on(
     "input",
     /*handleChange*/
-    t[4]
-  ), {
-    c() {
-      M(e.$$.fragment);
-    },
-    m(i, s) {
-      O(e, i, s), n = !0;
-    },
-    p(i, s) {
-      const l = {};
-      s & /*item*/
-      1 && (l.name = /*item*/
-      i[0].id), s & /*item*/
-      1 && (l.icon = /*item*/
-      i[0].icon), s & /*item*/
-      1 && (l.max = /*item*/
-      i[0].max), e.$set(l);
-    },
-    i(i) {
-      n || (_(e.$$.fragment, i), n = !0);
-    },
-    o(i) {
-      F(e.$$.fragment, i), n = !1;
-    },
-    d(i) {
-      R(e, i);
-    }
-  };
-}
-function nn(t) {
-  let e, n, i, s;
+    ctx[4]
+  );
   return {
     c() {
-      e = k("textarea"), g(e, "name", n = /*item*/
-      t[0].id), g(e, "class", "w-full p-2 border border-inputBorder rounded bg-input text-inputText font-input focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inputFocus");
+      create_component(ratingitem.$$.fragment);
     },
-    m(l, o) {
-      T(l, e, o), i || (s = H(
-        e,
-        "input",
-        /*handleChange*/
-        t[4]
-      ), i = !0);
+    m(target, anchor) {
+      mount_component(ratingitem, target, anchor);
+      current = true;
     },
-    p(l, o) {
-      o & /*item*/
-      1 && n !== (n = /*item*/
-      l[0].id) && g(e, "name", n);
+    p(ctx2, dirty) {
+      const ratingitem_changes = {};
+      if (dirty & /*item*/
+      1)
+        ratingitem_changes.name = /*item*/
+        ctx2[0].id;
+      if (dirty & /*item*/
+      1)
+        ratingitem_changes.icon = /*item*/
+        ctx2[0].icon;
+      if (dirty & /*item*/
+      1)
+        ratingitem_changes.max = /*item*/
+        ctx2[0].max;
+      ratingitem.$set(ratingitem_changes);
     },
-    i: D,
-    o: D,
-    d(l) {
-      l && S(e), i = !1, s();
+    i(local) {
+      if (current)
+        return;
+      transition_in(ratingitem.$$.fragment, local);
+      current = true;
+    },
+    o(local) {
+      transition_out(ratingitem.$$.fragment, local);
+      current = false;
+    },
+    d(detaching) {
+      destroy_component(ratingitem, detaching);
     }
   };
 }
-function sn(t) {
-  let e, n, i, s;
+function create_if_block_3$2(ctx) {
+  let textarea;
+  let textarea_name_value;
+  let mounted;
+  let dispose;
   return {
     c() {
-      e = k("input"), g(e, "type", "text"), g(e, "name", n = /*item*/
-      t[0].id), g(e, "class", "w-full p-2 border border-inputBorder rounded bg-input text-inputText font-input focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inputFocus");
+      textarea = element("textarea");
+      attr(textarea, "name", textarea_name_value = /*item*/
+      ctx[0].id);
+      attr(textarea, "class", "input-field textarea-field svelte-qmvkct");
     },
-    m(l, o) {
-      T(l, e, o), i || (s = H(
-        e,
-        "input",
-        /*handleChange*/
-        t[4]
-      ), i = !0);
+    m(target, anchor) {
+      insert(target, textarea, anchor);
+      if (!mounted) {
+        dispose = listen(
+          textarea,
+          "input",
+          /*handleChange*/
+          ctx[4]
+        );
+        mounted = true;
+      }
     },
-    p(l, o) {
-      o & /*item*/
-      1 && n !== (n = /*item*/
-      l[0].id) && g(e, "name", n);
+    p(ctx2, dirty) {
+      if (dirty & /*item*/
+      1 && textarea_name_value !== (textarea_name_value = /*item*/
+      ctx2[0].id)) {
+        attr(textarea, "name", textarea_name_value);
+      }
     },
-    i: D,
-    o: D,
-    d(l) {
-      l && S(e), i = !1, s();
+    i: noop,
+    o: noop,
+    d(detaching) {
+      if (detaching) {
+        detach(textarea);
+      }
+      mounted = false;
+      dispose();
     }
   };
 }
-function ln(t) {
-  let e, n, i = V(
+function create_if_block_2$2(ctx) {
+  let input;
+  let input_name_value;
+  let mounted;
+  let dispose;
+  return {
+    c() {
+      input = element("input");
+      attr(input, "type", "text");
+      attr(input, "name", input_name_value = /*item*/
+      ctx[0].id);
+      attr(input, "class", "input-field svelte-qmvkct");
+    },
+    m(target, anchor) {
+      insert(target, input, anchor);
+      if (!mounted) {
+        dispose = listen(
+          input,
+          "input",
+          /*handleChange*/
+          ctx[4]
+        );
+        mounted = true;
+      }
+    },
+    p(ctx2, dirty) {
+      if (dirty & /*item*/
+      1 && input_name_value !== (input_name_value = /*item*/
+      ctx2[0].id)) {
+        attr(input, "name", input_name_value);
+      }
+    },
+    i: noop,
+    o: noop,
+    d(detaching) {
+      if (detaching) {
+        detach(input);
+      }
+      mounted = false;
+      dispose();
+    }
+  };
+}
+function create_if_block_1$3(ctx) {
+  let div;
+  let current;
+  let each_value_1 = ensure_array_like(
     /*item*/
-    t[0].choices
-  ), s = [];
-  for (let o = 0; o < i.length; o += 1)
-    s[o] = Ke(Oe(t, i, o));
-  const l = (o) => F(s[o], 1, 1, () => {
-    s[o] = null;
+    ctx[0].choices
+  );
+  let each_blocks = [];
+  for (let i = 0; i < each_value_1.length; i += 1) {
+    each_blocks[i] = create_each_block_1(get_each_context_1(ctx, each_value_1, i));
+  }
+  const out = (i) => transition_out(each_blocks[i], 1, 1, () => {
+    each_blocks[i] = null;
   });
   return {
     c() {
-      e = k("div");
-      for (let o = 0; o < s.length; o += 1)
-        s[o].c();
-      g(e, "class", "space-y-2");
+      div = element("div");
+      for (let i = 0; i < each_blocks.length; i += 1) {
+        each_blocks[i].c();
+      }
+      attr(div, "class", "radio-group svelte-qmvkct");
     },
-    m(o, a) {
-      T(o, e, a);
-      for (let r = 0; r < s.length; r += 1)
-        s[r] && s[r].m(e, null);
-      n = !0;
+    m(target, anchor) {
+      insert(target, div, anchor);
+      for (let i = 0; i < each_blocks.length; i += 1) {
+        if (each_blocks[i]) {
+          each_blocks[i].m(div, null);
+        }
+      }
+      current = true;
     },
-    p(o, a) {
-      if (a & /*item, lang, translations, handleChange, setChoice*/
+    p(ctx2, dirty) {
+      if (dirty & /*item, lang, translations, handleChange, setChoice*/
       31) {
-        i = V(
+        each_value_1 = ensure_array_like(
           /*item*/
-          o[0].choices
+          ctx2[0].choices
         );
-        let r;
-        for (r = 0; r < i.length; r += 1) {
-          const u = Oe(o, i, r);
-          s[r] ? (s[r].p(u, a), _(s[r], 1)) : (s[r] = Ke(u), s[r].c(), _(s[r], 1), s[r].m(e, null));
+        let i;
+        for (i = 0; i < each_value_1.length; i += 1) {
+          const child_ctx = get_each_context_1(ctx2, each_value_1, i);
+          if (each_blocks[i]) {
+            each_blocks[i].p(child_ctx, dirty);
+            transition_in(each_blocks[i], 1);
+          } else {
+            each_blocks[i] = create_each_block_1(child_ctx);
+            each_blocks[i].c();
+            transition_in(each_blocks[i], 1);
+            each_blocks[i].m(div, null);
+          }
         }
-        for (K(), r = i.length; r < s.length; r += 1)
-          l(r);
-        Q();
+        group_outros();
+        for (i = each_value_1.length; i < each_blocks.length; i += 1) {
+          out(i);
+        }
+        check_outros();
       }
     },
-    i(o) {
-      if (!n) {
-        for (let a = 0; a < i.length; a += 1)
-          _(s[a]);
-        n = !0;
+    i(local) {
+      if (current)
+        return;
+      for (let i = 0; i < each_value_1.length; i += 1) {
+        transition_in(each_blocks[i]);
       }
+      current = true;
     },
-    o(o) {
-      s = s.filter(Boolean);
-      for (let a = 0; a < s.length; a += 1)
-        F(s[a]);
-      n = !1;
+    o(local) {
+      each_blocks = each_blocks.filter(Boolean);
+      for (let i = 0; i < each_blocks.length; i += 1) {
+        transition_out(each_blocks[i]);
+      }
+      current = false;
     },
-    d(o) {
-      o && S(e), te(s, o);
+    d(detaching) {
+      if (detaching) {
+        detach(div);
+      }
+      destroy_each(each_blocks, detaching);
     }
   };
 }
-function on(t) {
-  let e, n, i = V(
+function create_if_block$3(ctx) {
+  let div;
+  let current;
+  let each_value = ensure_array_like(
     /*item*/
-    t[0].choices
-  ), s = [];
-  for (let o = 0; o < i.length; o += 1)
-    s[o] = Qe(Re(t, i, o));
-  const l = (o) => F(s[o], 1, 1, () => {
-    s[o] = null;
+    ctx[0].choices
+  );
+  let each_blocks = [];
+  for (let i = 0; i < each_value.length; i += 1) {
+    each_blocks[i] = create_each_block$2(get_each_context$2(ctx, each_value, i));
+  }
+  const out = (i) => transition_out(each_blocks[i], 1, 1, () => {
+    each_blocks[i] = null;
   });
   return {
     c() {
-      e = k("div");
-      for (let o = 0; o < s.length; o += 1)
-        s[o].c();
-      g(e, "class", "space-y-2");
+      div = element("div");
+      for (let i = 0; i < each_blocks.length; i += 1) {
+        each_blocks[i].c();
+      }
+      attr(div, "class", "checkbox-group svelte-qmvkct");
     },
-    m(o, a) {
-      T(o, e, a);
-      for (let r = 0; r < s.length; r += 1)
-        s[r] && s[r].m(e, null);
-      n = !0;
+    m(target, anchor) {
+      insert(target, div, anchor);
+      for (let i = 0; i < each_blocks.length; i += 1) {
+        if (each_blocks[i]) {
+          each_blocks[i].m(div, null);
+        }
+      }
+      current = true;
     },
-    p(o, a) {
-      if (a & /*item, lang, translations, handleChange*/
+    p(ctx2, dirty) {
+      if (dirty & /*item, lang, translations, handleChange*/
       29) {
-        i = V(
+        each_value = ensure_array_like(
           /*item*/
-          o[0].choices
+          ctx2[0].choices
         );
-        let r;
-        for (r = 0; r < i.length; r += 1) {
-          const u = Re(o, i, r);
-          s[r] ? (s[r].p(u, a), _(s[r], 1)) : (s[r] = Qe(u), s[r].c(), _(s[r], 1), s[r].m(e, null));
+        let i;
+        for (i = 0; i < each_value.length; i += 1) {
+          const child_ctx = get_each_context$2(ctx2, each_value, i);
+          if (each_blocks[i]) {
+            each_blocks[i].p(child_ctx, dirty);
+            transition_in(each_blocks[i], 1);
+          } else {
+            each_blocks[i] = create_each_block$2(child_ctx);
+            each_blocks[i].c();
+            transition_in(each_blocks[i], 1);
+            each_blocks[i].m(div, null);
+          }
         }
-        for (K(), r = i.length; r < s.length; r += 1)
-          l(r);
-        Q();
-      }
-    },
-    i(o) {
-      if (!n) {
-        for (let a = 0; a < i.length; a += 1)
-          _(s[a]);
-        n = !0;
-      }
-    },
-    o(o) {
-      s = s.filter(Boolean);
-      for (let a = 0; a < s.length; a += 1)
-        F(s[a]);
-      n = !1;
-    },
-    d(o) {
-      o && S(e), te(s, o);
-    }
-  };
-}
-function De(t) {
-  let e, n = (
-    /*col*/
-    t[17] + ""
-  ), i;
-  return {
-    c() {
-      e = k("th"), i = X(n), g(e, "class", "p-2 text-center border-b text-text");
-    },
-    m(s, l) {
-      T(s, e, l), $(e, i);
-    },
-    p(s, l) {
-      l & /*item*/
-      1 && n !== (n = /*col*/
-      s[17] + "") && ie(i, n);
-    },
-    d(s) {
-      s && S(e);
-    }
-  };
-}
-function He(t) {
-  let e, n, i, s, l, o, a, r;
-  return {
-    c() {
-      e = k("td"), n = k("label"), i = k("input"), g(i, "type", s = /*item*/
-      t[0].type === "grid" ? "radio" : "checkbox"), g(i, "name", l = Be(
-        /*item*/
-        t[0].id,
-        /*row*/
-        t[14]
-      )), i.value = o = /*col*/
-      t[17], g(i, "class", "h-5 w-5 text-primary focus-visible:ring focus-visible:ring-inputFocus"), g(n, "class", "flex items-center justify-center cursor-pointer"), g(e, "class", "p-2 text-center");
-    },
-    m(u, c) {
-      T(u, e, c), $(e, n), $(n, i), a || (r = H(
-        i,
-        "change",
-        /*handleChange*/
-        t[4]
-      ), a = !0);
-    },
-    p(u, c) {
-      c & /*item*/
-      1 && s !== (s = /*item*/
-      u[0].type === "grid" ? "radio" : "checkbox") && g(i, "type", s), c & /*item*/
-      1 && l !== (l = Be(
-        /*item*/
-        u[0].id,
-        /*row*/
-        u[14]
-      )) && g(i, "name", l), c & /*item*/
-      1 && o !== (o = /*col*/
-      u[17]) && i.value !== o && (i.value = o);
-    },
-    d(u) {
-      u && S(e), a = !1, r();
-    }
-  };
-}
-function Ve(t) {
-  let e, n, i = (
-    /*row*/
-    t[14] + ""
-  ), s, l, o, a = V(
-    /*item*/
-    t[0].columns
-  ), r = [];
-  for (let u = 0; u < a.length; u += 1)
-    r[u] = He(je(t, a, u));
-  return {
-    c() {
-      e = k("tr"), n = k("th"), s = X(i), l = j();
-      for (let u = 0; u < r.length; u += 1)
-        r[u].c();
-      o = j(), g(n, "class", "p-2 text-left font-medium text-text"), g(e, "class", "border-b hover:bg-hoverBackground");
-    },
-    m(u, c) {
-      T(u, e, c), $(e, n), $(n, s), $(e, l);
-      for (let f = 0; f < r.length; f += 1)
-        r[f] && r[f].m(e, null);
-      $(e, o);
-    },
-    p(u, c) {
-      if (c & /*item*/
-      1 && i !== (i = /*row*/
-      u[14] + "") && ie(s, i), c & /*item, handleChange*/
-      17) {
-        a = V(
-          /*item*/
-          u[0].columns
-        );
-        let f;
-        for (f = 0; f < a.length; f += 1) {
-          const h = je(u, a, f);
-          r[f] ? r[f].p(h, c) : (r[f] = He(h), r[f].c(), r[f].m(e, o));
+        group_outros();
+        for (i = each_value.length; i < each_blocks.length; i += 1) {
+          out(i);
         }
-        for (; f < r.length; f += 1)
-          r[f].d(1);
-        r.length = a.length;
+        check_outros();
       }
     },
-    d(u) {
-      u && S(e), te(r, u);
+    i(local) {
+      if (current)
+        return;
+      for (let i = 0; i < each_value.length; i += 1) {
+        transition_in(each_blocks[i]);
+      }
+      current = true;
+    },
+    o(local) {
+      each_blocks = each_blocks.filter(Boolean);
+      for (let i = 0; i < each_blocks.length; i += 1) {
+        transition_out(each_blocks[i]);
+      }
+      current = false;
+    },
+    d(detaching) {
+      if (detaching) {
+        detach(div);
+      }
+      destroy_each(each_blocks, detaching);
     }
   };
 }
-function Je(t) {
-  let e, n = (
+function create_each_block_2(ctx) {
+  let option;
+  let t_value = (
     /*choice*/
-    t[7] + ""
-  ), i, s;
+    ctx[7] + ""
+  );
+  let t;
+  let option_value_value;
   return {
     c() {
-      e = k("option"), i = X(n), e.__value = s = /*choice*/
-      t[7], _e(e, e.__value);
+      option = element("option");
+      t = text(t_value);
+      option.__value = option_value_value = /*choice*/
+      ctx[7];
+      set_input_value(option, option.__value);
     },
-    m(l, o) {
-      T(l, e, o), $(e, i);
+    m(target, anchor) {
+      insert(target, option, anchor);
+      append(option, t);
     },
-    p(l, o) {
-      o & /*item*/
-      1 && n !== (n = /*choice*/
-      l[7] + "") && ie(i, n), o & /*item*/
-      1 && s !== (s = /*choice*/
-      l[7]) && (e.__value = s, _e(e, e.__value));
+    p(ctx2, dirty) {
+      if (dirty & /*item*/
+      1 && t_value !== (t_value = /*choice*/
+      ctx2[7] + ""))
+        set_data(t, t_value);
+      if (dirty & /*item*/
+      1 && option_value_value !== (option_value_value = /*choice*/
+      ctx2[7])) {
+        option.__value = option_value_value;
+        set_input_value(option, option.__value);
+      }
     },
-    d(l) {
-      l && S(e);
+    d(detaching) {
+      if (detaching) {
+        detach(option);
+      }
     }
   };
 }
-function Ke(t) {
-  let e, n, i, s, l, o, a, r, u, c, f;
-  function h(...m) {
+function create_each_block_1(ctx) {
+  let label;
+  let input;
+  let input_name_value;
+  let input_value_value;
+  let t0;
+  let span;
+  let t1;
+  let t2;
+  let current;
+  let mounted;
+  let dispose;
+  function change_handler(...args) {
     return (
       /*change_handler*/
-      t[6](
+      ctx[6](
         /*idx*/
-        t[11],
-        ...m
+        ctx[11],
+        ...args
       )
     );
   }
-  return a = new J({
+  t1 = new T({
     props: {
       text: (
         /*choice*/
-        t[7]
+        ctx[7]
       ),
       lang: (
         /*lang*/
-        t[2]
+        ctx[2]
       ),
       translations: (
         /*translations*/
-        t[3]
-      )
-    }
-  }), {
-    c() {
-      e = k("label"), n = k("input"), l = j(), o = k("span"), M(a.$$.fragment), r = j(), g(n, "type", "radio"), g(n, "name", i = /*item*/
-      t[0].id), n.value = s = /*choice*/
-      t[7], g(n, "class", "h-5 w-5 text-primary focus-visible:ring focus-visible:ring-inputFocus"), g(o, "class", "text-text"), g(e, "class", "flex items-center space-x-2");
-    },
-    m(m, d) {
-      T(m, e, d), $(e, n), $(e, l), $(e, o), O(a, o, null), $(e, r), u = !0, c || (f = H(n, "change", h), c = !0);
-    },
-    p(m, d) {
-      t = m, (!u || d & /*item*/
-      1 && i !== (i = /*item*/
-      t[0].id)) && g(n, "name", i), (!u || d & /*item*/
-      1 && s !== (s = /*choice*/
-      t[7])) && (n.value = s);
-      const L = {};
-      d & /*item*/
-      1 && (L.text = /*choice*/
-      t[7]), d & /*lang*/
-      4 && (L.lang = /*lang*/
-      t[2]), d & /*translations*/
-      8 && (L.translations = /*translations*/
-      t[3]), a.$set(L);
-    },
-    i(m) {
-      u || (_(a.$$.fragment, m), u = !0);
-    },
-    o(m) {
-      F(a.$$.fragment, m), u = !1;
-    },
-    d(m) {
-      m && S(e), R(a), c = !1, f();
-    }
-  };
-}
-function Qe(t) {
-  let e, n, i, s, l, o, a, r, u, c, f;
-  return a = new J({
-    props: {
-      text: (
-        /*choice*/
-        t[7]
-      ),
-      lang: (
-        /*lang*/
-        t[2]
-      ),
-      translations: (
-        /*translations*/
-        t[3]
-      )
-    }
-  }), {
-    c() {
-      e = k("label"), n = k("input"), l = j(), o = k("span"), M(a.$$.fragment), r = j(), g(n, "type", "checkbox"), g(n, "name", i = /*item*/
-      t[0].id), n.value = s = /*choice*/
-      t[7], g(n, "class", "h-5 w-5 text-primary focus-visible:ring focus-visible:ring-inputFocus"), g(o, "class", "text-text"), g(e, "class", "flex items-center space-x-2");
-    },
-    m(h, m) {
-      T(h, e, m), $(e, n), $(e, l), $(e, o), O(a, o, null), $(e, r), u = !0, c || (f = H(
-        n,
-        "change",
-        /*handleChange*/
-        t[4]
-      ), c = !0);
-    },
-    p(h, m) {
-      (!u || m & /*item*/
-      1 && i !== (i = /*item*/
-      h[0].id)) && g(n, "name", i), (!u || m & /*item*/
-      1 && s !== (s = /*choice*/
-      h[7])) && (n.value = s);
-      const d = {};
-      m & /*item*/
-      1 && (d.text = /*choice*/
-      h[7]), m & /*lang*/
-      4 && (d.lang = /*lang*/
-      h[2]), m & /*translations*/
-      8 && (d.translations = /*translations*/
-      h[3]), a.$set(d);
-    },
-    i(h) {
-      u || (_(a.$$.fragment, h), u = !0);
-    },
-    o(h) {
-      F(a.$$.fragment, h), u = !1;
-    },
-    d(h) {
-      h && S(e), R(a), c = !1, f();
-    }
-  };
-}
-function rn(t) {
-  let e, n, i, s, l, o, a, r;
-  i = new J({
-    props: {
-      text: (
-        /*item*/
-        t[0].title
-      ),
-      lang: (
-        /*lang*/
-        t[2]
-      ),
-      translations: (
-        /*translations*/
-        t[3]
+        ctx[3]
       )
     }
   });
-  let u = (
-    /*item*/
-    t[0].description && Me(t)
-  );
-  const c = [
-    on,
-    ln,
-    sn,
-    nn,
-    tn,
-    en,
-    xt,
-    Zt,
-    Yt,
-    Xt
-  ], f = [];
-  function h(m, d) {
-    return (
-      /*item*/
-      m[0].type === "checkbox" ? 0 : (
-        /*item*/
-        m[0].type === "multipleChoice" ? 1 : (
-          /*item*/
-          m[0].type === "text" ? 2 : (
-            /*item*/
-            m[0].type === "paragraph" ? 3 : (
-              /*item*/
-              m[0].type == "rating" ? 4 : (
-                /*item*/
-                m[0].type == "scale" ? 5 : (
-                  /*item*/
-                  m[0].type == "list" ? 6 : (
-                    /*item*/
-                    m[0].type == "date" || /*item*/
-                    m[0].type == "time" || /*item*/
-                    m[0].type == "datetime" ? 7 : (
-                      /*item*/
-                      m[0].type == "duration" ? 8 : (
-                        /*item*/
-                        m[0].type === "grid" || /*item*/
-                        m[0].type === "checkboxGrid" ? 9 : -1
-                      )
-                    )
-                  )
-                )
-              )
-            )
-          )
-        )
-      )
-    );
-  }
-  return ~(o = h(t)) && (a = f[o] = c[o](t)), {
+  return {
     c() {
-      e = k("div"), n = k("h3"), M(i.$$.fragment), s = j(), u && u.c(), l = j(), a && a.c(), g(n, "class", "text-lg font-semibold text-text"), g(e, "class", "mb-6");
+      label = element("label");
+      input = element("input");
+      t0 = space();
+      span = element("span");
+      create_component(t1.$$.fragment);
+      t2 = space();
+      attr(input, "type", "radio");
+      attr(input, "name", input_name_value = /*item*/
+      ctx[0].id);
+      input.value = input_value_value = /*choice*/
+      ctx[7];
+      attr(input, "class", "radio-input svelte-qmvkct");
+      attr(span, "class", "choice-text svelte-qmvkct");
+      attr(label, "class", "radio-label svelte-qmvkct");
     },
-    m(m, d) {
-      T(m, e, d), $(e, n), O(i, n, null), $(e, s), u && u.m(e, null), $(e, l), ~o && f[o].m(e, null), r = !0;
+    m(target, anchor) {
+      insert(target, label, anchor);
+      append(label, input);
+      append(label, t0);
+      append(label, span);
+      mount_component(t1, span, null);
+      append(label, t2);
+      current = true;
+      if (!mounted) {
+        dispose = listen(input, "change", change_handler);
+        mounted = true;
+      }
     },
-    p(m, [d]) {
-      const L = {};
-      d & /*item*/
-      1 && (L.text = /*item*/
-      m[0].title), d & /*lang*/
-      4 && (L.lang = /*lang*/
-      m[2]), d & /*translations*/
-      8 && (L.translations = /*translations*/
-      m[3]), i.$set(L), /*item*/
-      m[0].description ? u ? (u.p(m, d), d & /*item*/
-      1 && _(u, 1)) : (u = Me(m), u.c(), _(u, 1), u.m(e, l)) : u && (K(), F(u, 1, 1, () => {
-        u = null;
-      }), Q());
-      let y = o;
-      o = h(m), o === y ? ~o && f[o].p(m, d) : (a && (K(), F(f[y], 1, 1, () => {
-        f[y] = null;
-      }), Q()), ~o ? (a = f[o], a ? a.p(m, d) : (a = f[o] = c[o](m), a.c()), _(a, 1), a.m(e, null)) : a = null);
+    p(new_ctx, dirty) {
+      ctx = new_ctx;
+      if (!current || dirty & /*item*/
+      1 && input_name_value !== (input_name_value = /*item*/
+      ctx[0].id)) {
+        attr(input, "name", input_name_value);
+      }
+      if (!current || dirty & /*item*/
+      1 && input_value_value !== (input_value_value = /*choice*/
+      ctx[7])) {
+        input.value = input_value_value;
+      }
+      const t1_changes = {};
+      if (dirty & /*item*/
+      1)
+        t1_changes.text = /*choice*/
+        ctx[7];
+      if (dirty & /*lang*/
+      4)
+        t1_changes.lang = /*lang*/
+        ctx[2];
+      if (dirty & /*translations*/
+      8)
+        t1_changes.translations = /*translations*/
+        ctx[3];
+      t1.$set(t1_changes);
     },
-    i(m) {
-      r || (_(i.$$.fragment, m), _(u), _(a), r = !0);
+    i(local) {
+      if (current)
+        return;
+      transition_in(t1.$$.fragment, local);
+      current = true;
     },
-    o(m) {
-      F(i.$$.fragment, m), F(u), F(a), r = !1;
+    o(local) {
+      transition_out(t1.$$.fragment, local);
+      current = false;
     },
-    d(m) {
-      m && S(e), R(i), u && u.d(), ~o && f[o].d();
+    d(detaching) {
+      if (detaching) {
+        detach(label);
+      }
+      destroy_component(t1);
+      mounted = false;
+      dispose();
     }
   };
 }
-function an(t, e, n) {
-  let { item: i } = e, { onInputChange: s } = e, { setChoice: l } = e, { lang: o = "en" } = e, { translations: a = {} } = e;
-  function r(c) {
-    s(i.id, c.target.value);
-  }
-  const u = (c, f) => {
-    r(f), l(i, c);
+function create_each_block$2(ctx) {
+  let label;
+  let input;
+  let input_name_value;
+  let input_value_value;
+  let t0;
+  let span;
+  let t1;
+  let t2;
+  let current;
+  let mounted;
+  let dispose;
+  t1 = new T({
+    props: {
+      text: (
+        /*choice*/
+        ctx[7]
+      ),
+      lang: (
+        /*lang*/
+        ctx[2]
+      ),
+      translations: (
+        /*translations*/
+        ctx[3]
+      )
+    }
+  });
+  return {
+    c() {
+      label = element("label");
+      input = element("input");
+      t0 = space();
+      span = element("span");
+      create_component(t1.$$.fragment);
+      t2 = space();
+      attr(input, "type", "checkbox");
+      attr(input, "name", input_name_value = /*item*/
+      ctx[0].id);
+      input.value = input_value_value = /*choice*/
+      ctx[7];
+      attr(input, "class", "checkbox-input svelte-qmvkct");
+      attr(span, "class", "choice-text svelte-qmvkct");
+      attr(label, "class", "checkbox-label svelte-qmvkct");
+    },
+    m(target, anchor) {
+      insert(target, label, anchor);
+      append(label, input);
+      append(label, t0);
+      append(label, span);
+      mount_component(t1, span, null);
+      append(label, t2);
+      current = true;
+      if (!mounted) {
+        dispose = listen(
+          input,
+          "change",
+          /*handleChange*/
+          ctx[4]
+        );
+        mounted = true;
+      }
+    },
+    p(ctx2, dirty) {
+      if (!current || dirty & /*item*/
+      1 && input_name_value !== (input_name_value = /*item*/
+      ctx2[0].id)) {
+        attr(input, "name", input_name_value);
+      }
+      if (!current || dirty & /*item*/
+      1 && input_value_value !== (input_value_value = /*choice*/
+      ctx2[7])) {
+        input.value = input_value_value;
+      }
+      const t1_changes = {};
+      if (dirty & /*item*/
+      1)
+        t1_changes.text = /*choice*/
+        ctx2[7];
+      if (dirty & /*lang*/
+      4)
+        t1_changes.lang = /*lang*/
+        ctx2[2];
+      if (dirty & /*translations*/
+      8)
+        t1_changes.translations = /*translations*/
+        ctx2[3];
+      t1.$set(t1_changes);
+    },
+    i(local) {
+      if (current)
+        return;
+      transition_in(t1.$$.fragment, local);
+      current = true;
+    },
+    o(local) {
+      transition_out(t1.$$.fragment, local);
+      current = false;
+    },
+    d(detaching) {
+      if (detaching) {
+        detach(label);
+      }
+      destroy_component(t1);
+      mounted = false;
+      dispose();
+    }
   };
-  return t.$$set = (c) => {
-    "item" in c && n(0, i = c.item), "onInputChange" in c && n(5, s = c.onInputChange), "setChoice" in c && n(1, l = c.setChoice), "lang" in c && n(2, o = c.lang), "translations" in c && n(3, a = c.translations);
-  }, [
-    i,
-    l,
-    o,
-    a,
-    r,
-    s,
-    u
+}
+function create_fragment$3(ctx) {
+  let div;
+  let h3;
+  let t0;
+  let t1;
+  let t2;
+  let current_block_type_index;
+  let if_block1;
+  let current;
+  t0 = new T({
+    props: {
+      text: (
+        /*item*/
+        ctx[0].title
+      ),
+      lang: (
+        /*lang*/
+        ctx[2]
+      ),
+      translations: (
+        /*translations*/
+        ctx[3]
+      )
+    }
+  });
+  let if_block0 = (
+    /*item*/
+    ctx[0].description && create_if_block_7(ctx)
+  );
+  const if_block_creators = [
+    create_if_block$3,
+    create_if_block_1$3,
+    create_if_block_2$2,
+    create_if_block_3$2,
+    create_if_block_4$2,
+    create_if_block_5$2,
+    create_if_block_6
+  ];
+  const if_blocks = [];
+  function select_block_type(ctx2, dirty) {
+    if (
+      /*item*/
+      ctx2[0].type === "checkbox"
+    )
+      return 0;
+    if (
+      /*item*/
+      ctx2[0].type === "multipleChoice"
+    )
+      return 1;
+    if (
+      /*item*/
+      ctx2[0].type === "text"
+    )
+      return 2;
+    if (
+      /*item*/
+      ctx2[0].type === "paragraph"
+    )
+      return 3;
+    if (
+      /*item*/
+      ctx2[0].type == "rating"
+    )
+      return 4;
+    if (
+      /*item*/
+      ctx2[0].type == "scale"
+    )
+      return 5;
+    if (
+      /*item*/
+      ctx2[0].type == "list"
+    )
+      return 6;
+    return -1;
+  }
+  if (~(current_block_type_index = select_block_type(ctx))) {
+    if_block1 = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
+  }
+  return {
+    c() {
+      div = element("div");
+      h3 = element("h3");
+      create_component(t0.$$.fragment);
+      t1 = space();
+      if (if_block0)
+        if_block0.c();
+      t2 = space();
+      if (if_block1)
+        if_block1.c();
+      attr(h3, "class", "question-title svelte-qmvkct");
+      attr(div, "class", "form-item svelte-qmvkct");
+    },
+    m(target, anchor) {
+      insert(target, div, anchor);
+      append(div, h3);
+      mount_component(t0, h3, null);
+      append(div, t1);
+      if (if_block0)
+        if_block0.m(div, null);
+      append(div, t2);
+      if (~current_block_type_index) {
+        if_blocks[current_block_type_index].m(div, null);
+      }
+      current = true;
+    },
+    p(ctx2, [dirty]) {
+      const t0_changes = {};
+      if (dirty & /*item*/
+      1)
+        t0_changes.text = /*item*/
+        ctx2[0].title;
+      if (dirty & /*lang*/
+      4)
+        t0_changes.lang = /*lang*/
+        ctx2[2];
+      if (dirty & /*translations*/
+      8)
+        t0_changes.translations = /*translations*/
+        ctx2[3];
+      t0.$set(t0_changes);
+      if (
+        /*item*/
+        ctx2[0].description
+      ) {
+        if (if_block0) {
+          if_block0.p(ctx2, dirty);
+          if (dirty & /*item*/
+          1) {
+            transition_in(if_block0, 1);
+          }
+        } else {
+          if_block0 = create_if_block_7(ctx2);
+          if_block0.c();
+          transition_in(if_block0, 1);
+          if_block0.m(div, t2);
+        }
+      } else if (if_block0) {
+        group_outros();
+        transition_out(if_block0, 1, 1, () => {
+          if_block0 = null;
+        });
+        check_outros();
+      }
+      let previous_block_index = current_block_type_index;
+      current_block_type_index = select_block_type(ctx2);
+      if (current_block_type_index === previous_block_index) {
+        if (~current_block_type_index) {
+          if_blocks[current_block_type_index].p(ctx2, dirty);
+        }
+      } else {
+        if (if_block1) {
+          group_outros();
+          transition_out(if_blocks[previous_block_index], 1, 1, () => {
+            if_blocks[previous_block_index] = null;
+          });
+          check_outros();
+        }
+        if (~current_block_type_index) {
+          if_block1 = if_blocks[current_block_type_index];
+          if (!if_block1) {
+            if_block1 = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx2);
+            if_block1.c();
+          } else {
+            if_block1.p(ctx2, dirty);
+          }
+          transition_in(if_block1, 1);
+          if_block1.m(div, null);
+        } else {
+          if_block1 = null;
+        }
+      }
+    },
+    i(local) {
+      if (current)
+        return;
+      transition_in(t0.$$.fragment, local);
+      transition_in(if_block0);
+      transition_in(if_block1);
+      current = true;
+    },
+    o(local) {
+      transition_out(t0.$$.fragment, local);
+      transition_out(if_block0);
+      transition_out(if_block1);
+      current = false;
+    },
+    d(detaching) {
+      if (detaching) {
+        detach(div);
+      }
+      destroy_component(t0);
+      if (if_block0)
+        if_block0.d();
+      if (~current_block_type_index) {
+        if_blocks[current_block_type_index].d();
+      }
+    }
+  };
+}
+function instance$3($$self, $$props, $$invalidate) {
+  let { item } = $$props;
+  let { onInputChange } = $$props;
+  let { setChoice } = $$props;
+  let { lang = "en" } = $$props;
+  let { translations = {} } = $$props;
+  function handleChange(event) {
+    onInputChange(item.id, event.target.value);
+  }
+  const change_handler = (idx, event) => {
+    handleChange(event);
+    setChoice(item, idx);
+  };
+  $$self.$$set = ($$props2) => {
+    if ("item" in $$props2)
+      $$invalidate(0, item = $$props2.item);
+    if ("onInputChange" in $$props2)
+      $$invalidate(5, onInputChange = $$props2.onInputChange);
+    if ("setChoice" in $$props2)
+      $$invalidate(1, setChoice = $$props2.setChoice);
+    if ("lang" in $$props2)
+      $$invalidate(2, lang = $$props2.lang);
+    if ("translations" in $$props2)
+      $$invalidate(3, translations = $$props2.translations);
+  };
+  return [
+    item,
+    setChoice,
+    lang,
+    translations,
+    handleChange,
+    onInputChange,
+    change_handler
   ];
 }
-class bt extends ae {
-  constructor(e) {
-    super(), oe(this, e, an, rn, le, {
-      item: 0,
-      onInputChange: 5,
-      setChoice: 1,
-      lang: 2,
-      translations: 3
-    });
+class GFormItem extends SvelteComponent {
+  constructor(options) {
+    super();
+    init(
+      this,
+      options,
+      instance$3,
+      create_fragment$3,
+      safe_not_equal,
+      {
+        item: 0,
+        onInputChange: 5,
+        setChoice: 1,
+        lang: 2,
+        translations: 3
+      },
+      add_css$2
+    );
   }
   get item() {
     return this.$$.ctx[0];
   }
-  set item(e) {
-    this.$$set({ item: e }), I();
+  set item(item) {
+    this.$$set({ item });
+    flush();
   }
   get onInputChange() {
     return this.$$.ctx[5];
   }
-  set onInputChange(e) {
-    this.$$set({ onInputChange: e }), I();
+  set onInputChange(onInputChange) {
+    this.$$set({ onInputChange });
+    flush();
   }
   get setChoice() {
     return this.$$.ctx[1];
   }
-  set setChoice(e) {
-    this.$$set({ setChoice: e }), I();
+  set setChoice(setChoice) {
+    this.$$set({ setChoice });
+    flush();
   }
   get lang() {
     return this.$$.ctx[2];
   }
-  set lang(e) {
-    this.$$set({ lang: e }), I();
+  set lang(lang) {
+    this.$$set({ lang });
+    flush();
   }
   get translations() {
     return this.$$.ctx[3];
   }
-  set translations(e) {
-    this.$$set({ translations: e }), I();
+  set translations(translations) {
+    this.$$set({ translations });
+    flush();
   }
 }
-re(bt, { item: {}, onInputChange: {}, setChoice: {}, lang: {}, translations: {} }, [], [], !0);
-function We(t, e, n) {
-  const i = t.slice();
-  return i[15] = e[n], i;
+create_custom_element(GFormItem, { "item": {}, "onInputChange": {}, "setChoice": {}, "lang": {}, "translations": {} }, [], [], true);
+function add_css$1(target) {
+  append_styles(target, "svelte-hvfp2g", ".page-container.svelte-hvfp2g{max-width:42rem;margin:0 auto;padding:1.5rem;background-color:var(--bg-color, #ffffff);color:var(--text-color, #1f2937);box-shadow:0 4px 6px rgba(0, 0, 0, 0.1);border-radius:8px;transition:opacity 0.3s ease-in-out}.page-title.svelte-hvfp2g{font-size:1.5rem;font-weight:600;color:var(--text-color, #1f2937);margin-bottom:0.75rem}.page-description.svelte-hvfp2g{font-size:0.875rem;color:var(--muted-text, #6b7280);margin-bottom:1rem}.error-message.svelte-hvfp2g{background-color:var(--error-bg, #fef2f2);border:1px solid var(--error-color, #dc2626);color:var(--error-color, #dc2626);padding:0.5rem;border-radius:6px;font-size:0.875rem;margin-top:0.5rem}.nav-buttons.svelte-hvfp2g{display:flex;justify-content:space-between;margin-top:1.5rem}.nav-button.svelte-hvfp2g{padding:0.5rem 1rem;border-radius:6px;font-weight:500;font-size:1rem;transition:all 0.2s ease-in-out;cursor:pointer;border:none;outline:none}.back-button.svelte-hvfp2g{background-color:var(--muted-bg, #e5e7eb);color:var(--text-color, #1f2937)}.back-button.svelte-hvfp2g:hover{background-color:var(--muted-hover, #d1d5db)}.next-button.svelte-hvfp2g{background-color:var(--primary-color, #2563eb);color:#ffffff}.next-button.svelte-hvfp2g:hover{background-color:var(--primary-dark, #1d4ed8)}.next-button.svelte-hvfp2g:disabled{background-color:var(--disabled-bg, #9ca3af);cursor:not-allowed}.nav-button.svelte-hvfp2g:focus{outline:2px solid var(--input-focus-color, #2563eb);outline-offset:2px}.hidden.svelte-hvfp2g{visibility:hidden}");
 }
-function Xe(t) {
-  let e, n = (
+function get_each_context$1(ctx, list, i) {
+  const child_ctx = ctx.slice();
+  child_ctx[15] = list[i];
+  return child_ctx;
+}
+function create_if_block_5$1(ctx) {
+  let h2;
+  let t_value = (
     /*page*/
-    t[0].title + ""
-  ), i;
+    ctx[0].title + ""
+  );
+  let t;
   return {
     c() {
-      e = k("h2"), i = X(n), g(e, "class", "text-2xl font-semibold text-text");
+      h2 = element("h2");
+      t = text(t_value);
+      attr(h2, "class", "page-title svelte-hvfp2g");
     },
-    m(s, l) {
-      T(s, e, l), $(e, i);
+    m(target, anchor) {
+      insert(target, h2, anchor);
+      append(h2, t);
     },
-    p(s, l) {
-      l & /*page*/
-      1 && n !== (n = /*page*/
-      s[0].title + "") && ie(i, n);
+    p(ctx2, dirty) {
+      if (dirty & /*page*/
+      1 && t_value !== (t_value = /*page*/
+      ctx2[0].title + ""))
+        set_data(t, t_value);
     },
-    d(s) {
-      s && S(e);
+    d(detaching) {
+      if (detaching) {
+        detach(h2);
+      }
     }
   };
 }
-function Ye(t) {
-  let e, n, i;
-  return n = new J({
+function create_if_block_4$1(ctx) {
+  let p;
+  let t;
+  let current;
+  t = new T({
     props: {
       text: (
         /*page*/
-        t[0].description
+        ctx[0].description
       ),
       lang: (
         /*lang*/
-        t[5]
+        ctx[5]
       ),
       translations: (
         /*translations*/
-        t[6]
-      )
-    }
-  }), {
-    c() {
-      e = k("p"), M(n.$$.fragment), g(e, "class", "text-muted mb-4");
-    },
-    m(s, l) {
-      T(s, e, l), O(n, e, null), i = !0;
-    },
-    p(s, l) {
-      const o = {};
-      l & /*page*/
-      1 && (o.text = /*page*/
-      s[0].description), l & /*lang*/
-      32 && (o.lang = /*lang*/
-      s[5]), l & /*translations*/
-      64 && (o.translations = /*translations*/
-      s[6]), n.$set(o);
-    },
-    i(s) {
-      i || (_(n.$$.fragment, s), i = !0);
-    },
-    o(s) {
-      F(n.$$.fragment, s), i = !1;
-    },
-    d(s) {
-      s && S(e), R(n);
-    }
-  };
-}
-function Ze(t) {
-  let e, n = (
-    /*formErrors*/
-    t[8][
-      /*item*/
-      t[15].id
-    ] + ""
-  ), i, s;
-  return {
-    c() {
-      e = k("p"), i = X(n), s = j(), g(e, "class", "text-error bg-errorBg border border-error p-2 rounded-md text-sm mt-2");
-    },
-    m(l, o) {
-      T(l, e, o), $(e, i), $(e, s);
-    },
-    p(l, o) {
-      o & /*formErrors, page*/
-      257 && n !== (n = /*formErrors*/
-      l[8][
-        /*item*/
-        l[15].id
-      ] + "") && ie(i, n);
-    },
-    d(l) {
-      l && S(e);
-    }
-  };
-}
-function xe(t) {
-  let e, n, i, s;
-  e = new bt({
-    props: {
-      item: (
-        /*item*/
-        t[15]
-      ),
-      onInputChange: (
-        /*onInputChange*/
-        t[10]
-      ),
-      setChoice: (
-        /*setChoice*/
-        t[9]
-      ),
-      lang: (
-        /*lang*/
-        t[5]
-      ),
-      translations: (
-        /*translations*/
-        t[6]
+        ctx[6]
       )
     }
   });
-  let l = (
-    /*formErrors*/
-    t[8][
-      /*item*/
-      t[15].id
-    ] && Ze(t)
-  );
   return {
     c() {
-      M(e.$$.fragment), n = j(), l && l.c(), i = $e();
+      p = element("p");
+      create_component(t.$$.fragment);
+      attr(p, "class", "page-description svelte-hvfp2g");
     },
-    m(o, a) {
-      O(e, o, a), T(o, n, a), l && l.m(o, a), T(o, i, a), s = !0;
+    m(target, anchor) {
+      insert(target, p, anchor);
+      mount_component(t, p, null);
+      current = true;
     },
-    p(o, a) {
-      const r = {};
-      a & /*page*/
-      1 && (r.item = /*item*/
-      o[15]), a & /*lang*/
-      32 && (r.lang = /*lang*/
-      o[5]), a & /*translations*/
-      64 && (r.translations = /*translations*/
-      o[6]), e.$set(r), /*formErrors*/
-      o[8][
-        /*item*/
-        o[15].id
-      ] ? l ? l.p(o, a) : (l = Ze(o), l.c(), l.m(i.parentNode, i)) : l && (l.d(1), l = null);
+    p(ctx2, dirty) {
+      const t_changes = {};
+      if (dirty & /*page*/
+      1)
+        t_changes.text = /*page*/
+        ctx2[0].description;
+      if (dirty & /*lang*/
+      32)
+        t_changes.lang = /*lang*/
+        ctx2[5];
+      if (dirty & /*translations*/
+      64)
+        t_changes.translations = /*translations*/
+        ctx2[6];
+      t.$set(t_changes);
     },
-    i(o) {
-      s || (_(e.$$.fragment, o), s = !0);
+    i(local) {
+      if (current)
+        return;
+      transition_in(t.$$.fragment, local);
+      current = true;
     },
-    o(o) {
-      F(e.$$.fragment, o), s = !1;
+    o(local) {
+      transition_out(t.$$.fragment, local);
+      current = false;
     },
-    d(o) {
-      o && (S(n), S(i)), R(e, o), l && l.d(o);
+    d(detaching) {
+      if (detaching) {
+        detach(p);
+      }
+      destroy_component(t);
     }
   };
 }
-function et(t) {
-  let e, n, i, s, l;
-  return n = new J({
+function create_if_block_3$1(ctx) {
+  let p;
+  let t0_value = (
+    /*formErrors*/
+    ctx[8][
+      /*item*/
+      ctx[15].id
+    ] + ""
+  );
+  let t0;
+  let t1;
+  return {
+    c() {
+      p = element("p");
+      t0 = text(t0_value);
+      t1 = space();
+      attr(p, "class", "error-message svelte-hvfp2g");
+    },
+    m(target, anchor) {
+      insert(target, p, anchor);
+      append(p, t0);
+      append(p, t1);
+    },
+    p(ctx2, dirty) {
+      if (dirty & /*formErrors, page*/
+      257 && t0_value !== (t0_value = /*formErrors*/
+      ctx2[8][
+        /*item*/
+        ctx2[15].id
+      ] + ""))
+        set_data(t0, t0_value);
+    },
+    d(detaching) {
+      if (detaching) {
+        detach(p);
+      }
+    }
+  };
+}
+function create_each_block$1(ctx) {
+  let gformitem;
+  let t;
+  let if_block_anchor;
+  let current;
+  gformitem = new GFormItem({
+    props: {
+      item: (
+        /*item*/
+        ctx[15]
+      ),
+      onInputChange: (
+        /*onInputChange*/
+        ctx[10]
+      ),
+      setChoice: (
+        /*setChoice*/
+        ctx[9]
+      ),
+      lang: (
+        /*lang*/
+        ctx[5]
+      ),
+      translations: (
+        /*translations*/
+        ctx[6]
+      )
+    }
+  });
+  let if_block = (
+    /*formErrors*/
+    ctx[8][
+      /*item*/
+      ctx[15].id
+    ] && create_if_block_3$1(ctx)
+  );
+  return {
+    c() {
+      create_component(gformitem.$$.fragment);
+      t = space();
+      if (if_block)
+        if_block.c();
+      if_block_anchor = empty();
+    },
+    m(target, anchor) {
+      mount_component(gformitem, target, anchor);
+      insert(target, t, anchor);
+      if (if_block)
+        if_block.m(target, anchor);
+      insert(target, if_block_anchor, anchor);
+      current = true;
+    },
+    p(ctx2, dirty) {
+      const gformitem_changes = {};
+      if (dirty & /*page*/
+      1)
+        gformitem_changes.item = /*item*/
+        ctx2[15];
+      if (dirty & /*lang*/
+      32)
+        gformitem_changes.lang = /*lang*/
+        ctx2[5];
+      if (dirty & /*translations*/
+      64)
+        gformitem_changes.translations = /*translations*/
+        ctx2[6];
+      gformitem.$set(gformitem_changes);
+      if (
+        /*formErrors*/
+        ctx2[8][
+          /*item*/
+          ctx2[15].id
+        ]
+      ) {
+        if (if_block) {
+          if_block.p(ctx2, dirty);
+        } else {
+          if_block = create_if_block_3$1(ctx2);
+          if_block.c();
+          if_block.m(if_block_anchor.parentNode, if_block_anchor);
+        }
+      } else if (if_block) {
+        if_block.d(1);
+        if_block = null;
+      }
+    },
+    i(local) {
+      if (current)
+        return;
+      transition_in(gformitem.$$.fragment, local);
+      current = true;
+    },
+    o(local) {
+      transition_out(gformitem.$$.fragment, local);
+      current = false;
+    },
+    d(detaching) {
+      if (detaching) {
+        detach(t);
+        detach(if_block_anchor);
+      }
+      destroy_component(gformitem, detaching);
+      if (if_block)
+        if_block.d(detaching);
+    }
+  };
+}
+function create_else_block_1(ctx) {
+  let div;
+  return {
+    c() {
+      div = element("div");
+    },
+    m(target, anchor) {
+      insert(target, div, anchor);
+    },
+    p: noop,
+    i: noop,
+    o: noop,
+    d(detaching) {
+      if (detaching) {
+        detach(div);
+      }
+    }
+  };
+}
+function create_if_block_2$1(ctx) {
+  let button;
+  let t;
+  let current;
+  let mounted;
+  let dispose;
+  t = new T({
     props: {
       text: "Back",
       lang: (
         /*lang*/
-        t[5]
+        ctx[5]
       ),
       translations: (
         /*translations*/
-        t[6]
+        ctx[6]
       )
     }
-  }), {
+  });
+  return {
     c() {
-      e = k("button"), M(n.$$.fragment), g(e, "class", "px-4 py-2 bg-muted text-text rounded-md hover:bg-mutedHover transition focus:outline-none focus-visible:ring-2 focus-visible:ring-inputFocus");
+      button = element("button");
+      create_component(t.$$.fragment);
+      attr(button, "class", "nav-button back-button svelte-hvfp2g");
     },
-    m(o, a) {
-      T(o, e, a), O(n, e, null), i = !0, s || (l = H(e, "click", mt(function() {
-        Se(
-          /*onBack*/
-          t[4]
-        ) && t[4].apply(this, arguments);
-      })), s = !0);
+    m(target, anchor) {
+      insert(target, button, anchor);
+      mount_component(t, button, null);
+      current = true;
+      if (!mounted) {
+        dispose = listen(button, "click", prevent_default(function() {
+          if (is_function(
+            /*onBack*/
+            ctx[4]
+          ))
+            ctx[4].apply(this, arguments);
+        }));
+        mounted = true;
+      }
     },
-    p(o, a) {
-      t = o;
-      const r = {};
-      a & /*lang*/
-      32 && (r.lang = /*lang*/
-      t[5]), a & /*translations*/
-      64 && (r.translations = /*translations*/
-      t[6]), n.$set(r);
+    p(new_ctx, dirty) {
+      ctx = new_ctx;
+      const t_changes = {};
+      if (dirty & /*lang*/
+      32)
+        t_changes.lang = /*lang*/
+        ctx[5];
+      if (dirty & /*translations*/
+      64)
+        t_changes.translations = /*translations*/
+        ctx[6];
+      t.$set(t_changes);
     },
-    i(o) {
-      i || (_(n.$$.fragment, o), i = !0);
+    i(local) {
+      if (current)
+        return;
+      transition_in(t.$$.fragment, local);
+      current = true;
     },
-    o(o) {
-      F(n.$$.fragment, o), i = !1;
+    o(local) {
+      transition_out(t.$$.fragment, local);
+      current = false;
     },
-    d(o) {
-      o && S(e), R(n), s = !1, l();
+    d(detaching) {
+      if (detaching) {
+        detach(button);
+      }
+      destroy_component(t);
+      mounted = false;
+      dispose();
     }
   };
 }
-function un(t) {
-  let e, n;
-  return e = new J({
+function create_else_block(ctx) {
+  let t;
+  let current;
+  t = new T({
     props: {
       text: "Next",
       lang: (
         /*lang*/
-        t[5]
+        ctx[5]
       ),
       translations: (
         /*translations*/
-        t[6]
+        ctx[6]
       )
     }
-  }), {
+  });
+  return {
     c() {
-      M(e.$$.fragment);
+      create_component(t.$$.fragment);
     },
-    m(i, s) {
-      O(e, i, s), n = !0;
+    m(target, anchor) {
+      mount_component(t, target, anchor);
+      current = true;
     },
-    p(i, s) {
-      const l = {};
-      s & /*lang*/
-      32 && (l.lang = /*lang*/
-      i[5]), s & /*translations*/
-      64 && (l.translations = /*translations*/
-      i[6]), e.$set(l);
+    p(ctx2, dirty) {
+      const t_changes = {};
+      if (dirty & /*lang*/
+      32)
+        t_changes.lang = /*lang*/
+        ctx2[5];
+      if (dirty & /*translations*/
+      64)
+        t_changes.translations = /*translations*/
+        ctx2[6];
+      t.$set(t_changes);
     },
-    i(i) {
-      n || (_(e.$$.fragment, i), n = !0);
+    i(local) {
+      if (current)
+        return;
+      transition_in(t.$$.fragment, local);
+      current = true;
     },
-    o(i) {
-      F(e.$$.fragment, i), n = !1;
+    o(local) {
+      transition_out(t.$$.fragment, local);
+      current = false;
     },
-    d(i) {
-      R(e, i);
+    d(detaching) {
+      destroy_component(t, detaching);
     }
   };
 }
-function fn(t) {
-  let e, n;
-  return e = new J({
+function create_if_block_1$2(ctx) {
+  let t;
+  let current;
+  t = new T({
     props: {
       text: "Submit",
       lang: (
         /*lang*/
-        t[5]
+        ctx[5]
       ),
       translations: (
         /*translations*/
-        t[6]
+        ctx[6]
       )
     }
-  }), {
+  });
+  return {
     c() {
-      M(e.$$.fragment);
+      create_component(t.$$.fragment);
     },
-    m(i, s) {
-      O(e, i, s), n = !0;
+    m(target, anchor) {
+      mount_component(t, target, anchor);
+      current = true;
     },
-    p(i, s) {
-      const l = {};
-      s & /*lang*/
-      32 && (l.lang = /*lang*/
-      i[5]), s & /*translations*/
-      64 && (l.translations = /*translations*/
-      i[6]), e.$set(l);
+    p(ctx2, dirty) {
+      const t_changes = {};
+      if (dirty & /*lang*/
+      32)
+        t_changes.lang = /*lang*/
+        ctx2[5];
+      if (dirty & /*translations*/
+      64)
+        t_changes.translations = /*translations*/
+        ctx2[6];
+      t.$set(t_changes);
     },
-    i(i) {
-      n || (_(e.$$.fragment, i), n = !0);
+    i(local) {
+      if (current)
+        return;
+      transition_in(t.$$.fragment, local);
+      current = true;
     },
-    o(i) {
-      F(e.$$.fragment, i), n = !1;
+    o(local) {
+      transition_out(t.$$.fragment, local);
+      current = false;
     },
-    d(i) {
-      R(e, i);
+    d(detaching) {
+      destroy_component(t, detaching);
     }
   };
 }
-function cn(t) {
-  let e, n;
-  return e = new J({
+function create_if_block$2(ctx) {
+  let t;
+  let current;
+  t = new T({
     props: {
       text: "Submitting",
       lang: (
         /*lang*/
-        t[5]
+        ctx[5]
       ),
       translations: (
         /*translations*/
-        t[6]
+        ctx[6]
       )
     }
-  }), {
-    c() {
-      M(e.$$.fragment);
-    },
-    m(i, s) {
-      O(e, i, s), n = !0;
-    },
-    p(i, s) {
-      const l = {};
-      s & /*lang*/
-      32 && (l.lang = /*lang*/
-      i[5]), s & /*translations*/
-      64 && (l.translations = /*translations*/
-      i[6]), e.$set(l);
-    },
-    i(i) {
-      n || (_(e.$$.fragment, i), n = !0);
-    },
-    o(i) {
-      F(e.$$.fragment, i), n = !1;
-    },
-    d(i) {
-      R(e, i);
-    }
-  };
-}
-function mn(t) {
-  let e, n, i, s, l, o, a, r, u, c, f, h, m = (
-    /*page*/
-    t[0].title && Xe(t)
-  ), d = (
-    /*page*/
-    t[0].description && Ye(t)
-  ), L = V(
-    /*page*/
-    t[0].items
-  ), y = [];
-  for (let C = 0; C < L.length; C += 1)
-    y[C] = xe(We(t, L, C));
-  const A = (C) => F(y[C], 1, 1, () => {
-    y[C] = null;
   });
-  let v = !/*isFirst*/
-  t[2] && et(t);
-  const U = [cn, fn, un], E = [];
-  function B(C, p) {
-    return (
-      /*isSubmitting*/
-      C[3] ? 0 : (
-        /*nextPageId*/
-        C[7] === "submit" ? 1 : 2
-      )
-    );
-  }
-  return r = B(t), u = E[r] = U[r](t), {
+  return {
     c() {
-      e = k("div"), m && m.c(), n = j(), d && d.c(), i = j();
-      for (let C = 0; C < y.length; C += 1)
-        y[C].c();
-      s = j(), l = k("div"), v && v.c(), o = j(), a = k("button"), u.c(), g(a, "class", "px-4 py-2 bg-primary text-white rounded-md hover:bg-opacity-80 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-inputFocus"), a.disabled = /*isSubmitting*/
-      t[3], g(l, "class", "flex justify-between mt-6"), g(e, "class", "max-w-2xl mx-auto p-6 bg-background text-text shadow-md rounded-md transition-opacity duration-300 ease-in-out"), x(e, "hidden", !/*isActive*/
-      t[1]);
+      create_component(t.$$.fragment);
     },
-    m(C, p) {
-      T(C, e, p), m && m.m(e, null), $(e, n), d && d.m(e, null), $(e, i);
-      for (let z = 0; z < y.length; z += 1)
-        y[z] && y[z].m(e, null);
-      $(e, s), $(e, l), v && v.m(l, null), $(l, o), $(l, a), E[r].m(a, null), c = !0, f || (h = H(a, "click", mt(
-        /*handleNext*/
-        t[11]
-      )), f = !0);
+    m(target, anchor) {
+      mount_component(t, target, anchor);
+      current = true;
     },
-    p(C, [p]) {
-      if (/*page*/
-      C[0].title ? m ? m.p(C, p) : (m = Xe(C), m.c(), m.m(e, n)) : m && (m.d(1), m = null), /*page*/
-      C[0].description ? d ? (d.p(C, p), p & /*page*/
-      1 && _(d, 1)) : (d = Ye(C), d.c(), _(d, 1), d.m(e, i)) : d && (K(), F(d, 1, 1, () => {
-        d = null;
-      }), Q()), p & /*formErrors, page, onInputChange, setChoice, lang, translations*/
-      1889) {
-        L = V(
-          /*page*/
-          C[0].items
-        );
-        let G;
-        for (G = 0; G < L.length; G += 1) {
-          const q = We(C, L, G);
-          y[G] ? (y[G].p(q, p), _(y[G], 1)) : (y[G] = xe(q), y[G].c(), _(y[G], 1), y[G].m(e, s));
-        }
-        for (K(), G = L.length; G < y.length; G += 1)
-          A(G);
-        Q();
-      }
-      /*isFirst*/
-      C[2] ? v && (K(), F(v, 1, 1, () => {
-        v = null;
-      }), Q()) : v ? (v.p(C, p), p & /*isFirst*/
-      4 && _(v, 1)) : (v = et(C), v.c(), _(v, 1), v.m(l, o));
-      let z = r;
-      r = B(C), r === z ? E[r].p(C, p) : (K(), F(E[z], 1, 1, () => {
-        E[z] = null;
-      }), Q(), u = E[r], u ? u.p(C, p) : (u = E[r] = U[r](C), u.c()), _(u, 1), u.m(a, null)), (!c || p & /*isSubmitting*/
-      8) && (a.disabled = /*isSubmitting*/
-      C[3]), (!c || p & /*isActive*/
-      2) && x(e, "hidden", !/*isActive*/
-      C[1]);
+    p(ctx2, dirty) {
+      const t_changes = {};
+      if (dirty & /*lang*/
+      32)
+        t_changes.lang = /*lang*/
+        ctx2[5];
+      if (dirty & /*translations*/
+      64)
+        t_changes.translations = /*translations*/
+        ctx2[6];
+      t.$set(t_changes);
     },
-    i(C) {
-      if (!c) {
-        _(d);
-        for (let p = 0; p < L.length; p += 1)
-          _(y[p]);
-        _(v), _(u), c = !0;
-      }
+    i(local) {
+      if (current)
+        return;
+      transition_in(t.$$.fragment, local);
+      current = true;
     },
-    o(C) {
-      F(d), y = y.filter(Boolean);
-      for (let p = 0; p < y.length; p += 1)
-        F(y[p]);
-      F(v), F(u), c = !1;
+    o(local) {
+      transition_out(t.$$.fragment, local);
+      current = false;
     },
-    d(C) {
-      C && S(e), m && m.d(), d && d.d(), te(y, C), v && v.d(), E[r].d(), f = !1, h();
+    d(detaching) {
+      destroy_component(t, detaching);
     }
   };
 }
-function gn(t, e, n) {
-  let { page: i } = e, { isActive: s = !1 } = e, { isFirst: l = !1 } = e, { isSubmitting: o = !1 } = e, { onBack: a } = e, { onGoto: r } = e, { lang: u = "en" } = e, { translations: c = {} } = e, f = i.defaultNextPage, h = {}, m = {};
-  function d(v, U) {
-    v.choicesNavigation && v.choicesNavigation[U] && n(7, f = v.choicesNavigation[U].type === "page" ? v.choicesNavigation[U].id : "submit");
+function create_fragment$2(ctx) {
+  let div1;
+  let t0;
+  let t1;
+  let t2;
+  let div0;
+  let current_block_type_index;
+  let if_block2;
+  let t3;
+  let button;
+  let current_block_type_index_1;
+  let if_block3;
+  let current;
+  let mounted;
+  let dispose;
+  let if_block0 = (
+    /*page*/
+    ctx[0].title && create_if_block_5$1(ctx)
+  );
+  let if_block1 = (
+    /*page*/
+    ctx[0].description && create_if_block_4$1(ctx)
+  );
+  let each_value = ensure_array_like(
+    /*page*/
+    ctx[0].items
+  );
+  let each_blocks = [];
+  for (let i = 0; i < each_value.length; i += 1) {
+    each_blocks[i] = create_each_block$1(get_each_context$1(ctx, each_value, i));
   }
-  function L(v, U) {
-    h[v] = U, n(8, m[v] = "", m);
+  const out = (i) => transition_out(each_blocks[i], 1, 1, () => {
+    each_blocks[i] = null;
+  });
+  const if_block_creators = [create_if_block_2$1, create_else_block_1];
+  const if_blocks = [];
+  function select_block_type(ctx2, dirty) {
+    if (!/*isFirst*/
+    ctx2[2])
+      return 0;
+    return 1;
   }
-  function y() {
-    let v = !0;
-    n(8, m = {});
-    for (let U of i.items)
-      U.required && (!h[U.id] || h[U.id].length === 0) && (n(8, m[U.id] = dt("This field is required.", c, u), m), v = !1);
-    return v;
+  current_block_type_index = select_block_type(ctx);
+  if_block2 = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
+  const if_block_creators_1 = [create_if_block$2, create_if_block_1$2, create_else_block];
+  const if_blocks_1 = [];
+  function select_block_type_1(ctx2, dirty) {
+    if (
+      /*isSubmitting*/
+      ctx2[3]
+    )
+      return 0;
+    if (
+      /*nextPageId*/
+      ctx2[7] === "submit"
+    )
+      return 1;
+    return 2;
   }
-  function A() {
-    if (!y()) {
-      console.log("Validation failed", m);
+  current_block_type_index_1 = select_block_type_1(ctx);
+  if_block3 = if_blocks_1[current_block_type_index_1] = if_block_creators_1[current_block_type_index_1](ctx);
+  return {
+    c() {
+      div1 = element("div");
+      if (if_block0)
+        if_block0.c();
+      t0 = space();
+      if (if_block1)
+        if_block1.c();
+      t1 = space();
+      for (let i = 0; i < each_blocks.length; i += 1) {
+        each_blocks[i].c();
+      }
+      t2 = space();
+      div0 = element("div");
+      if_block2.c();
+      t3 = space();
+      button = element("button");
+      if_block3.c();
+      attr(button, "class", "nav-button next-button svelte-hvfp2g");
+      button.disabled = /*isSubmitting*/
+      ctx[3];
+      attr(div0, "class", "nav-buttons svelte-hvfp2g");
+      attr(div1, "class", "page-container svelte-hvfp2g");
+      toggle_class(div1, "hidden", !/*isActive*/
+      ctx[1]);
+    },
+    m(target, anchor) {
+      insert(target, div1, anchor);
+      if (if_block0)
+        if_block0.m(div1, null);
+      append(div1, t0);
+      if (if_block1)
+        if_block1.m(div1, null);
+      append(div1, t1);
+      for (let i = 0; i < each_blocks.length; i += 1) {
+        if (each_blocks[i]) {
+          each_blocks[i].m(div1, null);
+        }
+      }
+      append(div1, t2);
+      append(div1, div0);
+      if_blocks[current_block_type_index].m(div0, null);
+      append(div0, t3);
+      append(div0, button);
+      if_blocks_1[current_block_type_index_1].m(button, null);
+      current = true;
+      if (!mounted) {
+        dispose = listen(button, "click", prevent_default(
+          /*handleNext*/
+          ctx[11]
+        ));
+        mounted = true;
+      }
+    },
+    p(ctx2, [dirty]) {
+      if (
+        /*page*/
+        ctx2[0].title
+      ) {
+        if (if_block0) {
+          if_block0.p(ctx2, dirty);
+        } else {
+          if_block0 = create_if_block_5$1(ctx2);
+          if_block0.c();
+          if_block0.m(div1, t0);
+        }
+      } else if (if_block0) {
+        if_block0.d(1);
+        if_block0 = null;
+      }
+      if (
+        /*page*/
+        ctx2[0].description
+      ) {
+        if (if_block1) {
+          if_block1.p(ctx2, dirty);
+          if (dirty & /*page*/
+          1) {
+            transition_in(if_block1, 1);
+          }
+        } else {
+          if_block1 = create_if_block_4$1(ctx2);
+          if_block1.c();
+          transition_in(if_block1, 1);
+          if_block1.m(div1, t1);
+        }
+      } else if (if_block1) {
+        group_outros();
+        transition_out(if_block1, 1, 1, () => {
+          if_block1 = null;
+        });
+        check_outros();
+      }
+      if (dirty & /*formErrors, page, onInputChange, setChoice, lang, translations*/
+      1889) {
+        each_value = ensure_array_like(
+          /*page*/
+          ctx2[0].items
+        );
+        let i;
+        for (i = 0; i < each_value.length; i += 1) {
+          const child_ctx = get_each_context$1(ctx2, each_value, i);
+          if (each_blocks[i]) {
+            each_blocks[i].p(child_ctx, dirty);
+            transition_in(each_blocks[i], 1);
+          } else {
+            each_blocks[i] = create_each_block$1(child_ctx);
+            each_blocks[i].c();
+            transition_in(each_blocks[i], 1);
+            each_blocks[i].m(div1, t2);
+          }
+        }
+        group_outros();
+        for (i = each_value.length; i < each_blocks.length; i += 1) {
+          out(i);
+        }
+        check_outros();
+      }
+      let previous_block_index = current_block_type_index;
+      current_block_type_index = select_block_type(ctx2);
+      if (current_block_type_index === previous_block_index) {
+        if_blocks[current_block_type_index].p(ctx2, dirty);
+      } else {
+        group_outros();
+        transition_out(if_blocks[previous_block_index], 1, 1, () => {
+          if_blocks[previous_block_index] = null;
+        });
+        check_outros();
+        if_block2 = if_blocks[current_block_type_index];
+        if (!if_block2) {
+          if_block2 = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx2);
+          if_block2.c();
+        } else {
+          if_block2.p(ctx2, dirty);
+        }
+        transition_in(if_block2, 1);
+        if_block2.m(div0, t3);
+      }
+      let previous_block_index_1 = current_block_type_index_1;
+      current_block_type_index_1 = select_block_type_1(ctx2);
+      if (current_block_type_index_1 === previous_block_index_1) {
+        if_blocks_1[current_block_type_index_1].p(ctx2, dirty);
+      } else {
+        group_outros();
+        transition_out(if_blocks_1[previous_block_index_1], 1, 1, () => {
+          if_blocks_1[previous_block_index_1] = null;
+        });
+        check_outros();
+        if_block3 = if_blocks_1[current_block_type_index_1];
+        if (!if_block3) {
+          if_block3 = if_blocks_1[current_block_type_index_1] = if_block_creators_1[current_block_type_index_1](ctx2);
+          if_block3.c();
+        } else {
+          if_block3.p(ctx2, dirty);
+        }
+        transition_in(if_block3, 1);
+        if_block3.m(button, null);
+      }
+      if (!current || dirty & /*isSubmitting*/
+      8) {
+        button.disabled = /*isSubmitting*/
+        ctx2[3];
+      }
+      if (!current || dirty & /*isActive*/
+      2) {
+        toggle_class(div1, "hidden", !/*isActive*/
+        ctx2[1]);
+      }
+    },
+    i(local) {
+      if (current)
+        return;
+      transition_in(if_block1);
+      for (let i = 0; i < each_value.length; i += 1) {
+        transition_in(each_blocks[i]);
+      }
+      transition_in(if_block2);
+      transition_in(if_block3);
+      current = true;
+    },
+    o(local) {
+      transition_out(if_block1);
+      each_blocks = each_blocks.filter(Boolean);
+      for (let i = 0; i < each_blocks.length; i += 1) {
+        transition_out(each_blocks[i]);
+      }
+      transition_out(if_block2);
+      transition_out(if_block3);
+      current = false;
+    },
+    d(detaching) {
+      if (detaching) {
+        detach(div1);
+      }
+      if (if_block0)
+        if_block0.d();
+      if (if_block1)
+        if_block1.d();
+      destroy_each(each_blocks, detaching);
+      if_blocks[current_block_type_index].d();
+      if_blocks_1[current_block_type_index_1].d();
+      mounted = false;
+      dispose();
+    }
+  };
+}
+function instance$2($$self, $$props, $$invalidate) {
+  let { page } = $$props;
+  let { isActive = false } = $$props;
+  let { isFirst = false } = $$props;
+  let { isSubmitting = false } = $$props;
+  let { onBack } = $$props;
+  let { onGoto } = $$props;
+  let { lang = "en" } = $$props;
+  let { translations = {} } = $$props;
+  let nextPageId = page.defaultNextPage;
+  let formState = {};
+  let formErrors = {};
+  function setChoice(item, idx) {
+    if (!item.choicesNavigation)
+      return;
+    if (!item.choicesNavigation[idx])
+      return;
+    $$invalidate(7, nextPageId = item.choicesNavigation[idx].type === "page" ? item.choicesNavigation[idx].id : "submit");
+  }
+  function onInputChange(id, value) {
+    formState[id] = value;
+    $$invalidate(8, formErrors[id] = "", formErrors);
+  }
+  function validatePage() {
+    let isValid = true;
+    $$invalidate(8, formErrors = {});
+    for (let item of page.items) {
+      if (item.required && (!formState[item.id] || formState[item.id].length === 0)) {
+        $$invalidate(8, formErrors[item.id] = getText("This field is required.", translations, lang), formErrors);
+        isValid = false;
+      }
+    }
+    return isValid;
+  }
+  function handleNext() {
+    if (!validatePage()) {
+      console.log("Validation failed", formErrors);
       return;
     }
-    r(f);
+    onGoto(nextPageId);
   }
-  return t.$$set = (v) => {
-    "page" in v && n(0, i = v.page), "isActive" in v && n(1, s = v.isActive), "isFirst" in v && n(2, l = v.isFirst), "isSubmitting" in v && n(3, o = v.isSubmitting), "onBack" in v && n(4, a = v.onBack), "onGoto" in v && n(12, r = v.onGoto), "lang" in v && n(5, u = v.lang), "translations" in v && n(6, c = v.translations);
-  }, [
-    i,
-    s,
-    l,
-    o,
-    a,
-    u,
-    c,
-    f,
-    m,
-    d,
-    L,
-    A,
-    r
+  $$self.$$set = ($$props2) => {
+    if ("page" in $$props2)
+      $$invalidate(0, page = $$props2.page);
+    if ("isActive" in $$props2)
+      $$invalidate(1, isActive = $$props2.isActive);
+    if ("isFirst" in $$props2)
+      $$invalidate(2, isFirst = $$props2.isFirst);
+    if ("isSubmitting" in $$props2)
+      $$invalidate(3, isSubmitting = $$props2.isSubmitting);
+    if ("onBack" in $$props2)
+      $$invalidate(4, onBack = $$props2.onBack);
+    if ("onGoto" in $$props2)
+      $$invalidate(12, onGoto = $$props2.onGoto);
+    if ("lang" in $$props2)
+      $$invalidate(5, lang = $$props2.lang);
+    if ("translations" in $$props2)
+      $$invalidate(6, translations = $$props2.translations);
+  };
+  return [
+    page,
+    isActive,
+    isFirst,
+    isSubmitting,
+    onBack,
+    lang,
+    translations,
+    nextPageId,
+    formErrors,
+    setChoice,
+    onInputChange,
+    handleNext,
+    onGoto
   ];
 }
-class $t extends ae {
-  constructor(e) {
-    super(), oe(this, e, gn, mn, le, {
-      page: 0,
-      isActive: 1,
-      isFirst: 2,
-      isSubmitting: 3,
-      onBack: 4,
-      onGoto: 12,
-      lang: 5,
-      translations: 6
-    });
+class GPage extends SvelteComponent {
+  constructor(options) {
+    super();
+    init(
+      this,
+      options,
+      instance$2,
+      create_fragment$2,
+      safe_not_equal,
+      {
+        page: 0,
+        isActive: 1,
+        isFirst: 2,
+        isSubmitting: 3,
+        onBack: 4,
+        onGoto: 12,
+        lang: 5,
+        translations: 6
+      },
+      add_css$1
+    );
   }
   get page() {
     return this.$$.ctx[0];
   }
-  set page(e) {
-    this.$$set({ page: e }), I();
+  set page(page) {
+    this.$$set({ page });
+    flush();
   }
   get isActive() {
     return this.$$.ctx[1];
   }
-  set isActive(e) {
-    this.$$set({ isActive: e }), I();
+  set isActive(isActive) {
+    this.$$set({ isActive });
+    flush();
   }
   get isFirst() {
     return this.$$.ctx[2];
   }
-  set isFirst(e) {
-    this.$$set({ isFirst: e }), I();
+  set isFirst(isFirst) {
+    this.$$set({ isFirst });
+    flush();
   }
   get isSubmitting() {
     return this.$$.ctx[3];
   }
-  set isSubmitting(e) {
-    this.$$set({ isSubmitting: e }), I();
+  set isSubmitting(isSubmitting) {
+    this.$$set({ isSubmitting });
+    flush();
   }
   get onBack() {
     return this.$$.ctx[4];
   }
-  set onBack(e) {
-    this.$$set({ onBack: e }), I();
+  set onBack(onBack) {
+    this.$$set({ onBack });
+    flush();
   }
   get onGoto() {
     return this.$$.ctx[12];
   }
-  set onGoto(e) {
-    this.$$set({ onGoto: e }), I();
+  set onGoto(onGoto) {
+    this.$$set({ onGoto });
+    flush();
   }
   get lang() {
     return this.$$.ctx[5];
   }
-  set lang(e) {
-    this.$$set({ lang: e }), I();
+  set lang(lang) {
+    this.$$set({ lang });
+    flush();
   }
   get translations() {
     return this.$$.ctx[6];
   }
-  set translations(e) {
-    this.$$set({ translations: e }), I();
+  set translations(translations) {
+    this.$$set({ translations });
+    flush();
   }
 }
-re($t, { page: {}, isActive: { type: "Boolean" }, isFirst: { type: "Boolean" }, isSubmitting: { type: "Boolean" }, onBack: {}, onGoto: {}, lang: {}, translations: {} }, [], [], !0);
-function hn(t) {
-  be(t, "svelte-1spzav4", ':host,:root{--primary-color:#2563eb;--secondary-color:#9333ea;--success-color:#16a34a;--error-color:#dc2626;--primary-dark:color-mix(in srgb, var(--primary-color) 80%, black 20%);--secondary-dark:color-mix(in srgb, var(--secondary-color) 80%, black 20%);--bg-color:#ffffff;--text-color:#1f2937;--muted-text:color-mix(in srgb, var(--text-color) 70%, white 30%);--input-bg-color:#f9fafb;--input-text-color:#111827;--input-border-color:#d1d5db;--input-focus-color:#2563eb;--input-placeholder-color:#9ca3af;--font-family:"Inter", sans-serif;--input-font:"Inter", sans-serif}[data-theme="dark"]{--bg-color:#1f2937;--text-color:#e5e7eb;--muted-text:color-mix(in srgb, var(--text-color) 70%, black 30%);--input-bg-color:#374151;--input-text-color:#f3f4f6;--input-border-color:#4b5563;--input-focus-color:#60a5fa}[data-theme="transparent"]{--bg-color:transparent;--text-color:inherit}');
+create_custom_element(GPage, { "page": {}, "isActive": { "type": "Boolean" }, "isFirst": { "type": "Boolean" }, "isSubmitting": { "type": "Boolean" }, "onBack": {}, "onGoto": {}, "lang": {}, "translations": {} }, [], [], true);
+function add_css(target) {
+  append_styles(target, "svelte-1hpprge", ':host,:root{--primary-color:#2563eb;--secondary-color:#9333ea;--success-color:#16a34a;--error-color:#dc2626;--primary-dark:color-mix(in srgb, var(--primary-color) 80%, black 20%);--secondary-dark:color-mix(in srgb, var(--secondary-color) 80%, black 20%);--bg-color:#ffffff;--text-color:#1f2937;--muted-text:color-mix(in srgb, var(--text-color) 70%, white 30%);--input-bg-color:#f9fafb;--input-text-color:#111827;--input-border-color:#d1d5db;--input-focus-color:#2563eb;--input-placeholder-color:#9ca3af;--font-family:"Inter", sans-serif;--input-font:"Inter", sans-serif}[data-theme="dark"]{--bg-color:#1f2937;--text-color:#e5e7eb;--muted-text:color-mix(in srgb, var(--text-color) 70%, black 30%);--input-bg-color:#374151;--input-text-color:#f3f4f6;--input-border-color:#4b5563;--input-focus-color:#60a5fa}[data-theme="transparent"]{--bg-color:transparent;--text-color:inherit}.form-container.svelte-1hpprge{background:var(--bg-color);color:var(--text-color);font-family:var(--font-family);padding:1.5rem;border-radius:8px;box-shadow:0 4px 6px rgba(0, 0, 0, 0.1)}.form-title.svelte-1hpprge{font-size:1.75rem;font-weight:600;color:var(--primary-color)}.form-link.svelte-1hpprge{color:var(--primary-color);font-size:0.875rem;text-decoration:underline;cursor:pointer}.page-list.svelte-1hpprge{margin-top:1rem}.error-message.svelte-1hpprge{background:#fde2e2;border:1px solid var(--error-color);padding:0.75rem;color:var(--error-color);border-radius:6px;margin-top:1rem}.success-container.svelte-1hpprge{text-align:center;padding:1.5rem;border:1px solid var(--text-color);border-radius:8px;box-shadow:0 4px 6px rgba(0, 0, 0, 0.1)}.success-title.svelte-1hpprge{font-size:1.5rem;font-weight:600;color:var(--success-color)}.edit-response-link.svelte-1hpprge{color:var(--secondary-color);text-decoration:underline;margin-top:0.5rem}.submit-again-button.svelte-1hpprge{background:var(--primary-color);color:white;padding:0.75rem 1.5rem;border-radius:6px;cursor:pointer;margin-top:1rem}.submit-again-button.svelte-1hpprge:hover{background:var(--secondary-color)}main.svelte-1hpprge{display:flex;flex-direction:column;align-items:center;justify-content:center}.hidden.svelte-1hpprge{visibility:hidden;display:none}');
 }
-function tt(t, e, n) {
-  const i = t.slice();
-  return i[26] = e[n], i;
+function get_each_context(ctx, list, i) {
+  const child_ctx = ctx.slice();
+  child_ctx[23] = list[i];
+  return child_ctx;
 }
-function nt(t) {
-  let e, n, i, s, l, o, a, r, u, c, f, h, m, d, L, y, A, v, U, E, B;
-  e = new pt({
+function create_if_block$1(ctx) {
+  let main;
+  let translationselector;
+  let t0;
+  let form_1;
+  let h1;
+  let t1;
+  let t2;
+  let a;
+  let t3;
+  let t4;
+  let t5;
+  let a_href_value;
+  let t6;
+  let div;
+  let t7;
+  let t8;
+  let current;
+  translationselector = new TranslationSelector({
     props: {
       translations: (
         /*translations*/
-        t[2]
+        ctx[2]
       ),
       form: (
         /*form*/
-        t[1]
+        ctx[1]
       ),
       onChange: (
         /*onLanguageChange*/
-        t[17]
+        ctx[16]
       )
     }
-  }), l = new J({
+  });
+  t1 = new T({
     props: {
       text: (
         /*form*/
-        t[1].title
+        ctx[1].title
       ),
       lang: (
         /*lang*/
-        t[0]
+        ctx[0]
       ),
       translations: (
         /*translations*/
-        t[2]
+        ctx[2]
       )
     }
-  }), u = new J({
+  });
+  t4 = new T({
     props: {
       text: "Complete in Google Forms",
       lang: (
         /*lang*/
-        t[0]
+        ctx[0]
       ),
       translations: (
         /*translations*/
-        t[2]
+        ctx[2]
       )
     }
   });
-  let C = V(
+  let each_value = ensure_array_like(
     /*pages*/
-    t[6]
-  ), p = [];
-  for (let w = 0; w < C.length; w += 1)
-    p[w] = it(tt(t, C, w));
-  const z = (w) => F(p[w], 1, 1, () => {
-    p[w] = null;
+    ctx[5]
+  );
+  let each_blocks = [];
+  for (let i = 0; i < each_value.length; i += 1) {
+    each_blocks[i] = create_each_block(get_each_context(ctx, each_value, i));
+  }
+  const out = (i) => transition_out(each_blocks[i], 1, 1, () => {
+    each_blocks[i] = null;
   });
-  A = new J({
-    props: {
-      text: "Submit",
-      lang: (
-        /*lang*/
-        t[0]
-      ),
-      translations: (
-        /*translations*/
-        t[2]
-      )
-    }
-  });
-  let G = (
+  let if_block0 = (
     /*submissionError*/
-    t[10] && st(t)
-  ), q = (
+    ctx[9] && create_if_block_5(ctx)
+  );
+  let if_block1 = (
     /*submitted*/
-    t[9] && lt(t)
+    ctx[8] && create_if_block_1$1(ctx)
   );
   return {
     c() {
-      M(e.$$.fragment), n = j(), i = k("form"), s = k("h1"), M(l.$$.fragment), o = j(), a = k("a"), r = X("("), M(u.$$.fragment), c = X(")"), h = j(), m = k("div");
-      for (let w = 0; w < p.length; w += 1)
-        p[w].c();
-      d = j(), L = k("div"), y = k("button"), M(A.$$.fragment), v = j(), G && G.c(), U = j(), q && q.c(), E = $e(), g(s, "class", "text-3xl font-semibold text-primary"), g(a, "class", "text-link hover:underline text-sm"), g(a, "href", f = /*form*/
-      t[1].publishedUrl), g(m, "class", "space-y-6"), g(y, "type", "submit"), g(y, "class", "px-6 py-2 text-white bg-primary rounded hover:bg-primaryDark transition focus:outline-none focus:ring-2 focus:ring-inputFocus"), g(L, "class", "flex justify-end"), g(i, "class", "bg-background text-text font-ui p-6 rounded-md shadow-md space-y-6"), x(
-        i,
+      main = element("main");
+      create_component(translationselector.$$.fragment);
+      t0 = space();
+      form_1 = element("form");
+      h1 = element("h1");
+      create_component(t1.$$.fragment);
+      t2 = space();
+      a = element("a");
+      t3 = text("(");
+      create_component(t4.$$.fragment);
+      t5 = text(")");
+      t6 = space();
+      div = element("div");
+      for (let i = 0; i < each_blocks.length; i += 1) {
+        each_blocks[i].c();
+      }
+      t7 = space();
+      if (if_block0)
+        if_block0.c();
+      t8 = space();
+      if (if_block1)
+        if_block1.c();
+      attr(h1, "class", "form-title svelte-1hpprge");
+      attr(a, "class", "form-link svelte-1hpprge");
+      attr(a, "href", a_href_value = /*form*/
+      ctx[1].publishedUrl);
+      attr(div, "class", "page-list svelte-1hpprge");
+      attr(form_1, "class", "form-container svelte-1hpprge");
+      toggle_class(
+        form_1,
         "hidden",
         /*submitted*/
-        t[9]
+        ctx[8]
       );
+      attr(main, "class", "svelte-1hpprge");
     },
-    m(w, b) {
-      O(e, w, b), T(w, n, b), T(w, i, b), $(i, s), O(l, s, null), $(i, o), $(i, a), $(a, r), O(u, a, null), $(a, c), $(i, h), $(i, m);
-      for (let P = 0; P < p.length; P += 1)
-        p[P] && p[P].m(m, null);
-      $(i, d), $(i, L), $(L, y), O(A, y, null), t[21](i), T(w, v, b), G && G.m(w, b), T(w, U, b), q && q.m(w, b), T(w, E, b), B = !0;
-    },
-    p(w, b) {
-      const P = {};
-      b & /*translations*/
-      4 && (P.translations = /*translations*/
-      w[2]), b & /*form*/
-      2 && (P.form = /*form*/
-      w[1]), e.$set(P);
-      const W = {};
-      b & /*form*/
-      2 && (W.text = /*form*/
-      w[1].title), b & /*lang*/
-      1 && (W.lang = /*lang*/
-      w[0]), b & /*translations*/
-      4 && (W.translations = /*translations*/
-      w[2]), l.$set(W);
-      const Y = {};
-      if (b & /*lang*/
-      1 && (Y.lang = /*lang*/
-      w[0]), b & /*translations*/
-      4 && (Y.translations = /*translations*/
-      w[2]), u.$set(Y), (!B || b & /*form*/
-      2 && f !== (f = /*form*/
-      w[1].publishedUrl)) && g(a, "href", f), b & /*pageHistory, currentPageId, pages, submitting, lang, translations, goBack, nextPageOrSubmit*/
-      53701) {
-        C = V(
-          /*pages*/
-          w[6]
-        );
-        let N;
-        for (N = 0; N < C.length; N += 1) {
-          const Te = tt(w, C, N);
-          p[N] ? (p[N].p(Te, b), _(p[N], 1)) : (p[N] = it(Te), p[N].c(), _(p[N], 1), p[N].m(m, null));
+    m(target, anchor) {
+      insert(target, main, anchor);
+      mount_component(translationselector, main, null);
+      append(main, t0);
+      append(main, form_1);
+      append(form_1, h1);
+      mount_component(t1, h1, null);
+      append(form_1, t2);
+      append(form_1, a);
+      append(a, t3);
+      mount_component(t4, a, null);
+      append(a, t5);
+      append(form_1, t6);
+      append(form_1, div);
+      for (let i = 0; i < each_blocks.length; i += 1) {
+        if (each_blocks[i]) {
+          each_blocks[i].m(div, null);
         }
-        for (K(), N = C.length; N < p.length; N += 1)
-          z(N);
-        Q();
       }
-      const ee = {};
-      b & /*lang*/
-      1 && (ee.lang = /*lang*/
-      w[0]), b & /*translations*/
-      4 && (ee.translations = /*translations*/
-      w[2]), A.$set(ee), (!B || b & /*submitted*/
-      512) && x(
-        i,
-        "hidden",
+      ctx[18](form_1);
+      append(main, t7);
+      if (if_block0)
+        if_block0.m(main, null);
+      append(main, t8);
+      if (if_block1)
+        if_block1.m(main, null);
+      current = true;
+    },
+    p(ctx2, dirty) {
+      const translationselector_changes = {};
+      if (dirty & /*translations*/
+      4)
+        translationselector_changes.translations = /*translations*/
+        ctx2[2];
+      if (dirty & /*form*/
+      2)
+        translationselector_changes.form = /*form*/
+        ctx2[1];
+      translationselector.$set(translationselector_changes);
+      const t1_changes = {};
+      if (dirty & /*form*/
+      2)
+        t1_changes.text = /*form*/
+        ctx2[1].title;
+      if (dirty & /*lang*/
+      1)
+        t1_changes.lang = /*lang*/
+        ctx2[0];
+      if (dirty & /*translations*/
+      4)
+        t1_changes.translations = /*translations*/
+        ctx2[2];
+      t1.$set(t1_changes);
+      const t4_changes = {};
+      if (dirty & /*lang*/
+      1)
+        t4_changes.lang = /*lang*/
+        ctx2[0];
+      if (dirty & /*translations*/
+      4)
+        t4_changes.translations = /*translations*/
+        ctx2[2];
+      t4.$set(t4_changes);
+      if (!current || dirty & /*form*/
+      2 && a_href_value !== (a_href_value = /*form*/
+      ctx2[1].publishedUrl)) {
+        attr(a, "href", a_href_value);
+      }
+      if (dirty & /*pageHistory, currentPageId, pages, submitting, lang, translations, goBack, nextPageOrSubmit*/
+      26853) {
+        each_value = ensure_array_like(
+          /*pages*/
+          ctx2[5]
+        );
+        let i;
+        for (i = 0; i < each_value.length; i += 1) {
+          const child_ctx = get_each_context(ctx2, each_value, i);
+          if (each_blocks[i]) {
+            each_blocks[i].p(child_ctx, dirty);
+            transition_in(each_blocks[i], 1);
+          } else {
+            each_blocks[i] = create_each_block(child_ctx);
+            each_blocks[i].c();
+            transition_in(each_blocks[i], 1);
+            each_blocks[i].m(div, null);
+          }
+        }
+        group_outros();
+        for (i = each_value.length; i < each_blocks.length; i += 1) {
+          out(i);
+        }
+        check_outros();
+      }
+      if (!current || dirty & /*submitted*/
+      256) {
+        toggle_class(
+          form_1,
+          "hidden",
+          /*submitted*/
+          ctx2[8]
+        );
+      }
+      if (
+        /*submissionError*/
+        ctx2[9]
+      ) {
+        if (if_block0) {
+          if_block0.p(ctx2, dirty);
+          if (dirty & /*submissionError*/
+          512) {
+            transition_in(if_block0, 1);
+          }
+        } else {
+          if_block0 = create_if_block_5(ctx2);
+          if_block0.c();
+          transition_in(if_block0, 1);
+          if_block0.m(main, t8);
+        }
+      } else if (if_block0) {
+        group_outros();
+        transition_out(if_block0, 1, 1, () => {
+          if_block0 = null;
+        });
+        check_outros();
+      }
+      if (
         /*submitted*/
-        w[9]
-      ), /*submissionError*/
-      w[10] ? G ? (G.p(w, b), b & /*submissionError*/
-      1024 && _(G, 1)) : (G = st(w), G.c(), _(G, 1), G.m(U.parentNode, U)) : G && (K(), F(G, 1, 1, () => {
-        G = null;
-      }), Q()), /*submitted*/
-      w[9] ? q ? (q.p(w, b), b & /*submitted*/
-      512 && _(q, 1)) : (q = lt(w), q.c(), _(q, 1), q.m(E.parentNode, E)) : q && (K(), F(q, 1, 1, () => {
-        q = null;
-      }), Q());
-    },
-    i(w) {
-      if (!B) {
-        _(e.$$.fragment, w), _(l.$$.fragment, w), _(u.$$.fragment, w);
-        for (let b = 0; b < C.length; b += 1)
-          _(p[b]);
-        _(A.$$.fragment, w), _(G), _(q), B = !0;
+        ctx2[8]
+      ) {
+        if (if_block1) {
+          if_block1.p(ctx2, dirty);
+          if (dirty & /*submitted*/
+          256) {
+            transition_in(if_block1, 1);
+          }
+        } else {
+          if_block1 = create_if_block_1$1(ctx2);
+          if_block1.c();
+          transition_in(if_block1, 1);
+          if_block1.m(main, null);
+        }
+      } else if (if_block1) {
+        group_outros();
+        transition_out(if_block1, 1, 1, () => {
+          if_block1 = null;
+        });
+        check_outros();
       }
     },
-    o(w) {
-      F(e.$$.fragment, w), F(l.$$.fragment, w), F(u.$$.fragment, w), p = p.filter(Boolean);
-      for (let b = 0; b < p.length; b += 1)
-        F(p[b]);
-      F(A.$$.fragment, w), F(G), F(q), B = !1;
+    i(local) {
+      if (current)
+        return;
+      transition_in(translationselector.$$.fragment, local);
+      transition_in(t1.$$.fragment, local);
+      transition_in(t4.$$.fragment, local);
+      for (let i = 0; i < each_value.length; i += 1) {
+        transition_in(each_blocks[i]);
+      }
+      transition_in(if_block0);
+      transition_in(if_block1);
+      current = true;
     },
-    d(w) {
-      w && (S(n), S(i), S(v), S(U), S(E)), R(e, w), R(l), R(u), te(p, w), R(A), t[21](null), G && G.d(w), q && q.d(w);
+    o(local) {
+      transition_out(translationselector.$$.fragment, local);
+      transition_out(t1.$$.fragment, local);
+      transition_out(t4.$$.fragment, local);
+      each_blocks = each_blocks.filter(Boolean);
+      for (let i = 0; i < each_blocks.length; i += 1) {
+        transition_out(each_blocks[i]);
+      }
+      transition_out(if_block0);
+      transition_out(if_block1);
+      current = false;
+    },
+    d(detaching) {
+      if (detaching) {
+        detach(main);
+      }
+      destroy_component(translationselector);
+      destroy_component(t1);
+      destroy_component(t4);
+      destroy_each(each_blocks, detaching);
+      ctx[18](null);
+      if (if_block0)
+        if_block0.d();
+      if (if_block1)
+        if_block1.d();
     }
   };
 }
-function it(t) {
-  let e, n;
-  return e = new $t({
+function create_each_block(ctx) {
+  let gpage;
+  let current;
+  gpage = new GPage({
     props: {
       isFirst: (
         /*pageHistory*/
-        t[12].length === 0
+        ctx[11].length === 0
       ),
       isActive: (
         /*currentPageId*/
-        t[7] === /*page*/
-        t[26].id
+        ctx[6] === /*page*/
+        ctx[23].id
       ),
       isSubmitting: (
         /*submitting*/
-        t[8]
+        ctx[7]
       ),
       page: (
         /*page*/
-        t[26]
+        ctx[23]
       ),
       lang: (
         /*lang*/
-        t[0]
+        ctx[0]
       ),
       translations: (
         /*translations*/
-        t[2]
+        ctx[2]
       ),
       onBack: (
         /*goBack*/
-        t[14]
+        ctx[13]
       ),
       onGoto: (
-        /*func*/
-        t[20]
+        /*nextPageOrSubmit*/
+        ctx[14]
       )
     }
-  }), {
+  });
+  return {
     c() {
-      M(e.$$.fragment);
+      create_component(gpage.$$.fragment);
     },
-    m(i, s) {
-      O(e, i, s), n = !0;
+    m(target, anchor) {
+      mount_component(gpage, target, anchor);
+      current = true;
     },
-    p(i, s) {
-      const l = {};
-      s & /*pageHistory*/
-      4096 && (l.isFirst = /*pageHistory*/
-      i[12].length === 0), s & /*currentPageId, pages*/
-      192 && (l.isActive = /*currentPageId*/
-      i[7] === /*page*/
-      i[26].id), s & /*submitting*/
-      256 && (l.isSubmitting = /*submitting*/
-      i[8]), s & /*pages*/
-      64 && (l.page = /*page*/
-      i[26]), s & /*lang*/
-      1 && (l.lang = /*lang*/
-      i[0]), s & /*translations*/
-      4 && (l.translations = /*translations*/
-      i[2]), e.$set(l);
+    p(ctx2, dirty) {
+      const gpage_changes = {};
+      if (dirty & /*pageHistory*/
+      2048)
+        gpage_changes.isFirst = /*pageHistory*/
+        ctx2[11].length === 0;
+      if (dirty & /*currentPageId, pages*/
+      96)
+        gpage_changes.isActive = /*currentPageId*/
+        ctx2[6] === /*page*/
+        ctx2[23].id;
+      if (dirty & /*submitting*/
+      128)
+        gpage_changes.isSubmitting = /*submitting*/
+        ctx2[7];
+      if (dirty & /*pages*/
+      32)
+        gpage_changes.page = /*page*/
+        ctx2[23];
+      if (dirty & /*lang*/
+      1)
+        gpage_changes.lang = /*lang*/
+        ctx2[0];
+      if (dirty & /*translations*/
+      4)
+        gpage_changes.translations = /*translations*/
+        ctx2[2];
+      gpage.$set(gpage_changes);
     },
-    i(i) {
-      n || (_(e.$$.fragment, i), n = !0);
+    i(local) {
+      if (current)
+        return;
+      transition_in(gpage.$$.fragment, local);
+      current = true;
     },
-    o(i) {
-      F(e.$$.fragment, i), n = !1;
+    o(local) {
+      transition_out(gpage.$$.fragment, local);
+      current = false;
     },
-    d(i) {
-      R(e, i);
+    d(detaching) {
+      destroy_component(gpage, detaching);
     }
   };
 }
-function st(t) {
-  let e, n, i;
-  return n = new J({
+function create_if_block_5(ctx) {
+  let div;
+  let t;
+  let current;
+  t = new T({
     props: {
       text: (
         /*submissionError*/
-        t[10]
+        ctx[9]
       ),
       lang: (
         /*lang*/
-        t[0]
+        ctx[0]
       ),
       translations: (
         /*translations*/
-        t[2]
+        ctx[2]
       )
     }
-  }), {
+  });
+  return {
     c() {
-      e = k("div"), M(n.$$.fragment), g(e, "class", "mt-4 text-error bg-red-100 border border-error p-3 rounded-md");
+      div = element("div");
+      create_component(t.$$.fragment);
+      attr(div, "class", "error-message svelte-1hpprge");
     },
-    m(s, l) {
-      T(s, e, l), O(n, e, null), i = !0;
+    m(target, anchor) {
+      insert(target, div, anchor);
+      mount_component(t, div, null);
+      current = true;
     },
-    p(s, l) {
-      const o = {};
-      l & /*submissionError*/
-      1024 && (o.text = /*submissionError*/
-      s[10]), l & /*lang*/
-      1 && (o.lang = /*lang*/
-      s[0]), l & /*translations*/
-      4 && (o.translations = /*translations*/
-      s[2]), n.$set(o);
+    p(ctx2, dirty) {
+      const t_changes = {};
+      if (dirty & /*submissionError*/
+      512)
+        t_changes.text = /*submissionError*/
+        ctx2[9];
+      if (dirty & /*lang*/
+      1)
+        t_changes.lang = /*lang*/
+        ctx2[0];
+      if (dirty & /*translations*/
+      4)
+        t_changes.translations = /*translations*/
+        ctx2[2];
+      t.$set(t_changes);
     },
-    i(s) {
-      i || (_(n.$$.fragment, s), i = !0);
+    i(local) {
+      if (current)
+        return;
+      transition_in(t.$$.fragment, local);
+      current = true;
     },
-    o(s) {
-      F(n.$$.fragment, s), i = !1;
+    o(local) {
+      transition_out(t.$$.fragment, local);
+      current = false;
     },
-    d(s) {
-      s && S(e), R(n);
+    d(detaching) {
+      if (detaching) {
+        detach(div);
+      }
+      destroy_component(t);
     }
   };
 }
-function lt(t) {
-  let e, n, i, s, l, o, a, r = (
+function create_if_block_1$1(ctx) {
+  let div;
+  let h2;
+  let t1;
+  let t2;
+  let t3;
+  let current;
+  let if_block0 = (
     /*form*/
-    t[1].confirmationMessage && ot(t)
-  ), u = (
+    ctx[1].confirmationMessage && create_if_block_4(ctx)
+  );
+  let if_block1 = (
     /*editResponseUrl*/
-    t[11] && rt(t)
-  ), c = (
+    ctx[10] && create_if_block_3(ctx)
+  );
+  let if_block2 = (
     /*allowPostAgain*/
-    t[4] && at(t)
+    ctx[3] && create_if_block_2(ctx)
   );
   return {
     c() {
-      e = k("div"), n = k("h2"), i = X(
-        /*postedMessage*/
-        t[3]
-      ), s = j(), r && r.c(), l = j(), u && u.c(), o = j(), c && c.c(), g(n, "class", "text-2xl font-semibold text-success"), g(e, "class", "text-center p-6 border border-gray-300 rounded-md shadow-md bg-background text-text");
+      div = element("div");
+      h2 = element("h2");
+      h2.textContent = "Form submitted successfully!";
+      t1 = space();
+      if (if_block0)
+        if_block0.c();
+      t2 = space();
+      if (if_block1)
+        if_block1.c();
+      t3 = space();
+      if (if_block2)
+        if_block2.c();
+      attr(h2, "class", "success-title svelte-1hpprge");
+      attr(div, "class", "success-container svelte-1hpprge");
     },
-    m(f, h) {
-      T(f, e, h), $(e, n), $(n, i), $(e, s), r && r.m(e, null), $(e, l), u && u.m(e, null), $(e, o), c && c.m(e, null), a = !0;
+    m(target, anchor) {
+      insert(target, div, anchor);
+      append(div, h2);
+      append(div, t1);
+      if (if_block0)
+        if_block0.m(div, null);
+      append(div, t2);
+      if (if_block1)
+        if_block1.m(div, null);
+      append(div, t3);
+      if (if_block2)
+        if_block2.m(div, null);
+      current = true;
     },
-    p(f, h) {
-      (!a || h & /*postedMessage*/
-      8) && ie(
-        i,
-        /*postedMessage*/
-        f[3]
-      ), /*form*/
-      f[1].confirmationMessage ? r ? (r.p(f, h), h & /*form*/
-      2 && _(r, 1)) : (r = ot(f), r.c(), _(r, 1), r.m(e, l)) : r && (K(), F(r, 1, 1, () => {
-        r = null;
-      }), Q()), /*editResponseUrl*/
-      f[11] ? u ? (u.p(f, h), h & /*editResponseUrl*/
-      2048 && _(u, 1)) : (u = rt(f), u.c(), _(u, 1), u.m(e, o)) : u && (K(), F(u, 1, 1, () => {
-        u = null;
-      }), Q()), /*allowPostAgain*/
-      f[4] ? c ? (c.p(f, h), h & /*allowPostAgain*/
-      16 && _(c, 1)) : (c = at(f), c.c(), _(c, 1), c.m(e, null)) : c && (K(), F(c, 1, 1, () => {
-        c = null;
-      }), Q());
+    p(ctx2, dirty) {
+      if (
+        /*form*/
+        ctx2[1].confirmationMessage
+      ) {
+        if (if_block0) {
+          if_block0.p(ctx2, dirty);
+          if (dirty & /*form*/
+          2) {
+            transition_in(if_block0, 1);
+          }
+        } else {
+          if_block0 = create_if_block_4(ctx2);
+          if_block0.c();
+          transition_in(if_block0, 1);
+          if_block0.m(div, t2);
+        }
+      } else if (if_block0) {
+        group_outros();
+        transition_out(if_block0, 1, 1, () => {
+          if_block0 = null;
+        });
+        check_outros();
+      }
+      if (
+        /*editResponseUrl*/
+        ctx2[10]
+      ) {
+        if (if_block1) {
+          if_block1.p(ctx2, dirty);
+          if (dirty & /*editResponseUrl*/
+          1024) {
+            transition_in(if_block1, 1);
+          }
+        } else {
+          if_block1 = create_if_block_3(ctx2);
+          if_block1.c();
+          transition_in(if_block1, 1);
+          if_block1.m(div, t3);
+        }
+      } else if (if_block1) {
+        group_outros();
+        transition_out(if_block1, 1, 1, () => {
+          if_block1 = null;
+        });
+        check_outros();
+      }
+      if (
+        /*allowPostAgain*/
+        ctx2[3]
+      ) {
+        if (if_block2) {
+          if_block2.p(ctx2, dirty);
+          if (dirty & /*allowPostAgain*/
+          8) {
+            transition_in(if_block2, 1);
+          }
+        } else {
+          if_block2 = create_if_block_2(ctx2);
+          if_block2.c();
+          transition_in(if_block2, 1);
+          if_block2.m(div, null);
+        }
+      } else if (if_block2) {
+        group_outros();
+        transition_out(if_block2, 1, 1, () => {
+          if_block2 = null;
+        });
+        check_outros();
+      }
     },
-    i(f) {
-      a || (_(r), _(u), _(c), a = !0);
+    i(local) {
+      if (current)
+        return;
+      transition_in(if_block0);
+      transition_in(if_block1);
+      transition_in(if_block2);
+      current = true;
     },
-    o(f) {
-      F(r), F(u), F(c), a = !1;
+    o(local) {
+      transition_out(if_block0);
+      transition_out(if_block1);
+      transition_out(if_block2);
+      current = false;
     },
-    d(f) {
-      f && S(e), r && r.d(), u && u.d(), c && c.d();
+    d(detaching) {
+      if (detaching) {
+        detach(div);
+      }
+      if (if_block0)
+        if_block0.d();
+      if (if_block1)
+        if_block1.d();
+      if (if_block2)
+        if_block2.d();
     }
   };
 }
-function ot(t) {
-  let e, n;
-  return e = new J({
+function create_if_block_4(ctx) {
+  let p;
+  let t;
+  let current;
+  t = new T({
     props: {
       text: (
         /*form*/
-        t[1].confirmationMessage
+        ctx[1].confirmationMessage
       ),
       lang: (
         /*lang*/
-        t[0]
+        ctx[0]
       ),
       translations: (
         /*translations*/
-        t[2]
+        ctx[2]
       )
     }
-  }), {
+  });
+  return {
     c() {
-      M(e.$$.fragment);
+      p = element("p");
+      create_component(t.$$.fragment);
     },
-    m(i, s) {
-      O(e, i, s), n = !0;
+    m(target, anchor) {
+      insert(target, p, anchor);
+      mount_component(t, p, null);
+      current = true;
     },
-    p(i, s) {
-      const l = {};
-      s & /*form*/
-      2 && (l.text = /*form*/
-      i[1].confirmationMessage), s & /*lang*/
-      1 && (l.lang = /*lang*/
-      i[0]), s & /*translations*/
-      4 && (l.translations = /*translations*/
-      i[2]), e.$set(l);
+    p(ctx2, dirty) {
+      const t_changes = {};
+      if (dirty & /*form*/
+      2)
+        t_changes.text = /*form*/
+        ctx2[1].confirmationMessage;
+      if (dirty & /*lang*/
+      1)
+        t_changes.lang = /*lang*/
+        ctx2[0];
+      if (dirty & /*translations*/
+      4)
+        t_changes.translations = /*translations*/
+        ctx2[2];
+      t.$set(t_changes);
     },
-    i(i) {
-      n || (_(e.$$.fragment, i), n = !0);
+    i(local) {
+      if (current)
+        return;
+      transition_in(t.$$.fragment, local);
+      current = true;
     },
-    o(i) {
-      F(e.$$.fragment, i), n = !1;
+    o(local) {
+      transition_out(t.$$.fragment, local);
+      current = false;
     },
-    d(i) {
-      R(e, i);
+    d(detaching) {
+      if (detaching) {
+        detach(p);
+      }
+      destroy_component(t);
     }
   };
 }
-function rt(t) {
-  let e, n, i, s;
-  return i = new J({
+function create_if_block_3(ctx) {
+  let p;
+  let a;
+  let t;
+  let current;
+  t = new T({
     props: {
-      text: "Click here to edit your response in Google Forms",
+      text: "Edit your response in Google Forms",
       lang: (
         /*lang*/
-        t[0]
+        ctx[0]
       ),
       translations: (
         /*translations*/
-        t[2]
+        ctx[2]
       )
     }
-  }), {
+  });
+  return {
     c() {
-      e = k("p"), n = k("a"), M(i.$$.fragment), g(
-        n,
+      p = element("p");
+      a = element("a");
+      create_component(t.$$.fragment);
+      attr(a, "class", "edit-response-link svelte-1hpprge");
+      attr(
+        a,
         "href",
         /*editResponseUrl*/
-        t[11]
-      ), g(n, "target", "_blank"), g(n, "class", "text-link underline hover:text-secondary"), g(e, "class", "mt-2");
-    },
-    m(l, o) {
-      T(l, e, o), $(e, n), O(i, n, null), s = !0;
-    },
-    p(l, o) {
-      const a = {};
-      o & /*lang*/
-      1 && (a.lang = /*lang*/
-      l[0]), o & /*translations*/
-      4 && (a.translations = /*translations*/
-      l[2]), i.$set(a), (!s || o & /*editResponseUrl*/
-      2048) && g(
-        n,
-        "href",
-        /*editResponseUrl*/
-        l[11]
+        ctx[10]
       );
+      attr(a, "target", "_blank");
     },
-    i(l) {
-      s || (_(i.$$.fragment, l), s = !0);
+    m(target, anchor) {
+      insert(target, p, anchor);
+      append(p, a);
+      mount_component(t, a, null);
+      current = true;
     },
-    o(l) {
-      F(i.$$.fragment, l), s = !1;
+    p(ctx2, dirty) {
+      const t_changes = {};
+      if (dirty & /*lang*/
+      1)
+        t_changes.lang = /*lang*/
+        ctx2[0];
+      if (dirty & /*translations*/
+      4)
+        t_changes.translations = /*translations*/
+        ctx2[2];
+      t.$set(t_changes);
+      if (!current || dirty & /*editResponseUrl*/
+      1024) {
+        attr(
+          a,
+          "href",
+          /*editResponseUrl*/
+          ctx2[10]
+        );
+      }
     },
-    d(l) {
-      l && S(e), R(i);
+    i(local) {
+      if (current)
+        return;
+      transition_in(t.$$.fragment, local);
+      current = true;
+    },
+    o(local) {
+      transition_out(t.$$.fragment, local);
+      current = false;
+    },
+    d(detaching) {
+      if (detaching) {
+        detach(p);
+      }
+      destroy_component(t);
     }
   };
 }
-function at(t) {
-  let e, n, i, s, l;
-  return n = new J({
+function create_if_block_2(ctx) {
+  let button;
+  let t;
+  let current;
+  let mounted;
+  let dispose;
+  t = new T({
     props: {
       text: (
         /*postAgainText*/
-        t[5]
+        ctx[4]
       ),
       lang: (
         /*lang*/
-        t[0]
+        ctx[0]
       ),
       translations: (
         /*translations*/
-        t[2]
+        ctx[2]
       )
     }
-  }), {
+  });
+  return {
     c() {
-      e = k("button"), M(n.$$.fragment), g(e, "class", "mt-4 px-6 py-2 text-white bg-primary rounded hover:bg-primaryDark focus:outline-none focus:ring-2 focus:ring-inputFocus transition");
+      button = element("button");
+      create_component(t.$$.fragment);
+      attr(button, "class", "submit-again-button svelte-1hpprge");
     },
-    m(o, a) {
-      T(o, e, a), O(n, e, null), i = !0, s || (l = H(
-        e,
-        "click",
-        /*resetForm*/
-        t[16]
-      ), s = !0);
+    m(target, anchor) {
+      insert(target, button, anchor);
+      mount_component(t, button, null);
+      current = true;
+      if (!mounted) {
+        dispose = listen(
+          button,
+          "click",
+          /*resetForm*/
+          ctx[15]
+        );
+        mounted = true;
+      }
     },
-    p(o, a) {
-      const r = {};
-      a & /*postAgainText*/
-      32 && (r.text = /*postAgainText*/
-      o[5]), a & /*lang*/
-      1 && (r.lang = /*lang*/
-      o[0]), a & /*translations*/
-      4 && (r.translations = /*translations*/
-      o[2]), n.$set(r);
+    p(ctx2, dirty) {
+      const t_changes = {};
+      if (dirty & /*postAgainText*/
+      16)
+        t_changes.text = /*postAgainText*/
+        ctx2[4];
+      if (dirty & /*lang*/
+      1)
+        t_changes.lang = /*lang*/
+        ctx2[0];
+      if (dirty & /*translations*/
+      4)
+        t_changes.translations = /*translations*/
+        ctx2[2];
+      t.$set(t_changes);
     },
-    i(o) {
-      i || (_(n.$$.fragment, o), i = !0);
+    i(local) {
+      if (current)
+        return;
+      transition_in(t.$$.fragment, local);
+      current = true;
     },
-    o(o) {
-      F(n.$$.fragment, o), i = !1;
+    o(local) {
+      transition_out(t.$$.fragment, local);
+      current = false;
     },
-    d(o) {
-      o && S(e), R(n), s = !1, l();
+    d(detaching) {
+      if (detaching) {
+        detach(button);
+      }
+      destroy_component(t);
+      mounted = false;
+      dispose();
     }
   };
 }
-function dn(t) {
-  let e, n, i = (
+function create_fragment$1(ctx) {
+  let if_block_anchor;
+  let current;
+  let if_block = (
     /*form*/
-    t[1] && nt(t)
+    ctx[1] && create_if_block$1(ctx)
   );
   return {
     c() {
-      i && i.c(), e = $e();
+      if (if_block)
+        if_block.c();
+      if_block_anchor = empty();
     },
-    m(s, l) {
-      i && i.m(s, l), T(s, e, l), n = !0;
+    m(target, anchor) {
+      if (if_block)
+        if_block.m(target, anchor);
+      insert(target, if_block_anchor, anchor);
+      current = true;
     },
-    p(s, [l]) {
-      /*form*/
-      s[1] ? i ? (i.p(s, l), l & /*form*/
-      2 && _(i, 1)) : (i = nt(s), i.c(), _(i, 1), i.m(e.parentNode, e)) : i && (K(), F(i, 1, 1, () => {
-        i = null;
-      }), Q());
+    p(ctx2, [dirty]) {
+      if (
+        /*form*/
+        ctx2[1]
+      ) {
+        if (if_block) {
+          if_block.p(ctx2, dirty);
+          if (dirty & /*form*/
+          2) {
+            transition_in(if_block, 1);
+          }
+        } else {
+          if_block = create_if_block$1(ctx2);
+          if_block.c();
+          transition_in(if_block, 1);
+          if_block.m(if_block_anchor.parentNode, if_block_anchor);
+        }
+      } else if (if_block) {
+        group_outros();
+        transition_out(if_block, 1, 1, () => {
+          if_block = null;
+        });
+        check_outros();
+      }
     },
-    i(s) {
-      n || (_(i), n = !0);
+    i(local) {
+      if (current)
+        return;
+      transition_in(if_block);
+      current = true;
     },
-    o(s) {
-      F(i), n = !1;
+    o(local) {
+      transition_out(if_block);
+      current = false;
     },
-    d(s) {
-      s && S(e), i && i.d(s);
+    d(detaching) {
+      if (detaching) {
+        detach(if_block_anchor);
+      }
+      if (if_block)
+        if_block.d(detaching);
     }
   };
 }
-function pn(t, e) {
-  const n = { id: e, items: {} };
-  return t.forEach((i, s) => {
-    n.items[s] !== void 0 ? (Array.isArray(n.items[s]) || (n.items[s] = [n.items[s]]), n.items[s].push(i)) : n.items[s] = i;
-  }), n;
-}
-function _n(t, e, n) {
-  let { form: i } = e, { translations: s = {} } = e, { postUrl: l = "" } = e, { postCallback: o = null } = e, { postedMessage: a = "Form submitted successfully!" } = e, { allowPostAgain: r = !0 } = e, { postAgainText: u = "Submit another response" } = e, c, f = !1, h = !1, m = "", d = "";
-  function L(b) {
-    var ee;
-    if (!b)
+function instance$1($$self, $$props, $$invalidate) {
+  let { form } = $$props;
+  let { translations = {} } = $$props;
+  let { postUrl = "" } = $$props;
+  let { allowPostAgain = true } = $$props;
+  let { postAgainText = "Submit another response" } = $$props;
+  let pages = [];
+  let submitting = false;
+  let submitted = false;
+  let submissionError = "";
+  let editResponseUrl = "";
+  let currentPageId;
+  let pageHistory = [];
+  function parsePages(form2) {
+    if (!form2)
       return [];
-    const P = [];
-    let W = {
+    const pages2 = [];
+    let currentPage = {
       id: "start",
-      description: b.description,
-      items: [],
-      defaultNextPage: null
+      description: form2.description,
+      items: []
     };
-    for (const N of b.items)
-      N.type === "pageBreak" ? (P.push(W), W = {
-        id: N.id,
-        items: [],
-        title: N.title || void 0,
-        description: N.description || void 0,
-        defaultNextPage: ((ee = N.navigation) == null ? void 0 : ee.id) || null
-      }) : W.items.push(N);
-    W.items.length > 0 && P.push(W);
-    for (let N = 0; N < P.length - 1; N++)
-      P[N].defaultNextPage || (P[N].defaultNextPage = P[N + 1].id);
-    const Y = P[P.length - 1];
-    return Y.defaultNextPage || (Y.defaultNextPage = "submit"), n(7, y = P[0].id), P;
+    for (const item of form2.items) {
+      if (item.type === "pageBreak") {
+        pages2.push(currentPage);
+        currentPage = {
+          id: item.id,
+          items: [],
+          title: item.title
+        };
+      } else {
+        currentPage.items.push(item);
+      }
+    }
+    if (currentPage.items.length > 0)
+      pages2.push(currentPage);
+    for (let i = 0; i < pages2.length - 1; i++) {
+      if (!pages2[i].defaultNextPage)
+        pages2[i].defaultNextPage = pages2[i + 1].id;
+    }
+    pages2[pages2.length - 1].defaultNextPage = "submit";
+    $$invalidate(6, currentPageId = pages2[0].id);
+    return pages2;
   }
-  let y, A = [];
-  function v() {
-    A.length > 0 && (n(7, y = A.pop()), n(12, A));
+  function goBack() {
+    if (pageHistory.length > 0) {
+      $$invalidate(6, currentPageId = pageHistory.pop());
+    }
   }
-  async function U() {
-    n(8, f = !0), n(10, m = "");
-    let b = new FormData(p);
-    const P = crypto.randomUUID();
-    let W = {
-      ...pn(b, i.id),
-      uuid: P
+  async function submitForm() {
+    $$invalidate(7, submitting = true);
+    $$invalidate(9, submissionError = "");
+    let formData = new FormData(theFormElement);
+    const uuid = crypto.randomUUID();
+    let formJson = {
+      id: form.id,
+      items: Object.fromEntries(formData),
+      uuid
     };
     try {
-      await fetch(l, {
+      await fetch(postUrl, {
         method: "POST",
         mode: "no-cors",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(W)
+        body: JSON.stringify(formJson)
       });
-    } catch (ee) {
-      console.warn("Expected CORS error, ignoring:", ee);
+    } catch (error) {
+      console.warn("Expected CORS error, ignoring:", error);
     }
-    let Y = await E(P);
-    console.log("Final result:", Y), Y.success ? (n(9, h = !0), n(11, d = Y.editResponseUrl || "")) : n(10, m = "There was an error submitting the form."), n(8, f = !1);
+    console.log("Submitted data... polling for response: ", uuid);
+    let result = await pollForResponse(uuid);
+    console.log("Submitted form!", result);
+    if (result.success) {
+      $$invalidate(8, submitted = true);
+      $$invalidate(10, editResponseUrl = result.editResponseUrl || "");
+    } else {
+      $$invalidate(9, submissionError = "Error submitting the form.");
+    }
+    $$invalidate(7, submitting = false);
   }
-  async function E(b) {
-    let P = 0;
-    const W = 10, Y = (ee) => new Promise((N) => setTimeout(N, ee));
-    for (; P < W; ) {
-      console.log(`Checking form submission status (Attempt ${P + 1})`);
-      let N = await (await fetch(`${l}?uuid=${b}`, { method: "GET" })).json();
-      if (N.success || N.error)
-        return N;
-      await Y(1e3), P++;
+  async function pollForResponse(uuid) {
+    for (let i = 0; i < 10; i++) {
+      let response = await fetch(`${postUrl}?uuid=${uuid}`, { method: "GET" });
+      let data = await response.json();
+      if (data.success || data.error)
+        return data;
+      await new Promise((r) => setTimeout(r, 1e3));
     }
     return {
-      success: !1,
-      error: "Timeout while waiting for response"
+      success: false,
+      error: "Timeout waiting for response"
     };
   }
-  function B(b) {
-    b == "submit" ? U() : (A.push(y), n(12, A), n(7, y = b));
+  function nextPageOrSubmit(nextPageId2) {
+    if (nextPageId2 === "submit") {
+      submitForm();
+    } else {
+      pageHistory.push(currentPageId);
+      $$invalidate(6, currentPageId = nextPageId2);
+    }
   }
-  function C() {
-    n(9, h = !1), n(10, m = ""), n(11, d = ""), n(7, y = c[0].id), n(12, A = []), p.reset();
+  function resetForm() {
+    $$invalidate(8, submitted = false);
+    $$invalidate(9, submissionError = "");
+    $$invalidate(10, editResponseUrl = "");
+    $$invalidate(6, currentPageId = pages[0].id);
+    $$invalidate(11, pageHistory = []);
+    theFormElement.reset();
   }
-  let p, { lang: z = "en" } = e;
-  function G(b, P) {
-    console.log("Language changed to", z, "using Google Translate?", P), n(0, z = b);
+  let theFormElement;
+  let { lang = "en" } = $$props;
+  function onLanguageChange(newLang) {
+    $$invalidate(0, lang = newLang);
   }
-  const q = (b) => {
-    B(b);
-  };
-  function w(b) {
-    Fe[b ? "unshift" : "push"](() => {
-      p = b, n(13, p);
+  function form_1_binding($$value) {
+    binding_callbacks[$$value ? "unshift" : "push"](() => {
+      theFormElement = $$value;
+      $$invalidate(12, theFormElement);
     });
   }
-  return t.$$set = (b) => {
-    "form" in b && n(1, i = b.form), "translations" in b && n(2, s = b.translations), "postUrl" in b && n(18, l = b.postUrl), "postCallback" in b && n(19, o = b.postCallback), "postedMessage" in b && n(3, a = b.postedMessage), "allowPostAgain" in b && n(4, r = b.allowPostAgain), "postAgainText" in b && n(5, u = b.postAgainText), "lang" in b && n(0, z = b.lang);
-  }, t.$$.update = () => {
-    var b;
-    t.$$.dirty & /*form*/
-    2 && n(6, c = L(i)), t.$$.dirty & /*pages, currentPageId*/
-    192 && (b = c.find((P) => P.id === y)) != null && b.defaultNextPage;
-  }, [
-    z,
-    i,
-    s,
-    a,
-    r,
-    u,
-    c,
-    y,
-    f,
-    h,
-    m,
-    d,
-    A,
-    p,
-    v,
-    B,
-    C,
-    G,
-    l,
-    o,
-    q,
-    w
+  $$self.$$set = ($$props2) => {
+    if ("form" in $$props2)
+      $$invalidate(1, form = $$props2.form);
+    if ("translations" in $$props2)
+      $$invalidate(2, translations = $$props2.translations);
+    if ("postUrl" in $$props2)
+      $$invalidate(17, postUrl = $$props2.postUrl);
+    if ("allowPostAgain" in $$props2)
+      $$invalidate(3, allowPostAgain = $$props2.allowPostAgain);
+    if ("postAgainText" in $$props2)
+      $$invalidate(4, postAgainText = $$props2.postAgainText);
+    if ("lang" in $$props2)
+      $$invalidate(0, lang = $$props2.lang);
+  };
+  $$self.$$.update = () => {
+    var _a;
+    if ($$self.$$.dirty & /*form*/
+    2) {
+      $$invalidate(5, pages = parsePages(form));
+    }
+    if ($$self.$$.dirty & /*pages, currentPageId*/
+    96) {
+      ((_a = pages.find((page) => page.id === currentPageId)) == null ? void 0 : _a.defaultNextPage) || "submit";
+    }
+  };
+  return [
+    lang,
+    form,
+    translations,
+    allowPostAgain,
+    postAgainText,
+    pages,
+    currentPageId,
+    submitting,
+    submitted,
+    submissionError,
+    editResponseUrl,
+    pageHistory,
+    theFormElement,
+    goBack,
+    nextPageOrSubmit,
+    resetForm,
+    onLanguageChange,
+    postUrl,
+    form_1_binding
   ];
 }
-class kt extends ae {
-  constructor(e) {
-    super(), oe(
+class GForm extends SvelteComponent {
+  constructor(options) {
+    super();
+    init(
       this,
-      e,
-      _n,
-      dn,
-      le,
+      options,
+      instance$1,
+      create_fragment$1,
+      safe_not_equal,
       {
         form: 1,
         translations: 2,
-        postUrl: 18,
-        postCallback: 19,
-        postedMessage: 3,
-        allowPostAgain: 4,
-        postAgainText: 5,
+        postUrl: 17,
+        allowPostAgain: 3,
+        postAgainText: 4,
         lang: 0
       },
-      hn
+      add_css
     );
   }
   get form() {
     return this.$$.ctx[1];
   }
-  set form(e) {
-    this.$$set({ form: e }), I();
+  set form(form) {
+    this.$$set({ form });
+    flush();
   }
   get translations() {
     return this.$$.ctx[2];
   }
-  set translations(e) {
-    this.$$set({ translations: e }), I();
+  set translations(translations) {
+    this.$$set({ translations });
+    flush();
   }
   get postUrl() {
-    return this.$$.ctx[18];
+    return this.$$.ctx[17];
   }
-  set postUrl(e) {
-    this.$$set({ postUrl: e }), I();
-  }
-  get postCallback() {
-    return this.$$.ctx[19];
-  }
-  set postCallback(e) {
-    this.$$set({ postCallback: e }), I();
-  }
-  get postedMessage() {
-    return this.$$.ctx[3];
-  }
-  set postedMessage(e) {
-    this.$$set({ postedMessage: e }), I();
+  set postUrl(postUrl) {
+    this.$$set({ postUrl });
+    flush();
   }
   get allowPostAgain() {
-    return this.$$.ctx[4];
+    return this.$$.ctx[3];
   }
-  set allowPostAgain(e) {
-    this.$$set({ allowPostAgain: e }), I();
+  set allowPostAgain(allowPostAgain) {
+    this.$$set({ allowPostAgain });
+    flush();
   }
   get postAgainText() {
-    return this.$$.ctx[5];
+    return this.$$.ctx[4];
   }
-  set postAgainText(e) {
-    this.$$set({ postAgainText: e }), I();
+  set postAgainText(postAgainText) {
+    this.$$set({ postAgainText });
+    flush();
   }
   get lang() {
     return this.$$.ctx[0];
   }
-  set lang(e) {
-    this.$$set({ lang: e }), I();
+  set lang(lang) {
+    this.$$set({ lang });
+    flush();
   }
 }
-re(kt, { form: {}, translations: {}, postUrl: {}, postCallback: {}, postedMessage: {}, allowPostAgain: { type: "Boolean" }, postAgainText: {}, lang: {} }, [], [], !0);
-function ut(t) {
-  let e, n;
-  return e = new kt({
+create_custom_element(GForm, { "form": {}, "translations": {}, "postUrl": {}, "allowPostAgain": { "type": "Boolean" }, "postAgainText": {}, "lang": {} }, [], [], true);
+function create_if_block_1(ctx) {
+  let gform;
+  let current;
+  gform = new GForm({
     props: {
       form: (
         /*data*/
-        t[1]
+        ctx[1]
       ),
       postUrl: (
         /*appsScriptUrl*/
-        t[3]
+        ctx[3]
       ),
       translations: (
         /*translations*/
-        t[0]
+        ctx[0]
       ),
       lang: "en"
     }
-  }), {
-    c() {
-      M(e.$$.fragment);
-    },
-    m(i, s) {
-      O(e, i, s), n = !0;
-    },
-    p(i, s) {
-      const l = {};
-      s & /*data*/
-      2 && (l.form = /*data*/
-      i[1]), s & /*appsScriptUrl*/
-      8 && (l.postUrl = /*appsScriptUrl*/
-      i[3]), s & /*translations*/
-      1 && (l.translations = /*translations*/
-      i[0]), e.$set(l);
-    },
-    i(i) {
-      n || (_(e.$$.fragment, i), n = !0);
-    },
-    o(i) {
-      F(e.$$.fragment, i), n = !1;
-    },
-    d(i) {
-      R(e, i);
-    }
-  };
-}
-function ft(t) {
-  let e, n, i, s;
+  });
   return {
     c() {
-      e = k("button"), n = X("↻"), e.disabled = /*loading*/
-      t[4], g(e, "class", "bg-primary hover:bg-primaryDark text-white font-bold py-2 px-4 rounded");
+      create_component(gform.$$.fragment);
     },
-    m(l, o) {
-      T(l, e, o), $(e, n), i || (s = H(
-        e,
-        "click",
-        /*loadForm*/
-        t[5]
-      ), i = !0);
+    m(target, anchor) {
+      mount_component(gform, target, anchor);
+      current = true;
     },
-    p(l, o) {
-      o & /*loading*/
-      16 && (e.disabled = /*loading*/
-      l[4]);
+    p(ctx2, dirty) {
+      const gform_changes = {};
+      if (dirty & /*data*/
+      2)
+        gform_changes.form = /*data*/
+        ctx2[1];
+      if (dirty & /*appsScriptUrl*/
+      8)
+        gform_changes.postUrl = /*appsScriptUrl*/
+        ctx2[3];
+      if (dirty & /*translations*/
+      1)
+        gform_changes.translations = /*translations*/
+        ctx2[0];
+      gform.$set(gform_changes);
     },
-    d(l) {
-      l && S(e), i = !1, s();
+    i(local) {
+      if (current)
+        return;
+      transition_in(gform.$$.fragment, local);
+      current = true;
+    },
+    o(local) {
+      transition_out(gform.$$.fragment, local);
+      current = false;
+    },
+    d(detaching) {
+      destroy_component(gform, detaching);
     }
   };
 }
-function bn(t) {
-  let e, n, i, s = (
+function create_if_block(ctx) {
+  let button;
+  let t;
+  let mounted;
+  let dispose;
+  return {
+    c() {
+      button = element("button");
+      t = text("↻");
+      button.disabled = /*loading*/
+      ctx[4];
+      attr(button, "class", "bg-primary hover:bg-primaryDark text-white font-bold py-2 px-4 rounded");
+    },
+    m(target, anchor) {
+      insert(target, button, anchor);
+      append(button, t);
+      if (!mounted) {
+        dispose = listen(
+          button,
+          "click",
+          /*loadForm*/
+          ctx[5]
+        );
+        mounted = true;
+      }
+    },
+    p(ctx2, dirty) {
+      if (dirty & /*loading*/
+      16) {
+        button.disabled = /*loading*/
+        ctx2[4];
+      }
+    },
+    d(detaching) {
+      if (detaching) {
+        detach(button);
+      }
+      mounted = false;
+      dispose();
+    }
+  };
+}
+function create_fragment(ctx) {
+  let t;
+  let if_block1_anchor;
+  let current;
+  let if_block0 = (
     /*data*/
-    t[1] && ut(t)
-  ), l = (
+    ctx[1] && create_if_block_1(ctx)
+  );
+  let if_block1 = (
     /*formsUrl*/
-    (t[2] || translationsUrl) && ft(t)
+    ctx[2] && create_if_block(ctx)
   );
   return {
     c() {
-      s && s.c(), e = j(), l && l.c(), n = $e();
+      if (if_block0)
+        if_block0.c();
+      t = space();
+      if (if_block1)
+        if_block1.c();
+      if_block1_anchor = empty();
     },
-    m(o, a) {
-      s && s.m(o, a), T(o, e, a), l && l.m(o, a), T(o, n, a), i = !0;
+    m(target, anchor) {
+      if (if_block0)
+        if_block0.m(target, anchor);
+      insert(target, t, anchor);
+      if (if_block1)
+        if_block1.m(target, anchor);
+      insert(target, if_block1_anchor, anchor);
+      current = true;
     },
-    p(o, [a]) {
-      /*data*/
-      o[1] ? s ? (s.p(o, a), a & /*data*/
-      2 && _(s, 1)) : (s = ut(o), s.c(), _(s, 1), s.m(e.parentNode, e)) : s && (K(), F(s, 1, 1, () => {
-        s = null;
-      }), Q()), /*formsUrl*/
-      o[2] || translationsUrl ? l ? l.p(o, a) : (l = ft(o), l.c(), l.m(n.parentNode, n)) : l && (l.d(1), l = null);
+    p(ctx2, [dirty]) {
+      if (
+        /*data*/
+        ctx2[1]
+      ) {
+        if (if_block0) {
+          if_block0.p(ctx2, dirty);
+          if (dirty & /*data*/
+          2) {
+            transition_in(if_block0, 1);
+          }
+        } else {
+          if_block0 = create_if_block_1(ctx2);
+          if_block0.c();
+          transition_in(if_block0, 1);
+          if_block0.m(t.parentNode, t);
+        }
+      } else if (if_block0) {
+        group_outros();
+        transition_out(if_block0, 1, 1, () => {
+          if_block0 = null;
+        });
+        check_outros();
+      }
+      if (
+        /*formsUrl*/
+        ctx2[2]
+      ) {
+        if (if_block1) {
+          if_block1.p(ctx2, dirty);
+        } else {
+          if_block1 = create_if_block(ctx2);
+          if_block1.c();
+          if_block1.m(if_block1_anchor.parentNode, if_block1_anchor);
+        }
+      } else if (if_block1) {
+        if_block1.d(1);
+        if_block1 = null;
+      }
     },
-    i(o) {
-      i || (_(s), i = !0);
+    i(local) {
+      if (current)
+        return;
+      transition_in(if_block0);
+      current = true;
     },
-    o(o) {
-      F(s), i = !1;
+    o(local) {
+      transition_out(if_block0);
+      current = false;
     },
-    d(o) {
-      o && (S(e), S(n)), s && s.d(o), l && l.d(o);
+    d(detaching) {
+      if (detaching) {
+        detach(t);
+        detach(if_block1_anchor);
+      }
+      if (if_block0)
+        if_block0.d(detaching);
+      if (if_block1)
+        if_block1.d(detaching);
     }
   };
 }
-function $n(t, e, n) {
-  let { formsUrl: i = "" } = e, { formsId: s = "" } = e, { appsScriptUrl: l = "" } = e, { translations: o = {} } = e, { data: a } = e;
-  async function r() {
+function instance($$self, $$props, $$invalidate) {
+  let { formsUrl = "" } = $$props;
+  let { formsId = "" } = $$props;
+  let { appsScriptUrl = "" } = $$props;
+  let { translations = {} } = $$props;
+  let { data } = $$props;
+  async function loadForm() {
     try {
-      n(4, u = !0), console.log("Loading form from URL", i);
-      var c = s ? `${l}?getFormData=1&formId=${encodeURIComponent(s)}` : `${l}?getFormData=1&formUrl=${encodeURIComponent(i)}`;
-      const h = await fetch(c, { method: "GET", redirect: "follow" });
-      if (!h.ok)
-        throw new Error(`Failed to load form: ${h.statusText}`);
-      n(1, a = await h.json()), console.log("Form Data Loaded:", a);
-    } catch (h) {
-      console.error("Error loading form from URL", c, h);
+      $$invalidate(4, loading = true);
+      console.log("Loading form from URL", formsUrl);
+      var fetchUrl = formsId ? `${appsScriptUrl}?getFormData=1&formId=${encodeURIComponent(formsId)}` : `${appsScriptUrl}?getFormData=1&formUrl=${encodeURIComponent(formsUrl)}`;
+      const response = await fetch(fetchUrl, { method: "GET", redirect: "follow" });
+      if (!response.ok) {
+        throw new Error(`Failed to load form: ${response.statusText}`);
+      }
+      $$invalidate(1, data = await response.json());
+      console.log("Form Data Loaded:", data);
+    } catch (error) {
+      console.error("Error loading form from URL", fetchUrl, error);
     } finally {
-      n(4, u = !1);
+      $$invalidate(4, loading = false);
     }
-    let f = `${l}?translations=1`;
-    s ? f += `&formId=${encodeURIComponent(s)}` : f += `&formUrl=${encodeURIComponent(i)}`, n(4, u = !0);
+    let translationsUrl = `${appsScriptUrl}?translations=1`;
+    if (formsId) {
+      translationsUrl += `&formId=${encodeURIComponent(formsId)}`;
+    } else {
+      translationsUrl += `&formUrl=${encodeURIComponent(formsUrl)}`;
+    }
+    $$invalidate(4, loading = true);
     try {
-      console.log("Fetch transalations from", f);
-      const h = await fetch(f, { method: "GET", redirect: "follow" });
-      if (!h.ok)
-        throw new Error(`Failed to load translations: ${h.statusText}`);
-      n(0, o = await h.json()), console.log("Translations Loaded:", o);
-    } catch (h) {
-      console.error("Error loading translations from URL", f, h);
+      console.log("Fetch transalations from", translationsUrl);
+      const response = await fetch(translationsUrl, { method: "GET", redirect: "follow" });
+      if (!response.ok) {
+        throw new Error(`Failed to load translations: ${response.statusText}`);
+      }
+      $$invalidate(0, translations = await response.json());
+      console.log("Translations Loaded:", translations);
+    } catch (error) {
+      console.error("Error loading translations from URL", translationsUrl, error);
     }
   }
-  let u = !1;
-  return gt(() => {
-    r();
-  }), t.$$set = (c) => {
-    "formsUrl" in c && n(2, i = c.formsUrl), "formsId" in c && n(6, s = c.formsId), "appsScriptUrl" in c && n(3, l = c.appsScriptUrl), "translations" in c && n(0, o = c.translations), "data" in c && n(1, a = c.data);
-  }, [o, a, i, l, u, r, s];
+  let loading = false;
+  onMount(() => {
+    loadForm();
+  });
+  $$self.$$set = ($$props2) => {
+    if ("formsUrl" in $$props2)
+      $$invalidate(2, formsUrl = $$props2.formsUrl);
+    if ("formsId" in $$props2)
+      $$invalidate(6, formsId = $$props2.formsId);
+    if ("appsScriptUrl" in $$props2)
+      $$invalidate(3, appsScriptUrl = $$props2.appsScriptUrl);
+    if ("translations" in $$props2)
+      $$invalidate(0, translations = $$props2.translations);
+    if ("data" in $$props2)
+      $$invalidate(1, data = $$props2.data);
+  };
+  return [translations, data, formsUrl, appsScriptUrl, loading, loadForm, formsId];
 }
-class kn extends ae {
-  constructor(e) {
-    super(), oe(this, e, $n, bn, le, {
+class GFormMirror extends SvelteComponent {
+  constructor(options) {
+    super();
+    init(this, options, instance, create_fragment, not_equal, {
       formsUrl: 2,
       formsId: 6,
       appsScriptUrl: 3,
@@ -3603,35 +5235,41 @@ class kn extends ae {
   get formsUrl() {
     return this.$$.ctx[2];
   }
-  set formsUrl(e) {
-    this.$$set({ formsUrl: e }), I();
+  set formsUrl(formsUrl) {
+    this.$$set({ formsUrl });
+    flush();
   }
   get formsId() {
     return this.$$.ctx[6];
   }
-  set formsId(e) {
-    this.$$set({ formsId: e }), I();
+  set formsId(formsId) {
+    this.$$set({ formsId });
+    flush();
   }
   get appsScriptUrl() {
     return this.$$.ctx[3];
   }
-  set appsScriptUrl(e) {
-    this.$$set({ appsScriptUrl: e }), I();
+  set appsScriptUrl(appsScriptUrl) {
+    this.$$set({ appsScriptUrl });
+    flush();
   }
   get translations() {
     return this.$$.ctx[0];
   }
-  set translations(e) {
-    this.$$set({ translations: e }), I();
+  set translations(translations) {
+    this.$$set({ translations });
+    flush();
   }
   get data() {
     return this.$$.ctx[1];
   }
-  set data(e) {
-    this.$$set({ data: e }), I();
+  set data(data) {
+    this.$$set({ data });
+    flush();
   }
 }
-re(kn, { formsUrl: {}, formsId: {}, appsScriptUrl: {}, translations: {}, data: {} }, [], [], !0);
+customElements.define("gforms-mirror", create_custom_element(GFormMirror, { "formsUrl": {}, "formsId": {}, "appsScriptUrl": {}, "translations": {}, "data": {} }, [], [], true));
 export {
-  kn as default
+  GFormMirror as default
 };
+//# sourceMappingURL=gform-mirror.js.map

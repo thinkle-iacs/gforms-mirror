@@ -63,19 +63,15 @@
 </script>
 
 <!-- Page Wrapper -->
-<div
-  class="max-w-2xl mx-auto p-6 bg-background text-text shadow-md rounded-md
-         transition-opacity duration-300 ease-in-out"
-  class:hidden={!isActive}
->
+<div class="page-container" class:hidden={!isActive}>
   <!-- Page Title -->
   {#if page.title}
-    <h2 class="text-2xl font-semibold text-text">{page.title}</h2>
+    <h2 class="page-title">{page.title}</h2>
   {/if}
 
   <!-- Page Description -->
   {#if page.description}
-    <p class="text-muted mb-4">
+    <p class="page-description">
       <T text={page.description} {lang} {translations} />
     </p>
   {/if}
@@ -84,30 +80,25 @@
   {#each page.items as item}
     <GFormItem {item} {onInputChange} {setChoice} {lang} {translations} />
     {#if formErrors[item.id]}
-      <p
-        class="text-error bg-errorBg border border-error p-2 rounded-md text-sm mt-2"
-      >
+      <p class="error-message">
         {formErrors[item.id]}
       </p>
     {/if}
   {/each}
 
   <!-- Navigation Buttons -->
-  <div class="flex justify-between mt-6">
+  <div class="nav-buttons">
     {#if !isFirst}
-      <button
-        on:click|preventDefault={onBack}
-        class="px-4 py-2 bg-muted text-text rounded-md hover:bg-mutedHover transition
-               focus:outline-none focus-visible:ring-2 focus-visible:ring-inputFocus"
-      >
+      <button on:click|preventDefault={onBack} class="nav-button back-button">
         <T text="Back" {lang} {translations} />
       </button>
+    {:else}
+      <div></div>
     {/if}
 
     <button
       on:click|preventDefault={handleNext}
-      class="px-4 py-2 bg-primary text-white rounded-md hover:bg-opacity-80 transition
-             focus:outline-none focus-visible:ring-2 focus-visible:ring-inputFocus"
+      class="nav-button next-button"
       disabled={isSubmitting}
     >
       {#if isSubmitting}
@@ -120,3 +111,91 @@
     </button>
   </div>
 </div>
+
+<style>
+  /* === Page Container === */
+  .page-container {
+    max-width: 42rem;
+    margin: 0 auto;
+    padding: 1.5rem;
+    background-color: var(--bg-color, #ffffff);
+    color: var(--text-color, #1f2937);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    transition: opacity 0.3s ease-in-out;
+  }
+
+  .page-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-color, #1f2937);
+    margin-bottom: 0.75rem;
+  }
+
+  .page-description {
+    font-size: 0.875rem;
+    color: var(--muted-text, #6b7280);
+    margin-bottom: 1rem;
+  }
+
+  /* === Error Message Styling === */
+  .error-message {
+    background-color: var(--error-bg, #fef2f2);
+    border: 1px solid var(--error-color, #dc2626);
+    color: var(--error-color, #dc2626);
+    padding: 0.5rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+  }
+
+  /* === Navigation Buttons === */
+  .nav-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1.5rem;
+  }
+
+  .nav-button {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 1rem;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+    border: none;
+    outline: none;
+  }
+
+  .back-button {
+    background-color: var(--muted-bg, #e5e7eb);
+    color: var(--text-color, #1f2937);
+  }
+
+  .back-button:hover {
+    background-color: var(--muted-hover, #d1d5db);
+  }
+
+  .next-button {
+    background-color: var(--primary-color, #2563eb);
+    color: #ffffff;
+  }
+
+  .next-button:hover {
+    background-color: var(--primary-dark, #1d4ed8);
+  }
+
+  .next-button:disabled {
+    background-color: var(--disabled-bg, #9ca3af);
+    cursor: not-allowed;
+  }
+
+  /* === Focus & Active States === */
+  .nav-button:focus {
+    outline: 2px solid var(--input-focus-color, #2563eb);
+    outline-offset: 2px;
+  }
+  .hidden {
+    visibility: hidden;
+  }
+</style>

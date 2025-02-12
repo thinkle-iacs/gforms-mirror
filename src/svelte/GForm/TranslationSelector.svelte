@@ -11,6 +11,7 @@
   let selectedLang = sourceLanguage;
   let useGoogleTranslate = false;
   let googleTranslateIsReady = false;
+  let showAllLanguages = false;
 
   function googleTranslateElementInit() {
     new google.translate.TranslateElement(
@@ -33,7 +34,6 @@
   onMount(() => {
     detectGoogleTranslateLanguage(window.location.hash);
     window.googleTranslateLoaded = googleTranslateLoaded;
-    // Listen for hash changes
     window.addEventListener("hashchange", () => {
       detectGoogleTranslateLanguage(window.location.hash);
     });
@@ -59,7 +59,6 @@
   function hasCompleteTranslations(lang: string) {
     let translation = translations[lang];
     if (!translation) return false;
-    // Now crawl the form for strings...
     if (form.title && !translation[form.title]) return false;
     if (form.description && !translation[form.description]) return false;
     for (let item of form.items) {
@@ -78,7 +77,6 @@
     googleTranslateElementInit();
   }
 
-  let showAllLanguages = false;
   $: onChange(selectedLang, useGoogleTranslate);
 </script>
 
@@ -87,16 +85,16 @@
     src="https://translate.google.com/translate_a/element.js?cb=googleTranslateLoaded"
   ></script>
 </svelte:head>
-<div class="translate space-y-2 mt-4">
-  <div class="flex flex-wrap gap-2">
+
+<div class="translation-container">
+  <div class="button-group">
     {#if selectedLang !== sourceLanguage}
       {@const langName = new Intl.DisplayNames([sourceLanguage], {
         type: "language",
       }).of(sourceLanguage)}
       <button
         on:click={() => setLanguage(sourceLanguage)}
-        class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primaryDark transition text-sm capitalize notranslate
-              focus:outline-none focus:ring-2 focus:ring-inputFocus"
+        class="lang-button primary"
       >
         <T lang={selectedLang} {translations} text={langName} />
       </button>
@@ -106,11 +104,7 @@
       {@const langName = new Intl.DisplayNames([lang], { type: "language" }).of(
         lang
       )}
-      <button
-        on:click={() => setLanguage(lang)}
-        class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primaryDark transition text-sm capitalize notranslate
-              focus:outline-none focus:ring-2 focus:ring-inputFocus"
-      >
+      <button on:click={() => setLanguage(lang)} class="lang-button primary">
         {langName}
       </button>
     {/each}
@@ -118,11 +112,10 @@
     <!-- Toggle Google Translate -->
     <button
       on:click={() => {
-        setLanguage(sourceLanguage); // Reset to source language
-        showAllLanguages = !showAllLanguages; // Toggle translation UI
+        setLanguage(sourceLanguage);
+        showAllLanguages = !showAllLanguages;
       }}
-      class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition text-sm
-            focus:outline-none focus:ring-2 focus:ring-gray-400"
+      class="lang-button secondary"
     >
       {#if Object.keys(translations).length}
         <T lang={selectedLang} {translations} text="Other Languages" />
@@ -134,16 +127,60 @@
 </div>
 
 <!-- Google Translate Element -->
-<div class:hidden={!showAllLanguages} id="google_translate_element"></div>
+<div
+  class="google-translate-container"
+  class:hidden={!showAllLanguages}
+  id="google_translate_element"
+></div>
 
 <style>
-  .translate {
-    margin-bottom: 10px;
+  .translation-container {
+    margin-top: 1rem;
   }
+
+  .button-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .lang-button {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition:
+      background 0.2s ease-in-out,
+      transform 0.1s ease-in-out;
+    text-transform: capitalize;
+  }
+
+  .lang-button.primary {
+    background-color: var(--primary-color, #2563eb);
+    color: white;
+  }
+
+  .lang-button.primary:hover {
+    background-color: var(--primary-dark, #1d4ed8);
+    transform: scale(1.05);
+  }
+
+  .lang-button.secondary {
+    background-color: var(--text-color, #6b7280);
+    color: white;
+  }
+
+  .lang-button.secondary:hover {
+    background-color: var(--muted-text, #4b5563);
+    transform: scale(1.05);
+  }
+
+  .google-translate-container {
+    margin-top: 1rem;
+  }
+
   .hidden {
     display: none;
-  }
-  button {
-    text-transform: capitalize; /* Capitalizes the language names */
   }
 </style>

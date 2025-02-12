@@ -9,7 +9,15 @@ export default defineConfig(({ command, mode }) => {
 
   return {
     plugins: [
-      svelte({ compilerOptions: { customElement: isWebComponent } }),
+      svelte({
+        compilerOptions: {
+          customElement: isWebComponent,
+        },
+        emitCss: false,
+        experimental: {
+          injectStyles: "always",
+        },
+      }),
       !isWebComponent && viteSingleFile(), // ✅ Ensure viteSingleFile runs when NOT in webcomponent mode
     ].filter(Boolean), // Remove `false` values
     css: {
@@ -28,16 +36,21 @@ export default defineConfig(({ command, mode }) => {
             fileName: "gform-mirror",
             formats: ["es"], // Only ES module format
           },
+          minify: false,
           rollupOptions: {
             output: {
               dir: "./webcomponent",
+
+              sourcemap: true,
               entryFileNames: "gform-mirror.js",
+              inlineDynamicImports: true, // ✅ Ensures everything gets inlined
             },
           },
         }
       : {
           outDir: "../../dist",
           emptyOutDir: true,
+
           rollupOptions: {
             output: {
               inlineDynamicImports: true, // ✅ Ensures everything gets inlined

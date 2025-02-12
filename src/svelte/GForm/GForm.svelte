@@ -2,33 +2,28 @@
   import TranslationSelector from "./TranslationSelector.svelte";
   import GPage from "./GPage.svelte";
   import T from "./T.svelte";
-  import type {
-    Form,
-    StandardFormItem,
-    ChoiceFormItem,
-    FormResponse,
-    Translations,
-  } from "./../../gas/types.ts";
+  import type { Form, Translations } from "./../../gas/types.ts";
   import type { Page } from "./types";
 
   export let form: Form;
   export let translations: Translations = {};
   export let postUrl: string = "";
-  export let postCallback: (data: any) => void | null = null;
-  export let postedMessage = `Form submitted successfully!`;
   export let allowPostAgain = true;
   export let postAgainText = "Submit another response";
 
-  let pages: Page[];
+  let pages: Page[] = [];
   let submitting = false;
   let submitted = false;
   let submissionError = "";
   let editResponseUrl = "";
+  let currentPageId: string;
+  let pageHistory: string[] = [];
 
-  /**
-   * Parses the form into separate pages based on Google Forms' "page breaks."
-   * Ensures that navigation rules are respected and a default submit behavior is applied.
-   */
+  $: pages = parsePages(form);
+  $: nextPageId =
+    pages.find((page) => page.id === currentPageId)?.defaultNextPage ||
+    "submit";
+
   function parsePages(form: Form): Page[] {
     if (!form) return [];
     const pages: Page[] = [];
@@ -36,97 +31,37 @@
       id: "start",
       description: form.description,
       items: [],
-      defaultNextPage: null,
     };
 
     for (const item of form.items) {
       if (item.type === "pageBreak") {
         pages.push(currentPage);
-        currentPage = {
-          id: item.id,
-          items: [],
-          title: item.title || undefined,
-          description: item.description || undefined,
-          defaultNextPage: item.navigation?.id || null,
-        };
+        currentPage = { id: item.id, items: [], title: item.title };
       } else {
         currentPage.items.push(item);
       }
     }
-
-    if (currentPage.items.length > 0) {
-      pages.push(currentPage);
-    }
-
+    if (currentPage.items.length > 0) pages.push(currentPage);
     for (let i = 0; i < pages.length - 1; i++) {
-      if (!pages[i].defaultNextPage) {
-        pages[i].defaultNextPage = pages[i + 1].id;
-      }
+      if (!pages[i].defaultNextPage) pages[i].defaultNextPage = pages[i + 1].id;
     }
-
-    const lastPage = pages[pages.length - 1];
-    if (!lastPage.defaultNextPage) {
-      lastPage.defaultNextPage = "submit";
-    }
+    pages[pages.length - 1].defaultNextPage = "submit";
     currentPageId = pages[0].id;
     return pages;
   }
 
-  let currentPageId: string;
-  let nextPageId: string;
-  $: pages = parsePages(form);
-  $: nextPageId =
-    pages.find((page) => page.id === currentPageId)?.defaultNextPage ||
-    "submit";
-
-  let pageHistory = [];
-
   function goBack() {
     if (pageHistory.length > 0) {
       currentPageId = pageHistory.pop();
-      pageHistory = pageHistory;
     }
   }
 
-  /**
-   * Converts form data into a JSON object that matches the expected format for submission.
-   * Ensures multiple selections (checkboxes) are stored as arrays.
-   */
-  function formDataToJson(formData: FormData, formId: string): FormResponse {
-    const json: Record<string, any> = { id: formId, items: {} };
-
-    formData.forEach((value, key) => {
-      if (json.items[key] !== undefined) {
-        if (!Array.isArray(json.items[key])) {
-          json.items[key] = [json.items[key]];
-        }
-        json.items[key].push(value);
-      } else {
-        json.items[key] = value;
-      }
-    });
-
-    return json;
-  }
-
-  /*
-   * 🛠️ NOTE: Due to CORS restrictions, Google Apps Script does not support direct POST responses.
-   * -> (1) Every form submission includes a unique UUID in the request body.
-   * -> (2) The POST request is sent using `mode: "no-cors"`, which prevents direct response handling.
-   * -> (3) The Google Apps Script backend stores the response temporarily using the UUID.
-   * -> (4) The front-end then makes a GET request with the UUID to retrieve the response.
-   * -> (5) The backend deletes the stored response after returning it.
-   *
-   * This workaround ensures that form submissions are properly processed and retrievable,
-   * despite CORS limitations. If Apps Script ever supports CORS properly in the future,
-   * we can remove this hack and handle responses directly from the POST request.
-   */
   async function submitForm() {
     submitting = true;
     submissionError = "";
     let formData = new FormData(theFormElement);
-    const uuid = crypto.randomUUID(); // Generate a unique ID
-    let formJson = { ...formDataToJson(formData, form.id), uuid };
+    const uuid = crypto.randomUUID();
+    let formJson = { id: form.id, items: Object.fromEntries(formData), uuid };
 
     try {
       await fetch(postUrl, {
@@ -138,51 +73,35 @@
     } catch (error) {
       console.warn("Expected CORS error, ignoring:", error);
     }
+    console.log("Submitted data... polling for response: ", uuid);
 
     let result = await pollForResponse(uuid);
-    console.log("Final result:", result);
-
+    console.log("Submitted form!", result);
     if (result.success) {
       submitted = true;
       editResponseUrl = result.editResponseUrl || "";
     } else {
-      submissionError = "There was an error submitting the form.";
+      submissionError = "Error submitting the form.";
     }
+
     submitting = false;
   }
 
-  /**
-   * Polls the backend for the submission result using the UUID.
-   * Tries up to `maxAttempts` times before giving up.
-   */
   async function pollForResponse(uuid) {
-    let attempts = 0;
-    const maxAttempts = 10;
-    const delay = (ms) => new Promise((res) => setTimeout(res, ms));
-
-    while (attempts < maxAttempts) {
-      console.log(`Checking form submission status (Attempt ${attempts + 1})`);
-
+    for (let i = 0; i < 10; i++) {
       let response = await fetch(`${postUrl}?uuid=${uuid}`, { method: "GET" });
       let data = await response.json();
-
-      if (data.success || data.error) {
-        return data;
-      }
-
-      await delay(1000);
-      attempts++;
+      if (data.success || data.error) return data;
+      await new Promise((r) => setTimeout(r, 1000));
     }
-
-    return { success: false, error: "Timeout while waiting for response" };
+    return { success: false, error: "Timeout waiting for response" };
   }
 
   function nextPageOrSubmit(nextPageId: string) {
-    if (nextPageId == "submit") {
+    if (nextPageId === "submit") {
       submitForm();
     } else {
       pageHistory.push(currentPageId);
-      pageHistory = pageHistory;
       currentPageId = nextPageId;
     }
   }
@@ -197,110 +116,88 @@
   }
 
   let theFormElement: HTMLFormElement;
-
   export let lang = "en";
 
-  function onLanguageChange(newLang: string, useGoogle: boolean) {
-    console.log(
-      "Language changed to",
-      lang,
-      "using Google Translate?",
-      useGoogle
-    );
+  function onLanguageChange(newLang: string) {
     lang = newLang;
   }
 </script>
 
 {#if form}
-  <TranslationSelector {translations} {form} onChange={onLanguageChange} />
+  <main>
+    <TranslationSelector {translations} {form} onChange={onLanguageChange} />
 
-  <form
-    bind:this={theFormElement}
-    class="bg-background text-text font-ui p-6 rounded-md shadow-md space-y-6"
-    class:hidden={submitted}
-  >
-    <!-- Form Title -->
-    <h1 class="text-3xl font-semibold text-primary">
-      <T text={form.title} {lang} {translations} />
-    </h1>
-
-    <a class="text-link hover:underline text-sm" href={form.publishedUrl}>
-      (<T text="Complete in Google Forms" {lang} {translations} />)
-    </a>
-
-    <!-- Pages -->
-    <div class="space-y-6">
-      {#each pages as page}
-        <GPage
-          isFirst={pageHistory.length === 0}
-          isActive={currentPageId === page.id}
-          isSubmitting={submitting}
-          {page}
-          {lang}
-          {translations}
-          onBack={goBack}
-          onGoto={(id) => {
-            nextPageOrSubmit(id);
-          }}
-        />
-      {/each}
-    </div>
-
-    <!-- Submit Button -->
-    <div class="flex justify-end">
-      <button
-        type="submit"
-        class="px-6 py-2 text-white bg-primary rounded hover:bg-primaryDark transition focus:outline-none focus:ring-2 focus:ring-inputFocus"
-      >
-        <T text="Submit" {lang} {translations} />
-      </button>
-    </div>
-  </form>
-
-  <!-- Submission Error -->
-  {#if submissionError}
-    <div class="mt-4 text-error bg-red-100 border border-error p-3 rounded-md">
-      <T text={submissionError} {lang} {translations} />
-    </div>
-  {/if}
-
-  <!-- Success Message -->
-  {#if submitted}
-    <div
-      class="text-center p-6 border border-gray-300 rounded-md shadow-md bg-background text-text"
+    <form
+      bind:this={theFormElement}
+      class="form-container"
+      class:hidden={submitted}
     >
-      <h2 class="text-2xl font-semibold text-success">{postedMessage}</h2>
+      <!-- Form Title -->
+      <h1 class="form-title">
+        <T text={form.title} {lang} {translations} />
+      </h1>
 
-      {#if form.confirmationMessage}
-        <T text={form.confirmationMessage} {lang} {translations} />
-      {/if}
+      <a class="form-link" href={form.publishedUrl}>
+        (<T text="Complete in Google Forms" {lang} {translations} />)
+      </a>
 
-      {#if editResponseUrl}
-        <p class="mt-2">
-          <a
-            href={editResponseUrl}
-            target="_blank"
-            class="text-link underline hover:text-secondary"
-          >
-            <T
-              text="Click here to edit your response in Google Forms"
-              {lang}
-              {translations}
-            />
-          </a>
-        </p>
-      {/if}
+      <!-- Pages -->
+      <div class="page-list">
+        {#each pages as page}
+          <GPage
+            isFirst={pageHistory.length === 0}
+            isActive={currentPageId === page.id}
+            isSubmitting={submitting}
+            {page}
+            {lang}
+            {translations}
+            onBack={goBack}
+            onGoto={nextPageOrSubmit}
+          />
+        {/each}
+      </div>
+    </form>
 
-      {#if allowPostAgain}
-        <button
-          on:click={resetForm}
-          class="mt-4 px-6 py-2 text-white bg-primary rounded hover:bg-primaryDark focus:outline-none focus:ring-2 focus:ring-inputFocus transition"
-        >
-          <T text={postAgainText} {lang} {translations} />
-        </button>
-      {/if}
-    </div>
-  {/if}
+    {#if submissionError}
+      <div class="error-message">
+        <T text={submissionError} {lang} {translations} />
+      </div>
+    {/if}
+
+    {#if submitted}
+      <div class="success-container">
+        <h2 class="success-title">Form submitted successfully!</h2>
+
+        {#if form.confirmationMessage}
+          <p>
+            <T text={form.confirmationMessage} {lang} {translations} />
+          </p>
+        {/if}
+
+        {#if editResponseUrl}
+          <p>
+            <a
+              class="edit-response-link"
+              href={editResponseUrl}
+              target="_blank"
+            >
+              <T
+                text="Edit your response in Google Forms"
+                {lang}
+                {translations}
+              />
+            </a>
+          </p>
+        {/if}
+
+        {#if allowPostAgain}
+          <button on:click={resetForm} class="submit-again-button">
+            <T text={postAgainText} {lang} {translations} />
+          </button>
+        {/if}
+      </div>
+    {/if}
+  </main>
 {/if}
 
 <style>
@@ -344,5 +241,83 @@
   :global([data-theme="transparent"]) {
     --bg-color: transparent;
     --text-color: inherit;
+  }
+
+  .form-container {
+    background: var(--bg-color);
+    color: var(--text-color);
+    font-family: var(--font-family);
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .form-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--primary-color);
+  }
+
+  .form-link {
+    color: var(--primary-color);
+    font-size: 0.875rem;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .page-list {
+    margin-top: 1rem;
+  }
+
+  .error-message {
+    background: #fde2e2;
+    border: 1px solid var(--error-color);
+    padding: 0.75rem;
+    color: var(--error-color);
+    border-radius: 6px;
+    margin-top: 1rem;
+  }
+
+  .success-container {
+    text-align: center;
+    padding: 1.5rem;
+    border: 1px solid var(--text-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .success-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--success-color);
+  }
+
+  .edit-response-link {
+    color: var(--secondary-color);
+    text-decoration: underline;
+    margin-top: 0.5rem;
+  }
+
+  .submit-again-button {
+    background: var(--primary-color);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 1rem;
+  }
+
+  .submit-again-button:hover {
+    background: var(--secondary-color);
+  }
+  main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .hidden {
+    visibility: hidden;
+    display: none;
   }
 </style>

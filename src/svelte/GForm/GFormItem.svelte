@@ -13,37 +13,38 @@
   export let translations: Translations = {};
   import { getRowIdentifier } from "../../util";
   import T from "./T.svelte";
+
   function handleChange(event) {
     onInputChange(item.id, event.target.value);
   }
 </script>
 
-<div class="mb-6">
+<div class="form-item">
   <!-- Question Title -->
-  <h3 class="text-lg font-semibold text-text">
+  <h3 class="question-title">
     <T text={item.title} {lang} {translations} />
   </h3>
 
   <!-- Question Description -->
   {#if item.description}
-    <p class="text-sm text-muted mb-2">
+    <p class="question-description">
       <T text={item.description} {lang} {translations} />
     </p>
   {/if}
 
   <!-- Checkbox Inputs -->
   {#if item.type === "checkbox"}
-    <div class="space-y-2">
+    <div class="checkbox-group">
       {#each item.choices as choice}
-        <label class="flex items-center space-x-2">
+        <label class="checkbox-label">
           <input
             type="checkbox"
             name={item.id}
             value={choice}
-            class="h-5 w-5 text-primary focus-visible:ring focus-visible:ring-inputFocus"
+            class="checkbox-input"
             on:change={handleChange}
           />
-          <span class="text-text">
+          <span class="choice-text">
             <T text={choice} {lang} {translations} />
           </span>
         </label>
@@ -52,20 +53,20 @@
 
     <!-- Radio Inputs -->
   {:else if item.type === "multipleChoice"}
-    <div class="space-y-2">
+    <div class="radio-group">
       {#each item.choices as choice, idx}
-        <label class="flex items-center space-x-2">
+        <label class="radio-label">
           <input
             type="radio"
             name={item.id}
             value={choice}
-            class="h-5 w-5 text-primary focus-visible:ring focus-visible:ring-inputFocus"
+            class="radio-input"
             on:change={(event) => {
               handleChange(event);
               setChoice(item, idx);
             }}
           />
-          <span class="text-text">
+          <span class="choice-text">
             <T text={choice} {lang} {translations} />
           </span>
         </label>
@@ -77,8 +78,7 @@
     <input
       type="text"
       name={item.id}
-      class="w-full p-2 border border-inputBorder rounded bg-input text-inputText font-input
-             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inputFocus"
+      class="input-field"
       on:input={handleChange}
     />
 
@@ -86,8 +86,7 @@
   {:else if item.type === "paragraph"}
     <textarea
       name={item.id}
-      class="w-full p-2 border border-inputBorder rounded bg-input text-inputText font-input
-             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inputFocus"
+      class="input-field textarea-field"
       on:input={handleChange}
     ></textarea>
 
@@ -108,79 +107,141 @@
       min={item.min}
       max={item.max}
       step={item.step}
-      class="w-full p-2 border border-inputBorder rounded bg-input text-inputText
-             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inputFocus"
+      class="input-range"
       on:input={handleChange}
       on:change={handleChange}
     />
 
     <!-- Dropdown List -->
   {:else if item.type == "list"}
-    <select
-      name={item.id}
-      class="w-full p-2 border border-inputBorder rounded bg-input text-inputText
-             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inputFocus"
-      on:change={handleChange}
-    >
+    <select name={item.id} class="dropdown" on:change={handleChange}>
       <option value="">Select an option</option>
       {#each item.choices as choice}
         <option value={choice}>{choice}</option>
       {/each}
     </select>
-
-    <!-- Date, Time, and Datetime Inputs -->
-  {:else if item.type == "date" || item.type == "time" || item.type == "datetime"}
-    <input
-      type={item.type}
-      name={item.id}
-      class="w-full p-2 border border-inputBorder rounded bg-input text-inputText font-input
-             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inputFocus"
-      on:input={handleChange}
-      on:change={handleChange}
-    />
-
-    <!-- Duration Input -->
-  {:else if item.type == "duration"}
-    <input
-      type="number"
-      name={item.id}
-      class="w-full p-2 border border-inputBorder rounded bg-input text-inputText font-input
-             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inputFocus"
-      on:input={handleChange}
-      on:change={handleChange}
-    />
-
-    <!-- Grid & Checkbox Grid -->
-  {:else if item.type === "grid" || item.type === "checkboxGrid"}
-    <table class="w-full border border-inputBorder rounded-md shadow-sm">
-      <thead class="bg-backgroundLight">
-        <tr>
-          <th class="p-2 text-left border-b"></th>
-          {#each item.columns as col}
-            <th class="p-2 text-center border-b text-text">{col}</th>
-          {/each}
-        </tr>
-      </thead>
-      <tbody>
-        {#each item.rows as row}
-          <tr class="border-b hover:bg-hoverBackground">
-            <th class="p-2 text-left font-medium text-text">{row}</th>
-            {#each item.columns as col}
-              <td class="p-2 text-center">
-                <label class="flex items-center justify-center cursor-pointer">
-                  <input
-                    type={item.type === "grid" ? "radio" : "checkbox"}
-                    name={getRowIdentifier(item.id, row)}
-                    value={col}
-                    class="h-5 w-5 text-primary focus-visible:ring focus-visible:ring-inputFocus"
-                    on:change={handleChange}
-                  />
-                </label>
-              </td>
-            {/each}
-          </tr>
-        {/each}
-      </tbody>
-    </table>
   {/if}
 </div>
+
+<style>
+  /* === Global Form Item Styles === */
+  .form-item {
+    margin-bottom: 1.5rem;
+  }
+
+  .question-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-color, #1f2937);
+    margin-bottom: 0.5rem;
+  }
+
+  .question-description {
+    font-size: 0.875rem;
+    color: var(--muted-text, #6b7280);
+    margin-bottom: 0.75rem;
+  }
+
+  /* === Checkbox & Radio Group Styles === */
+  .checkbox-group,
+  .radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .checkbox-label,
+  .radio-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+  }
+
+  .choice-text {
+    color: var(--text-color, #1f2937);
+  }
+
+  /* === Styled Checkboxes & Radio Buttons === */
+  .checkbox-input,
+  .radio-input {
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 2px solid var(--input-border-color, #d1d5db);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+  }
+
+  .checkbox-input:hover,
+  .radio-input:hover {
+    transform: scale(1.1);
+  }
+
+  .checkbox-input:checked,
+  .radio-input:checked {
+    background-color: var(--primary-color, #2563eb);
+    border-color: var(--primary-color, #2563eb);
+    box-shadow: 0 0 5px var(--primary-color, #2563eb);
+  }
+
+  /* === Text & Paragraph Input Styling === */
+  .input-field {
+    width: 100%;
+    padding: 0.6rem;
+    border: 1px solid var(--input-border-color, #d1d5db);
+    border-radius: 6px;
+    background-color: var(--input-bg-color, #f9fafb);
+    color: var(--input-text-color, #111827);
+    font-family: var(--input-font, sans-serif);
+    transition: all 0.2s ease-in-out;
+  }
+
+  .input-field:focus {
+    outline: none;
+    border-color: var(--input-focus-color, #2563eb);
+    box-shadow: 0 0 6px var(--input-focus-color, #2563eb);
+  }
+
+  .textarea-field {
+    min-height: 100px;
+    resize: vertical;
+  }
+
+  /* === Range Input Styling === */
+  .input-range {
+    width: 100%;
+    padding: 0.5rem;
+    border: none;
+    cursor: pointer;
+  }
+
+  /* === Dropdown Select === */
+  .dropdown {
+    width: 100%;
+    padding: 0.6rem;
+    border: 1px solid var(--input-border-color, #d1d5db);
+    border-radius: 6px;
+    background-color: var(--input-bg-color, #f9fafb);
+    color: var(--input-text-color, #111827);
+    font-family: var(--input-font, sans-serif);
+    appearance: none;
+  }
+
+  .dropdown:focus {
+    outline: none;
+    border-color: var(--input-focus-color, #2563eb);
+    box-shadow: 0 0 6px var(--input-focus-color, #2563eb);
+  }
+
+  /* === Hover & Focus Effects === */
+  .input-field:hover,
+  .dropdown:hover {
+    border-color: var(--primary-dark, #1d4ed8);
+  }
+
+  .input-field:focus,
+  .dropdown:focus {
+    border-color: var(--primary-color, #2563eb);
+  }
+</style>

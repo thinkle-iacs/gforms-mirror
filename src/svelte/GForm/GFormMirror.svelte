@@ -1,3 +1,9 @@
+<svelte:options
+  customElement="gforms-mirror"
+  tag="gforms-mirror"
+  immutable={true}
+/>
+
 <script lang="ts">
   import { onMount } from "svelte";
   import type { Form, Translations } from "../../gas/types";
@@ -6,7 +12,6 @@
   export let formsId: string = "";
   export let appsScriptUrl: string = "";
   export let translations: Translations = {};
-
   export let data: Form;
 
   async function loadForm() {
@@ -74,7 +79,7 @@
 {#if data}
   <GForm form={data} postUrl={appsScriptUrl} {translations} lang="en" />
 {/if}
-{#if formsUrl || translationsUrl}
+{#if formsUrl}
   <button
     disabled={loading}
     class="bg-primary hover:bg-primaryDark text-white font-bold py-2 px-4 rounded"

@@ -6,7 +6,8 @@
   export let data: Form;
   export let translations: Translations;
   export let settings: Settings;
-  export let cdnUrl: string = "https://fixme.com";
+  export let cdnUrl: string =
+    "https://cdn.jsdelivr.net/gh/thinkle-iacs/gforms-mirror@latest/webcomponent/gform-mirror.js";
 
   /* Arguments force svelte reactivity... */
   function updateEmbedCode(

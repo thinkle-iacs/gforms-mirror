@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<script type="module" src="./gform-mirror.js"></script>
+
+
+<p>Does this thing work?</p>
+<gforms-mirror id="gform" formsUrl="https://docs.google.com/forms/d/1xh9cSzZvDqV9cm0n5ph4L4KwFx00ZQPkY8O3X6-nNLY/edit"
+    appsScriptUrl="https://script.google.com/macros/s/AKfycbxMX5zXcqs1j5eYBmeStDXQCW6xhe7BYWqp1iXIgu38oUyll-MCM8sSZrWFYtF3asYT/exec">
+</gforms-mirror>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const formElement = document.getElementById("gform");
+
+        if (formElement) {
+            formElement.data = {
+                "id": "1xh9cSzZvDqV9cm0n5ph4L4KwFx00ZQPkY8O3X6-nNLY",
+                "title": "Test Form",
+                "description": "Here is a brief description of the form.",
+                "confirmationMessage": "",
+                "editUrl": "https://docs.google.com/forms/d/1xh9cSzZvDqV9cm0n5ph4L4KwFx00ZQPkY8O3X6-nNLY/edit",
+                "publishedUrl": "https://docs.google.com/forms/d/e/1FAIpQLSc6X67WVbbxfSVS5MFBSlMQTeA4wryJHV3n0O7gv8cF1HEapA/viewform",
+                "items": [
+                    {
+                        "id": "348332502",
+                        "title": "How much do you love GForms-Mirror?",
+                        "description": "",
+                        "type": "rating",
+                        "required": true,
+                        "max": 5,
+                        "icon": "HEART"
+                    },
+                    {
+                        "id": "694904969",
+                        "title": "What is your favorite color",
+                        "description": "",
+                        "type": "multipleChoice",
+                        "required": true,
+                        "choices": [
+                            "Red",
+                            "Blue",
+                            "Purple",
+                            "Green"
+                        ],
+                        "choicesNavigation": [
+                            null,
+                            null,
+                            null,
+                            null
+                        ]
+                    },
+                    {
+                        "id": "490815094",
+                        "title": "What is your mother's maiden name?",
+                        "description": "",
+                        "type": "text",
+                        "required": false
+                    },
+                    {
+                        "id": "1147032025",
+                        "title": "Write me a paragraph about trees",
+                        "description": "",
+                        "type": "paragraph",
+                        "required": false
+                    }
+                ]
+            };
+            formElement.translations = {
+                "es": {
+                    "Test Form": "Forma de prueba",
+                    "Here is a brief description of the form.": "Verde que te quiero verde...",
+                    "How much do you love GForms-Mirror?": "Que tan genial es eso?",
+                    "What is your favorite color": "Y cuál color prefieres?",
+                    "Red": "rojo",
+                    "Blue": "azul",
+                    "Purple": "morado",
+                    "Green": "verde",
+                    "What is your mother's maiden name?": "Cual es el primer apellido de su madre",
+                    "Write me a paragraph about trees": "Escríbeme un párrafo sobre árboles."
+                },
+                "pt": {
+                    "Test Form": 123,
+                    "Here is a brief description of the form.": 234,
+                    "How much do you love GForms-Mirror?": 345,
+                    "What is your favorite color": 456,
+                    "Red": 234,
+                    "Blue": 123,
+                    "Purple": 1515,
+                    "Green": 1516,
+                    "What is your mother's maiden name?": 4356,
+                    "Write me a paragraph about trees": 34523
+                }
+            };
+        }
+    });
+</script>
+</html>
