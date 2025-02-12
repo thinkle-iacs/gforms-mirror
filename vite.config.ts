@@ -8,7 +8,10 @@ export default defineConfig(({ command, mode }) => {
   const isWebComponent = mode === "webcomponent"; // Use a separate mode for the web component build
 
   return {
-    plugins: [svelte({ compilerOptions: { customElement: isWebComponent } })],
+    plugins: [
+      svelte({ compilerOptions: { customElement: isWebComponent } }),
+      !isWebComponent && viteSingleFile(), // ✅ Ensure viteSingleFile runs when NOT in webcomponent mode
+    ].filter(Boolean), // Remove `false` values
     css: {
       postcss: {
         plugins: [tailwindcss, autoprefixer],
@@ -35,7 +38,11 @@ export default defineConfig(({ command, mode }) => {
       : {
           outDir: "../../dist",
           emptyOutDir: true,
-          plugins: [viteSingleFile()],
+          rollupOptions: {
+            output: {
+              inlineDynamicImports: true, // ✅ Ensures everything gets inlined
+            },
+          },
         },
   };
 });
