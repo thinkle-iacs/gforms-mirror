@@ -16,7 +16,6 @@
   function handleChange(event) {
     onInputChange(item.id, event.target.value);
   }
-  $: console.log("Render item: ", item);
 </script>
 
 <div class="mb-6">
