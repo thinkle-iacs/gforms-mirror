@@ -1,3 +1,4 @@
+import { getFormIdFromUrl } from "./cachedFormData";
 import { getFormData } from "./getFormData";
 
 import type { Form, Translations } from "./types";
@@ -11,21 +12,30 @@ function getTranslationsSpreadsheet(formId, initialLanguages = ["es", "pt"]) {
   let fileIterator = parent.getFilesByName(`${name}+Translations`);
   let translationSheet: GoogleAppsScript.Spreadsheet.Spreadsheet;
   if (fileIterator.hasNext()) {
-    console.log("Using existing translation sheet");
     let translationFile = fileIterator.next();
     let id = translationFile.getId();
+
     translationSheet = SpreadsheetApp.openById(id);
+    console.log("Using existing translation sheet", translationSheet.getUrl());
   } else {
     console.log("Creating new translation sheet");
     translationSheet = SpreadsheetApp.create(`${name}+Translations`);
-    translationSheet.insertSheet(0, TRANSLATION_SHEET_NAME);
+    translationSheet.insertSheet(TRANSLATION_SHEET_NAME, 0);
     let sheet = translationSheet.getSheetByName(TRANSLATION_SHEET_NAME);
     let header = ["Original", ...initialLanguages];
     sheet.getRange(1, 1, 1, header.length).setValues([header]);
     let translationFile = DriveApp.getFileById(translationSheet.getId());
     translationFile.moveTo(parent);
+    console.log("Created", translationFile.getUrl());
   }
   return translationSheet;
+}
+
+export function getTranslationsSpreadsheetUrl(
+  formId,
+  initialLanguages = ["es", "pt"]
+) {
+  return getTranslationsSpreadsheet(formId, initialLanguages).getUrl();
 }
 
 /**
@@ -46,13 +56,24 @@ export function setupTranslationsSpreadsheet(
   let ss = getTranslationsSpreadsheet(formId, initialLanguages);
   let form = getFormData(formId);
   let sheet = ss.getSheetByName(TRANSLATION_SHEET_NAME);
-  let existingStrings = sheet
-    .getRange(2, 1, sheet.getLastRow() - 1)
-    .getValues()
-    .map((r) => r[0]);
+  try {
+    var existingStrings = sheet
+      .getRange(2, 1, sheet.getLastRow() - 1)
+      .getValues()
+      .map((r) => r[0]);
+  } catch (e) {
+    console.log("No existing translations found.");
+    existingStrings = [];
+  }
   let existingData = getTranslationsFromSheet(ss);
   sheet.clear();
   let languages = Object.keys(existingData);
+  // Add any new languages
+  for (let lang of languages) {
+    if (!existingData[lang]) {
+      existingData[lang] = {};
+    }
+  }
   let header = ["Original", ...languages];
   let data = [header];
   let items = getTranslationStringsFromForm(form);
@@ -79,6 +100,7 @@ export function setupTranslationsSpreadsheet(
 function getTranslationsFromSheet(
   translationSheet: GoogleAppsScript.Spreadsheet.Spreadsheet
 ): Translations {
+  console.log("Getting translations from sheet", translationSheet.getUrl());
   let translations: Translations = {};
   let sheet = translationSheet.getSheetByName(TRANSLATION_SHEET_NAME);
   let data = sheet.getDataRange().getValues();
@@ -88,20 +110,26 @@ function getTranslationsFromSheet(
     let lang = headerRow[col];
     translations[lang] = {};
   }
+  console.log("Got header row:", headerRow);
   for (let row = 1; row < data.length; row++) {
     let rowData = data[row];
     let translationString = rowData[0];
-    for (let col = 0; col < headerRow.length; col++) {
+    for (let col = 1; col < headerRow.length; col++) {
       let lang = headerRow[col];
       if (lang) {
+        if (!translations[lang]) {
+          translations[lang] = {}; // shouldn't be necessary
+        }
         translations[lang][translationString] = rowData[col];
       }
     }
   }
+  console.log("Returning translations", translations);
   return translations;
 }
 
 export function getTranslations(formId) {
+  console.log("Getting translations for form", formId);
   let translationSheet = getTranslationsSpreadsheet(formId);
   return getTranslationsFromSheet(translationSheet);
 }
@@ -136,4 +164,11 @@ export function getTranslationStringsFromForm(form: Form) {
     }
   }
   return strings;
+}
+
+function test() {
+  let url =
+    "https://docs.google.com/forms/d/1xh9cSzZvDqV9cm0n5ph4L4KwFx00ZQPkY8O3X6-nNLY/edit";
+  let id = getFormIdFromUrl(url);
+  setupTranslationsSpreadsheet(id, ["es", "pt", "kh"]);
 }
