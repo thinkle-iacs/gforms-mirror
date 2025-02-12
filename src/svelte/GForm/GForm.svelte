@@ -166,7 +166,9 @@
 
     {#if submitted}
       <div class="success-container">
-        <h2 class="success-title">Form submitted successfully!</h2>
+        <h2 class="success-title">
+          <T text="Form submitted successfully!" {lang} {translations} />
+        </h2>
 
         {#if form.confirmationMessage}
           <p>
