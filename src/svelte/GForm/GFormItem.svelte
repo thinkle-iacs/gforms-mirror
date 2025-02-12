@@ -10,6 +10,7 @@
   export let onInputChange: (id: string, value: any) => void;
   export let setChoice: (item: ChoiceFormItem, idx: number) => void;
   export let lang = "en";
+  export let errorMessage = "";
   export let translations: Translations = {};
   import { getRowIdentifier } from "../../util";
   import T from "./T.svelte";
@@ -19,7 +20,7 @@
   }
 </script>
 
-<div class="form-item">
+<div class="form-item" class:error={errorMessage}>
   <!-- Question Title -->
   <h3 class="question-title">
     <T text={item.title} {lang} {translations} />
@@ -120,6 +121,11 @@
         <option value={choice}>{choice}</option>
       {/each}
     </select>
+  {/if}
+  {#if errorMessage}
+    <p class="error-message">
+      <T text={errorMessage} {lang} {translations} />
+    </p>
   {/if}
 </div>
 
@@ -243,5 +249,21 @@
   .input-field:focus,
   .dropdown:focus {
     border-color: var(--primary-color, #2563eb);
+  }
+
+  /* === Error Message Styling === */
+  .error-message {
+    background-color: var(--error-bg, #fef2f2);
+    border: 1px solid var(--error-color, #dc2626);
+    color: var(--error-color, #dc2626);
+    padding: 0.5rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+  }
+  .error {
+    border: 1px solid var(--error-color, #dc2626);
+    padding: 0.5rem;
+    border-radius: 6px;
   }
 </style>

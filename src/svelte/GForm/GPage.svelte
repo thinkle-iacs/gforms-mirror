@@ -78,12 +78,14 @@
 
   <!-- Form Items -->
   {#each page.items as item}
-    <GFormItem {item} {onInputChange} {setChoice} {lang} {translations} />
-    {#if formErrors[item.id]}
-      <p class="error-message">
-        {formErrors[item.id]}
-      </p>
-    {/if}
+    <GFormItem
+      {item}
+      {onInputChange}
+      {setChoice}
+      {lang}
+      {translations}
+      errorMessage={formErrors[item.id]}
+    />
   {/each}
 
   <!-- Navigation Buttons -->
@@ -136,17 +138,6 @@
     font-size: 0.875rem;
     color: var(--muted-text, #6b7280);
     margin-bottom: 1rem;
-  }
-
-  /* === Error Message Styling === */
-  .error-message {
-    background-color: var(--error-bg, #fef2f2);
-    border: 1px solid var(--error-color, #dc2626);
-    color: var(--error-color, #dc2626);
-    padding: 0.5rem;
-    border-radius: 6px;
-    font-size: 0.875rem;
-    margin-top: 0.5rem;
   }
 
   /* === Navigation Buttons === */

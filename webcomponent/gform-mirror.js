@@ -31,9 +31,6 @@ function src_url_equal(element_src, url) {
   src_url_equal_anchor.href = url;
   return element_src === src_url_equal_anchor.href;
 }
-function not_equal(a, b) {
-  return a != a ? b == b : a !== b;
-}
 function is_empty(obj) {
   return Object.keys(obj).length === 0;
 }
@@ -321,7 +318,7 @@ function make_dirty(component, i) {
   }
   component.$$.dirty[i / 31 | 0] |= 1 << i % 31;
 }
-function init(component, options, instance2, create_fragment2, not_equal2, props, append_styles2 = null, dirty = [-1]) {
+function init(component, options, instance2, create_fragment2, not_equal, props, append_styles2 = null, dirty = [-1]) {
   const parent_component = current_component;
   set_current_component(component);
   const $$ = component.$$ = {
@@ -330,7 +327,7 @@ function init(component, options, instance2, create_fragment2, not_equal2, props
     // state
     props,
     update: noop,
-    not_equal: not_equal2,
+    not_equal,
     bound: blank_object(),
     // lifecycle
     on_mount: [],
@@ -349,7 +346,7 @@ function init(component, options, instance2, create_fragment2, not_equal2, props
   let ready = false;
   $$.ctx = instance2 ? instance2(component, options.props || {}, (i, ret, ...rest) => {
     const value = rest.length ? rest[0] : ret;
-    if ($$.ctx && not_equal2($$.ctx[i], $$.ctx[i] = value)) {
+    if ($$.ctx && not_equal($$.ctx[i], $$.ctx[i] = value)) {
       if (!$$.skip_bound && $$.bound[i])
         $$.bound[i](value);
       if (ready)
@@ -1807,25 +1804,25 @@ class RatingItem extends SvelteComponent {
 }
 create_custom_element(RatingItem, { "max": {}, "icon": {}, "value": {}, "name": {} }, [], [], true);
 function add_css$2(target) {
-  append_styles(target, "svelte-qmvkct", ".form-item.svelte-qmvkct{margin-bottom:1.5rem}.question-title.svelte-qmvkct{font-size:1.125rem;font-weight:600;color:var(--text-color, #1f2937);margin-bottom:0.5rem}.question-description.svelte-qmvkct{font-size:0.875rem;color:var(--muted-text, #6b7280);margin-bottom:0.75rem}.checkbox-group.svelte-qmvkct,.radio-group.svelte-qmvkct{display:flex;flex-direction:column;gap:0.5rem}.checkbox-label.svelte-qmvkct,.radio-label.svelte-qmvkct{display:flex;align-items:center;gap:0.5rem;cursor:pointer}.choice-text.svelte-qmvkct{color:var(--text-color, #1f2937)}.checkbox-input.svelte-qmvkct,.radio-input.svelte-qmvkct{width:1.25rem;height:1.25rem;border:2px solid var(--input-border-color, #d1d5db);border-radius:50%;cursor:pointer;transition:transform 0.2s ease-in-out}.checkbox-input.svelte-qmvkct:hover,.radio-input.svelte-qmvkct:hover{transform:scale(1.1)}.checkbox-input.svelte-qmvkct:checked,.radio-input.svelte-qmvkct:checked{background-color:var(--primary-color, #2563eb);border-color:var(--primary-color, #2563eb);box-shadow:0 0 5px var(--primary-color, #2563eb)}.input-field.svelte-qmvkct{width:100%;padding:0.6rem;border:1px solid var(--input-border-color, #d1d5db);border-radius:6px;background-color:var(--input-bg-color, #f9fafb);color:var(--input-text-color, #111827);font-family:var(--input-font, sans-serif);transition:all 0.2s ease-in-out}.input-field.svelte-qmvkct:focus{outline:none;border-color:var(--input-focus-color, #2563eb);box-shadow:0 0 6px var(--input-focus-color, #2563eb)}.textarea-field.svelte-qmvkct{min-height:100px;resize:vertical}.input-range.svelte-qmvkct{width:100%;padding:0.5rem;border:none;cursor:pointer}.dropdown.svelte-qmvkct{width:100%;padding:0.6rem;border:1px solid var(--input-border-color, #d1d5db);border-radius:6px;background-color:var(--input-bg-color, #f9fafb);color:var(--input-text-color, #111827);font-family:var(--input-font, sans-serif);appearance:none}.dropdown.svelte-qmvkct:focus{outline:none;border-color:var(--input-focus-color, #2563eb);box-shadow:0 0 6px var(--input-focus-color, #2563eb)}.input-field.svelte-qmvkct:hover,.dropdown.svelte-qmvkct:hover{border-color:var(--primary-dark, #1d4ed8)}.input-field.svelte-qmvkct:focus,.dropdown.svelte-qmvkct:focus{border-color:var(--primary-color, #2563eb)}");
+  append_styles(target, "svelte-i7e7jn", ".form-item.svelte-i7e7jn{margin-bottom:1.5rem}.question-title.svelte-i7e7jn{font-size:1.125rem;font-weight:600;color:var(--text-color, #1f2937);margin-bottom:0.5rem}.question-description.svelte-i7e7jn{font-size:0.875rem;color:var(--muted-text, #6b7280);margin-bottom:0.75rem}.checkbox-group.svelte-i7e7jn,.radio-group.svelte-i7e7jn{display:flex;flex-direction:column;gap:0.5rem}.checkbox-label.svelte-i7e7jn,.radio-label.svelte-i7e7jn{display:flex;align-items:center;gap:0.5rem;cursor:pointer}.choice-text.svelte-i7e7jn{color:var(--text-color, #1f2937)}.checkbox-input.svelte-i7e7jn,.radio-input.svelte-i7e7jn{width:1.25rem;height:1.25rem;border:2px solid var(--input-border-color, #d1d5db);border-radius:50%;cursor:pointer;transition:transform 0.2s ease-in-out}.checkbox-input.svelte-i7e7jn:hover,.radio-input.svelte-i7e7jn:hover{transform:scale(1.1)}.checkbox-input.svelte-i7e7jn:checked,.radio-input.svelte-i7e7jn:checked{background-color:var(--primary-color, #2563eb);border-color:var(--primary-color, #2563eb);box-shadow:0 0 5px var(--primary-color, #2563eb)}.input-field.svelte-i7e7jn{width:100%;padding:0.6rem;border:1px solid var(--input-border-color, #d1d5db);border-radius:6px;background-color:var(--input-bg-color, #f9fafb);color:var(--input-text-color, #111827);font-family:var(--input-font, sans-serif);transition:all 0.2s ease-in-out}.input-field.svelte-i7e7jn:focus{outline:none;border-color:var(--input-focus-color, #2563eb);box-shadow:0 0 6px var(--input-focus-color, #2563eb)}.textarea-field.svelte-i7e7jn{min-height:100px;resize:vertical}.input-range.svelte-i7e7jn{width:100%;padding:0.5rem;border:none;cursor:pointer}.dropdown.svelte-i7e7jn{width:100%;padding:0.6rem;border:1px solid var(--input-border-color, #d1d5db);border-radius:6px;background-color:var(--input-bg-color, #f9fafb);color:var(--input-text-color, #111827);font-family:var(--input-font, sans-serif);appearance:none}.dropdown.svelte-i7e7jn:focus{outline:none;border-color:var(--input-focus-color, #2563eb);box-shadow:0 0 6px var(--input-focus-color, #2563eb)}.input-field.svelte-i7e7jn:hover,.dropdown.svelte-i7e7jn:hover{border-color:var(--primary-dark, #1d4ed8)}.input-field.svelte-i7e7jn:focus,.dropdown.svelte-i7e7jn:focus{border-color:var(--primary-color, #2563eb)}.error-message.svelte-i7e7jn{background-color:var(--error-bg, #fef2f2);border:1px solid var(--error-color, #dc2626);color:var(--error-color, #dc2626);padding:0.5rem;border-radius:6px;font-size:0.875rem;margin-top:0.5rem}.error.svelte-i7e7jn{border:1px solid var(--error-color, #dc2626);padding:0.5rem;border-radius:6px}");
 }
 function get_each_context_2(ctx, list, i) {
   const child_ctx = ctx.slice();
-  child_ctx[7] = list[i];
+  child_ctx[8] = list[i];
   return child_ctx;
 }
 function get_each_context_1(ctx, list, i) {
   const child_ctx = ctx.slice();
-  child_ctx[7] = list[i];
-  child_ctx[11] = i;
+  child_ctx[8] = list[i];
+  child_ctx[12] = i;
   return child_ctx;
 }
 function get_each_context$2(ctx, list, i) {
   const child_ctx = ctx.slice();
-  child_ctx[7] = list[i];
+  child_ctx[8] = list[i];
   return child_ctx;
 }
-function create_if_block_7(ctx) {
+function create_if_block_8(ctx) {
   let p;
   let t;
   let current;
@@ -1841,7 +1838,7 @@ function create_if_block_7(ctx) {
       ),
       translations: (
         /*translations*/
-        ctx[3]
+        ctx[4]
       )
     }
   });
@@ -1849,7 +1846,7 @@ function create_if_block_7(ctx) {
     c() {
       p = element("p");
       create_component(t.$$.fragment);
-      attr(p, "class", "question-description svelte-qmvkct");
+      attr(p, "class", "question-description svelte-i7e7jn");
     },
     m(target, anchor) {
       insert(target, p, anchor);
@@ -1867,9 +1864,9 @@ function create_if_block_7(ctx) {
         t_changes.lang = /*lang*/
         ctx2[2];
       if (dirty & /*translations*/
-      8)
+      16)
         t_changes.translations = /*translations*/
-        ctx2[3];
+        ctx2[4];
       t.$set(t_changes);
     },
     i(local) {
@@ -1890,7 +1887,7 @@ function create_if_block_7(ctx) {
     }
   };
 }
-function create_if_block_6(ctx) {
+function create_if_block_7(ctx) {
   let select;
   let option;
   let select_name_value;
@@ -1916,7 +1913,7 @@ function create_if_block_6(ctx) {
       set_input_value(option, option.__value);
       attr(select, "name", select_name_value = /*item*/
       ctx[0].id);
-      attr(select, "class", "dropdown svelte-qmvkct");
+      attr(select, "class", "dropdown svelte-i7e7jn");
     },
     m(target, anchor) {
       insert(target, select, anchor);
@@ -1931,7 +1928,7 @@ function create_if_block_6(ctx) {
           select,
           "change",
           /*handleChange*/
-          ctx[4]
+          ctx[5]
         );
         mounted = true;
       }
@@ -1977,7 +1974,7 @@ function create_if_block_6(ctx) {
     }
   };
 }
-function create_if_block_5$2(ctx) {
+function create_if_block_6(ctx) {
   let input;
   let input_name_value;
   let input_min_value;
@@ -1997,7 +1994,7 @@ function create_if_block_5$2(ctx) {
       ctx[0].max);
       attr(input, "step", input_step_value = /*item*/
       ctx[0].step);
-      attr(input, "class", "input-range svelte-qmvkct");
+      attr(input, "class", "input-range svelte-i7e7jn");
     },
     m(target, anchor) {
       insert(target, input, anchor);
@@ -2007,13 +2004,13 @@ function create_if_block_5$2(ctx) {
             input,
             "input",
             /*handleChange*/
-            ctx[4]
+            ctx[5]
           ),
           listen(
             input,
             "change",
             /*handleChange*/
-            ctx[4]
+            ctx[5]
           )
         ];
         mounted = true;
@@ -2052,7 +2049,7 @@ function create_if_block_5$2(ctx) {
     }
   };
 }
-function create_if_block_4$2(ctx) {
+function create_if_block_5$1(ctx) {
   let ratingitem;
   let current;
   ratingitem = new RatingItem({
@@ -2074,7 +2071,7 @@ function create_if_block_4$2(ctx) {
   ratingitem.$on(
     "input",
     /*handleChange*/
-    ctx[4]
+    ctx[5]
   );
   return {
     c() {
@@ -2115,7 +2112,7 @@ function create_if_block_4$2(ctx) {
     }
   };
 }
-function create_if_block_3$2(ctx) {
+function create_if_block_4$2(ctx) {
   let textarea;
   let textarea_name_value;
   let mounted;
@@ -2125,7 +2122,7 @@ function create_if_block_3$2(ctx) {
       textarea = element("textarea");
       attr(textarea, "name", textarea_name_value = /*item*/
       ctx[0].id);
-      attr(textarea, "class", "input-field textarea-field svelte-qmvkct");
+      attr(textarea, "class", "input-field textarea-field svelte-i7e7jn");
     },
     m(target, anchor) {
       insert(target, textarea, anchor);
@@ -2134,7 +2131,7 @@ function create_if_block_3$2(ctx) {
           textarea,
           "input",
           /*handleChange*/
-          ctx[4]
+          ctx[5]
         );
         mounted = true;
       }
@@ -2157,7 +2154,7 @@ function create_if_block_3$2(ctx) {
     }
   };
 }
-function create_if_block_2$2(ctx) {
+function create_if_block_3$2(ctx) {
   let input;
   let input_name_value;
   let mounted;
@@ -2168,7 +2165,7 @@ function create_if_block_2$2(ctx) {
       attr(input, "type", "text");
       attr(input, "name", input_name_value = /*item*/
       ctx[0].id);
-      attr(input, "class", "input-field svelte-qmvkct");
+      attr(input, "class", "input-field svelte-i7e7jn");
     },
     m(target, anchor) {
       insert(target, input, anchor);
@@ -2177,7 +2174,7 @@ function create_if_block_2$2(ctx) {
           input,
           "input",
           /*handleChange*/
-          ctx[4]
+          ctx[5]
         );
         mounted = true;
       }
@@ -2200,7 +2197,7 @@ function create_if_block_2$2(ctx) {
     }
   };
 }
-function create_if_block_1$3(ctx) {
+function create_if_block_2$2(ctx) {
   let div;
   let current;
   let each_value_1 = ensure_array_like(
@@ -2220,7 +2217,7 @@ function create_if_block_1$3(ctx) {
       for (let i = 0; i < each_blocks.length; i += 1) {
         each_blocks[i].c();
       }
-      attr(div, "class", "radio-group svelte-qmvkct");
+      attr(div, "class", "radio-group svelte-i7e7jn");
     },
     m(target, anchor) {
       insert(target, div, anchor);
@@ -2233,7 +2230,7 @@ function create_if_block_1$3(ctx) {
     },
     p(ctx2, dirty) {
       if (dirty & /*item, lang, translations, handleChange, setChoice*/
-      31) {
+      55) {
         each_value_1 = ensure_array_like(
           /*item*/
           ctx2[0].choices
@@ -2281,7 +2278,7 @@ function create_if_block_1$3(ctx) {
     }
   };
 }
-function create_if_block$3(ctx) {
+function create_if_block_1$3(ctx) {
   let div;
   let current;
   let each_value = ensure_array_like(
@@ -2301,7 +2298,7 @@ function create_if_block$3(ctx) {
       for (let i = 0; i < each_blocks.length; i += 1) {
         each_blocks[i].c();
       }
-      attr(div, "class", "checkbox-group svelte-qmvkct");
+      attr(div, "class", "checkbox-group svelte-i7e7jn");
     },
     m(target, anchor) {
       insert(target, div, anchor);
@@ -2314,7 +2311,7 @@ function create_if_block$3(ctx) {
     },
     p(ctx2, dirty) {
       if (dirty & /*item, lang, translations, handleChange*/
-      29) {
+      53) {
         each_value = ensure_array_like(
           /*item*/
           ctx2[0].choices
@@ -2366,7 +2363,7 @@ function create_each_block_2(ctx) {
   let option;
   let t_value = (
     /*choice*/
-    ctx[7] + ""
+    ctx[8] + ""
   );
   let t;
   let option_value_value;
@@ -2375,7 +2372,7 @@ function create_each_block_2(ctx) {
       option = element("option");
       t = text(t_value);
       option.__value = option_value_value = /*choice*/
-      ctx[7];
+      ctx[8];
       set_input_value(option, option.__value);
     },
     m(target, anchor) {
@@ -2385,11 +2382,11 @@ function create_each_block_2(ctx) {
     p(ctx2, dirty) {
       if (dirty & /*item*/
       1 && t_value !== (t_value = /*choice*/
-      ctx2[7] + ""))
+      ctx2[8] + ""))
         set_data(t, t_value);
       if (dirty & /*item*/
       1 && option_value_value !== (option_value_value = /*choice*/
-      ctx2[7])) {
+      ctx2[8])) {
         option.__value = option_value_value;
         set_input_value(option, option.__value);
       }
@@ -2416,9 +2413,9 @@ function create_each_block_1(ctx) {
   function change_handler(...args) {
     return (
       /*change_handler*/
-      ctx[6](
+      ctx[7](
         /*idx*/
-        ctx[11],
+        ctx[12],
         ...args
       )
     );
@@ -2427,7 +2424,7 @@ function create_each_block_1(ctx) {
     props: {
       text: (
         /*choice*/
-        ctx[7]
+        ctx[8]
       ),
       lang: (
         /*lang*/
@@ -2435,7 +2432,7 @@ function create_each_block_1(ctx) {
       ),
       translations: (
         /*translations*/
-        ctx[3]
+        ctx[4]
       )
     }
   });
@@ -2451,10 +2448,10 @@ function create_each_block_1(ctx) {
       attr(input, "name", input_name_value = /*item*/
       ctx[0].id);
       input.value = input_value_value = /*choice*/
-      ctx[7];
-      attr(input, "class", "radio-input svelte-qmvkct");
-      attr(span, "class", "choice-text svelte-qmvkct");
-      attr(label, "class", "radio-label svelte-qmvkct");
+      ctx[8];
+      attr(input, "class", "radio-input svelte-i7e7jn");
+      attr(span, "class", "choice-text svelte-i7e7jn");
+      attr(label, "class", "radio-label svelte-i7e7jn");
     },
     m(target, anchor) {
       insert(target, label, anchor);
@@ -2478,22 +2475,22 @@ function create_each_block_1(ctx) {
       }
       if (!current || dirty & /*item*/
       1 && input_value_value !== (input_value_value = /*choice*/
-      ctx[7])) {
+      ctx[8])) {
         input.value = input_value_value;
       }
       const t1_changes = {};
       if (dirty & /*item*/
       1)
         t1_changes.text = /*choice*/
-        ctx[7];
+        ctx[8];
       if (dirty & /*lang*/
       4)
         t1_changes.lang = /*lang*/
         ctx[2];
       if (dirty & /*translations*/
-      8)
+      16)
         t1_changes.translations = /*translations*/
-        ctx[3];
+        ctx[4];
       t1.$set(t1_changes);
     },
     i(local) {
@@ -2532,7 +2529,7 @@ function create_each_block$2(ctx) {
     props: {
       text: (
         /*choice*/
-        ctx[7]
+        ctx[8]
       ),
       lang: (
         /*lang*/
@@ -2540,7 +2537,7 @@ function create_each_block$2(ctx) {
       ),
       translations: (
         /*translations*/
-        ctx[3]
+        ctx[4]
       )
     }
   });
@@ -2556,10 +2553,10 @@ function create_each_block$2(ctx) {
       attr(input, "name", input_name_value = /*item*/
       ctx[0].id);
       input.value = input_value_value = /*choice*/
-      ctx[7];
-      attr(input, "class", "checkbox-input svelte-qmvkct");
-      attr(span, "class", "choice-text svelte-qmvkct");
-      attr(label, "class", "checkbox-label svelte-qmvkct");
+      ctx[8];
+      attr(input, "class", "checkbox-input svelte-i7e7jn");
+      attr(span, "class", "choice-text svelte-i7e7jn");
+      attr(label, "class", "checkbox-label svelte-i7e7jn");
     },
     m(target, anchor) {
       insert(target, label, anchor);
@@ -2574,7 +2571,7 @@ function create_each_block$2(ctx) {
           input,
           "change",
           /*handleChange*/
-          ctx[4]
+          ctx[5]
         );
         mounted = true;
       }
@@ -2587,22 +2584,22 @@ function create_each_block$2(ctx) {
       }
       if (!current || dirty & /*item*/
       1 && input_value_value !== (input_value_value = /*choice*/
-      ctx2[7])) {
+      ctx2[8])) {
         input.value = input_value_value;
       }
       const t1_changes = {};
       if (dirty & /*item*/
       1)
         t1_changes.text = /*choice*/
-        ctx2[7];
+        ctx2[8];
       if (dirty & /*lang*/
       4)
         t1_changes.lang = /*lang*/
         ctx2[2];
       if (dirty & /*translations*/
-      8)
+      16)
         t1_changes.translations = /*translations*/
-        ctx2[3];
+        ctx2[4];
       t1.$set(t1_changes);
     },
     i(local) {
@@ -2625,6 +2622,71 @@ function create_each_block$2(ctx) {
     }
   };
 }
+function create_if_block$3(ctx) {
+  let p;
+  let t;
+  let current;
+  t = new T({
+    props: {
+      text: (
+        /*errorMessage*/
+        ctx[3]
+      ),
+      lang: (
+        /*lang*/
+        ctx[2]
+      ),
+      translations: (
+        /*translations*/
+        ctx[4]
+      )
+    }
+  });
+  return {
+    c() {
+      p = element("p");
+      create_component(t.$$.fragment);
+      attr(p, "class", "error-message svelte-i7e7jn");
+    },
+    m(target, anchor) {
+      insert(target, p, anchor);
+      mount_component(t, p, null);
+      current = true;
+    },
+    p(ctx2, dirty) {
+      const t_changes = {};
+      if (dirty & /*errorMessage*/
+      8)
+        t_changes.text = /*errorMessage*/
+        ctx2[3];
+      if (dirty & /*lang*/
+      4)
+        t_changes.lang = /*lang*/
+        ctx2[2];
+      if (dirty & /*translations*/
+      16)
+        t_changes.translations = /*translations*/
+        ctx2[4];
+      t.$set(t_changes);
+    },
+    i(local) {
+      if (current)
+        return;
+      transition_in(t.$$.fragment, local);
+      current = true;
+    },
+    o(local) {
+      transition_out(t.$$.fragment, local);
+      current = false;
+    },
+    d(detaching) {
+      if (detaching) {
+        detach(p);
+      }
+      destroy_component(t);
+    }
+  };
+}
 function create_fragment$3(ctx) {
   let div;
   let h3;
@@ -2633,6 +2695,7 @@ function create_fragment$3(ctx) {
   let t2;
   let current_block_type_index;
   let if_block1;
+  let t3;
   let current;
   t0 = new T({
     props: {
@@ -2646,22 +2709,22 @@ function create_fragment$3(ctx) {
       ),
       translations: (
         /*translations*/
-        ctx[3]
+        ctx[4]
       )
     }
   });
   let if_block0 = (
     /*item*/
-    ctx[0].description && create_if_block_7(ctx)
+    ctx[0].description && create_if_block_8(ctx)
   );
   const if_block_creators = [
-    create_if_block$3,
     create_if_block_1$3,
     create_if_block_2$2,
     create_if_block_3$2,
     create_if_block_4$2,
-    create_if_block_5$2,
-    create_if_block_6
+    create_if_block_5$1,
+    create_if_block_6,
+    create_if_block_7
   ];
   const if_blocks = [];
   function select_block_type(ctx2, dirty) {
@@ -2705,6 +2768,10 @@ function create_fragment$3(ctx) {
   if (~(current_block_type_index = select_block_type(ctx))) {
     if_block1 = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
   }
+  let if_block2 = (
+    /*errorMessage*/
+    ctx[3] && create_if_block$3(ctx)
+  );
   return {
     c() {
       div = element("div");
@@ -2716,8 +2783,17 @@ function create_fragment$3(ctx) {
       t2 = space();
       if (if_block1)
         if_block1.c();
-      attr(h3, "class", "question-title svelte-qmvkct");
-      attr(div, "class", "form-item svelte-qmvkct");
+      t3 = space();
+      if (if_block2)
+        if_block2.c();
+      attr(h3, "class", "question-title svelte-i7e7jn");
+      attr(div, "class", "form-item svelte-i7e7jn");
+      toggle_class(
+        div,
+        "error",
+        /*errorMessage*/
+        ctx[3]
+      );
     },
     m(target, anchor) {
       insert(target, div, anchor);
@@ -2730,6 +2806,9 @@ function create_fragment$3(ctx) {
       if (~current_block_type_index) {
         if_blocks[current_block_type_index].m(div, null);
       }
+      append(div, t3);
+      if (if_block2)
+        if_block2.m(div, null);
       current = true;
     },
     p(ctx2, [dirty]) {
@@ -2743,9 +2822,9 @@ function create_fragment$3(ctx) {
         t0_changes.lang = /*lang*/
         ctx2[2];
       if (dirty & /*translations*/
-      8)
+      16)
         t0_changes.translations = /*translations*/
-        ctx2[3];
+        ctx2[4];
       t0.$set(t0_changes);
       if (
         /*item*/
@@ -2758,7 +2837,7 @@ function create_fragment$3(ctx) {
             transition_in(if_block0, 1);
           }
         } else {
-          if_block0 = create_if_block_7(ctx2);
+          if_block0 = create_if_block_8(ctx2);
           if_block0.c();
           transition_in(if_block0, 1);
           if_block0.m(div, t2);
@@ -2793,10 +2872,42 @@ function create_fragment$3(ctx) {
             if_block1.p(ctx2, dirty);
           }
           transition_in(if_block1, 1);
-          if_block1.m(div, null);
+          if_block1.m(div, t3);
         } else {
           if_block1 = null;
         }
+      }
+      if (
+        /*errorMessage*/
+        ctx2[3]
+      ) {
+        if (if_block2) {
+          if_block2.p(ctx2, dirty);
+          if (dirty & /*errorMessage*/
+          8) {
+            transition_in(if_block2, 1);
+          }
+        } else {
+          if_block2 = create_if_block$3(ctx2);
+          if_block2.c();
+          transition_in(if_block2, 1);
+          if_block2.m(div, null);
+        }
+      } else if (if_block2) {
+        group_outros();
+        transition_out(if_block2, 1, 1, () => {
+          if_block2 = null;
+        });
+        check_outros();
+      }
+      if (!current || dirty & /*errorMessage*/
+      8) {
+        toggle_class(
+          div,
+          "error",
+          /*errorMessage*/
+          ctx2[3]
+        );
       }
     },
     i(local) {
@@ -2805,12 +2916,14 @@ function create_fragment$3(ctx) {
       transition_in(t0.$$.fragment, local);
       transition_in(if_block0);
       transition_in(if_block1);
+      transition_in(if_block2);
       current = true;
     },
     o(local) {
       transition_out(t0.$$.fragment, local);
       transition_out(if_block0);
       transition_out(if_block1);
+      transition_out(if_block2);
       current = false;
     },
     d(detaching) {
@@ -2823,6 +2936,8 @@ function create_fragment$3(ctx) {
       if (~current_block_type_index) {
         if_blocks[current_block_type_index].d();
       }
+      if (if_block2)
+        if_block2.d();
     }
   };
 }
@@ -2831,6 +2946,7 @@ function instance$3($$self, $$props, $$invalidate) {
   let { onInputChange } = $$props;
   let { setChoice } = $$props;
   let { lang = "en" } = $$props;
+  let { errorMessage = "" } = $$props;
   let { translations = {} } = $$props;
   function handleChange(event) {
     onInputChange(item.id, event.target.value);
@@ -2843,18 +2959,21 @@ function instance$3($$self, $$props, $$invalidate) {
     if ("item" in $$props2)
       $$invalidate(0, item = $$props2.item);
     if ("onInputChange" in $$props2)
-      $$invalidate(5, onInputChange = $$props2.onInputChange);
+      $$invalidate(6, onInputChange = $$props2.onInputChange);
     if ("setChoice" in $$props2)
       $$invalidate(1, setChoice = $$props2.setChoice);
     if ("lang" in $$props2)
       $$invalidate(2, lang = $$props2.lang);
+    if ("errorMessage" in $$props2)
+      $$invalidate(3, errorMessage = $$props2.errorMessage);
     if ("translations" in $$props2)
-      $$invalidate(3, translations = $$props2.translations);
+      $$invalidate(4, translations = $$props2.translations);
   };
   return [
     item,
     setChoice,
     lang,
+    errorMessage,
     translations,
     handleChange,
     onInputChange,
@@ -2872,10 +2991,11 @@ class GFormItem extends SvelteComponent {
       safe_not_equal,
       {
         item: 0,
-        onInputChange: 5,
+        onInputChange: 6,
         setChoice: 1,
         lang: 2,
-        translations: 3
+        errorMessage: 3,
+        translations: 4
       },
       add_css$2
     );
@@ -2888,7 +3008,7 @@ class GFormItem extends SvelteComponent {
     flush();
   }
   get onInputChange() {
-    return this.$$.ctx[5];
+    return this.$$.ctx[6];
   }
   set onInputChange(onInputChange) {
     this.$$set({ onInputChange });
@@ -2908,24 +3028,31 @@ class GFormItem extends SvelteComponent {
     this.$$set({ lang });
     flush();
   }
-  get translations() {
+  get errorMessage() {
     return this.$$.ctx[3];
+  }
+  set errorMessage(errorMessage) {
+    this.$$set({ errorMessage });
+    flush();
+  }
+  get translations() {
+    return this.$$.ctx[4];
   }
   set translations(translations) {
     this.$$set({ translations });
     flush();
   }
 }
-create_custom_element(GFormItem, { "item": {}, "onInputChange": {}, "setChoice": {}, "lang": {}, "translations": {} }, [], [], true);
+create_custom_element(GFormItem, { "item": {}, "onInputChange": {}, "setChoice": {}, "lang": {}, "errorMessage": {}, "translations": {} }, [], [], true);
 function add_css$1(target) {
-  append_styles(target, "svelte-hvfp2g", ".page-container.svelte-hvfp2g{max-width:42rem;margin:0 auto;padding:1.5rem;background-color:var(--bg-color, #ffffff);color:var(--text-color, #1f2937);box-shadow:0 4px 6px rgba(0, 0, 0, 0.1);border-radius:8px;transition:opacity 0.3s ease-in-out}.page-title.svelte-hvfp2g{font-size:1.5rem;font-weight:600;color:var(--text-color, #1f2937);margin-bottom:0.75rem}.page-description.svelte-hvfp2g{font-size:0.875rem;color:var(--muted-text, #6b7280);margin-bottom:1rem}.error-message.svelte-hvfp2g{background-color:var(--error-bg, #fef2f2);border:1px solid var(--error-color, #dc2626);color:var(--error-color, #dc2626);padding:0.5rem;border-radius:6px;font-size:0.875rem;margin-top:0.5rem}.nav-buttons.svelte-hvfp2g{display:flex;justify-content:space-between;margin-top:1.5rem}.nav-button.svelte-hvfp2g{padding:0.5rem 1rem;border-radius:6px;font-weight:500;font-size:1rem;transition:all 0.2s ease-in-out;cursor:pointer;border:none;outline:none}.back-button.svelte-hvfp2g{background-color:var(--muted-bg, #e5e7eb);color:var(--text-color, #1f2937)}.back-button.svelte-hvfp2g:hover{background-color:var(--muted-hover, #d1d5db)}.next-button.svelte-hvfp2g{background-color:var(--primary-color, #2563eb);color:#ffffff}.next-button.svelte-hvfp2g:hover{background-color:var(--primary-dark, #1d4ed8)}.next-button.svelte-hvfp2g:disabled{background-color:var(--disabled-bg, #9ca3af);cursor:not-allowed}.nav-button.svelte-hvfp2g:focus{outline:2px solid var(--input-focus-color, #2563eb);outline-offset:2px}.hidden.svelte-hvfp2g{visibility:hidden}");
+  append_styles(target, "svelte-1kil0we", ".page-container.svelte-1kil0we{max-width:42rem;margin:0 auto;padding:1.5rem;background-color:var(--bg-color, #ffffff);color:var(--text-color, #1f2937);box-shadow:0 4px 6px rgba(0, 0, 0, 0.1);border-radius:8px;transition:opacity 0.3s ease-in-out}.page-title.svelte-1kil0we{font-size:1.5rem;font-weight:600;color:var(--text-color, #1f2937);margin-bottom:0.75rem}.page-description.svelte-1kil0we{font-size:0.875rem;color:var(--muted-text, #6b7280);margin-bottom:1rem}.nav-buttons.svelte-1kil0we{display:flex;justify-content:space-between;margin-top:1.5rem}.nav-button.svelte-1kil0we{padding:0.5rem 1rem;border-radius:6px;font-weight:500;font-size:1rem;transition:all 0.2s ease-in-out;cursor:pointer;border:none;outline:none}.back-button.svelte-1kil0we{background-color:var(--muted-bg, #e5e7eb);color:var(--text-color, #1f2937)}.back-button.svelte-1kil0we:hover{background-color:var(--muted-hover, #d1d5db)}.next-button.svelte-1kil0we{background-color:var(--primary-color, #2563eb);color:#ffffff}.next-button.svelte-1kil0we:hover{background-color:var(--primary-dark, #1d4ed8)}.next-button.svelte-1kil0we:disabled{background-color:var(--disabled-bg, #9ca3af);cursor:not-allowed}.nav-button.svelte-1kil0we:focus{outline:2px solid var(--input-focus-color, #2563eb);outline-offset:2px}.hidden.svelte-1kil0we{visibility:hidden}");
 }
 function get_each_context$1(ctx, list, i) {
   const child_ctx = ctx.slice();
   child_ctx[15] = list[i];
   return child_ctx;
 }
-function create_if_block_5$1(ctx) {
+function create_if_block_4$1(ctx) {
   let h2;
   let t_value = (
     /*page*/
@@ -2936,7 +3063,7 @@ function create_if_block_5$1(ctx) {
     c() {
       h2 = element("h2");
       t = text(t_value);
-      attr(h2, "class", "page-title svelte-hvfp2g");
+      attr(h2, "class", "page-title svelte-1kil0we");
     },
     m(target, anchor) {
       insert(target, h2, anchor);
@@ -2955,7 +3082,7 @@ function create_if_block_5$1(ctx) {
     }
   };
 }
-function create_if_block_4$1(ctx) {
+function create_if_block_3$1(ctx) {
   let p;
   let t;
   let current;
@@ -2979,7 +3106,7 @@ function create_if_block_4$1(ctx) {
     c() {
       p = element("p");
       create_component(t.$$.fragment);
-      attr(p, "class", "page-description svelte-hvfp2g");
+      attr(p, "class", "page-description svelte-1kil0we");
     },
     m(target, anchor) {
       insert(target, p, anchor);
@@ -3020,49 +3147,8 @@ function create_if_block_4$1(ctx) {
     }
   };
 }
-function create_if_block_3$1(ctx) {
-  let p;
-  let t0_value = (
-    /*formErrors*/
-    ctx[8][
-      /*item*/
-      ctx[15].id
-    ] + ""
-  );
-  let t0;
-  let t1;
-  return {
-    c() {
-      p = element("p");
-      t0 = text(t0_value);
-      t1 = space();
-      attr(p, "class", "error-message svelte-hvfp2g");
-    },
-    m(target, anchor) {
-      insert(target, p, anchor);
-      append(p, t0);
-      append(p, t1);
-    },
-    p(ctx2, dirty) {
-      if (dirty & /*formErrors, page*/
-      257 && t0_value !== (t0_value = /*formErrors*/
-      ctx2[8][
-        /*item*/
-        ctx2[15].id
-      ] + ""))
-        set_data(t0, t0_value);
-    },
-    d(detaching) {
-      if (detaching) {
-        detach(p);
-      }
-    }
-  };
-}
 function create_each_block$1(ctx) {
   let gformitem;
-  let t;
-  let if_block_anchor;
   let current;
   gformitem = new GFormItem({
     props: {
@@ -3085,30 +3171,22 @@ function create_each_block$1(ctx) {
       translations: (
         /*translations*/
         ctx[6]
+      ),
+      errorMessage: (
+        /*formErrors*/
+        ctx[8][
+          /*item*/
+          ctx[15].id
+        ]
       )
     }
   });
-  let if_block = (
-    /*formErrors*/
-    ctx[8][
-      /*item*/
-      ctx[15].id
-    ] && create_if_block_3$1(ctx)
-  );
   return {
     c() {
       create_component(gformitem.$$.fragment);
-      t = space();
-      if (if_block)
-        if_block.c();
-      if_block_anchor = empty();
     },
     m(target, anchor) {
       mount_component(gformitem, target, anchor);
-      insert(target, t, anchor);
-      if (if_block)
-        if_block.m(target, anchor);
-      insert(target, if_block_anchor, anchor);
       current = true;
     },
     p(ctx2, dirty) {
@@ -3125,25 +3203,14 @@ function create_each_block$1(ctx) {
       64)
         gformitem_changes.translations = /*translations*/
         ctx2[6];
-      gformitem.$set(gformitem_changes);
-      if (
-        /*formErrors*/
+      if (dirty & /*formErrors, page*/
+      257)
+        gformitem_changes.errorMessage = /*formErrors*/
         ctx2[8][
           /*item*/
           ctx2[15].id
-        ]
-      ) {
-        if (if_block) {
-          if_block.p(ctx2, dirty);
-        } else {
-          if_block = create_if_block_3$1(ctx2);
-          if_block.c();
-          if_block.m(if_block_anchor.parentNode, if_block_anchor);
-        }
-      } else if (if_block) {
-        if_block.d(1);
-        if_block = null;
-      }
+        ];
+      gformitem.$set(gformitem_changes);
     },
     i(local) {
       if (current)
@@ -3156,13 +3223,7 @@ function create_each_block$1(ctx) {
       current = false;
     },
     d(detaching) {
-      if (detaching) {
-        detach(t);
-        detach(if_block_anchor);
-      }
       destroy_component(gformitem, detaching);
-      if (if_block)
-        if_block.d(detaching);
     }
   };
 }
@@ -3208,7 +3269,7 @@ function create_if_block_2$1(ctx) {
     c() {
       button = element("button");
       create_component(t.$$.fragment);
-      attr(button, "class", "nav-button back-button svelte-hvfp2g");
+      attr(button, "class", "nav-button back-button svelte-1kil0we");
     },
     m(target, anchor) {
       insert(target, button, anchor);
@@ -3428,11 +3489,11 @@ function create_fragment$2(ctx) {
   let dispose;
   let if_block0 = (
     /*page*/
-    ctx[0].title && create_if_block_5$1(ctx)
+    ctx[0].title && create_if_block_4$1(ctx)
   );
   let if_block1 = (
     /*page*/
-    ctx[0].description && create_if_block_4$1(ctx)
+    ctx[0].description && create_if_block_3$1(ctx)
   );
   let each_value = ensure_array_like(
     /*page*/
@@ -3490,11 +3551,11 @@ function create_fragment$2(ctx) {
       t3 = space();
       button = element("button");
       if_block3.c();
-      attr(button, "class", "nav-button next-button svelte-hvfp2g");
+      attr(button, "class", "nav-button next-button svelte-1kil0we");
       button.disabled = /*isSubmitting*/
       ctx[3];
-      attr(div0, "class", "nav-buttons svelte-hvfp2g");
-      attr(div1, "class", "page-container svelte-hvfp2g");
+      attr(div0, "class", "nav-buttons svelte-1kil0we");
+      attr(div1, "class", "page-container svelte-1kil0we");
       toggle_class(div1, "hidden", !/*isActive*/
       ctx[1]);
     },
@@ -3534,7 +3595,7 @@ function create_fragment$2(ctx) {
         if (if_block0) {
           if_block0.p(ctx2, dirty);
         } else {
-          if_block0 = create_if_block_5$1(ctx2);
+          if_block0 = create_if_block_4$1(ctx2);
           if_block0.c();
           if_block0.m(div1, t0);
         }
@@ -3553,7 +3614,7 @@ function create_fragment$2(ctx) {
             transition_in(if_block1, 1);
           }
         } else {
-          if_block1 = create_if_block_4$1(ctx2);
+          if_block1 = create_if_block_3$1(ctx2);
           if_block1.c();
           transition_in(if_block1, 1);
           if_block1.m(div1, t1);
@@ -3565,7 +3626,7 @@ function create_fragment$2(ctx) {
         });
         check_outros();
       }
-      if (dirty & /*formErrors, page, onInputChange, setChoice, lang, translations*/
+      if (dirty & /*page, onInputChange, setChoice, lang, translations, formErrors*/
       1889) {
         each_value = ensure_array_like(
           /*page*/
@@ -5224,7 +5285,7 @@ function instance($$self, $$props, $$invalidate) {
 class GFormMirror extends SvelteComponent {
   constructor(options) {
     super();
-    init(this, options, instance, create_fragment, not_equal, {
+    init(this, options, instance, create_fragment, safe_not_equal, {
       formsUrl: 2,
       formsId: 6,
       appsScriptUrl: 3,
@@ -5268,7 +5329,7 @@ class GFormMirror extends SvelteComponent {
     flush();
   }
 }
-customElements.define("gforms-mirror", create_custom_element(GFormMirror, { "formsUrl": {}, "formsId": {}, "appsScriptUrl": {}, "translations": {}, "data": {} }, [], [], true));
+customElements.define("gforms-mirror", create_custom_element(GFormMirror, { "formsUrl": {}, "formsId": {}, "appsScriptUrl": {}, "translations": {}, "data": {} }, [], [], false));
 export {
   GFormMirror as default
 };

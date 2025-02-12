@@ -1,7 +1,8 @@
 <svelte:options
-  customElement="gforms-mirror"
-  tag="gforms-mirror"
-  immutable={true}
+  customElement={{
+    tag: "gforms-mirror",
+    shadow: "none",
+  }}
 />
 
 <script lang="ts">
