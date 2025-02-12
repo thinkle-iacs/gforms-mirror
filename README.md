@@ -16,6 +16,14 @@ Submitting forms happens by hitting a custom Google Apps Script URI which handle
 
 The most *convenient* solution is to just point a custom element at a google apps script URL with a form ID and call it a day. HOWEVER, Google Apps Script is not exactly performant, so if you want your form to load quickly, you'll want to hard-code the form data and translations onto your webpage. That way, you don't have to wait for an Apps Script call before your users see the form.
 
+## Set Up...
+
+To submit forms, you will need an Apps Script process running which has edit access to the forms in question. The easiest way to do that is to copy our source code into Apps Script, but we will also keep a "built" script available you can copy [here](fixme).
+
+1. Copy [script](fixme).
+2. Deploy as web app
+3. Visit web app URL and use interface to generate form code.
+4. Copy generated form code into wherever you are hosting your pages.
 
 ## Google Apps Script + Svelte (Template used for this project...)
 
