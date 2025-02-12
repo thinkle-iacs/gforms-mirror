@@ -75,7 +75,9 @@
 
   <!-- Page Description -->
   {#if page.description}
-    <p class="text-muted mb-4">{page.description}</p>
+    <p class="text-muted mb-4">
+      <T text={page.description} {lang} {translations} />
+    </p>
   {/if}
 
   <!-- Form Items -->

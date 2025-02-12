@@ -34,6 +34,7 @@
     const pages: Page[] = [];
     let currentPage: Page = {
       id: "start",
+      description: form.description,
       items: [],
       defaultNextPage: null,
     };
@@ -269,6 +270,10 @@
       class="text-center p-6 border border-gray-300 rounded-md shadow-md bg-background text-text"
     >
       <h2 class="text-2xl font-semibold text-success">{postedMessage}</h2>
+
+      {#if form.confirmationMessage}
+        <T text={form.confirmationMessage} {lang} {translations} />
+      {/if}
 
       {#if editResponseUrl}
         <p class="mt-2">
