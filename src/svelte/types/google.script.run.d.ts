@@ -6,7 +6,11 @@ declare namespace google.script {
       withUserObject(object: Object): this;
       getActiveUserEmail(): void;
   getAppsScriptUrl(): void;
+  getFormIdFromUrl(formUrl: string): void;
   getCachedFormData(formId: string, formUrl: string): void;
+  getTranslationsSpreadsheetUrl(formId: any, initialLanguages: string[]): void;
+  setupTranslationsSpreadsheet(formId: any, initialLanguages: string[]): void;
+  getTranslations(formId: any): void;
   getFormData(formId: string, formUrl: string): void
   }
   const run : GoogleScriptRun;
