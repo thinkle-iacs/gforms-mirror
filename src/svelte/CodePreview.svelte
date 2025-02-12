@@ -23,7 +23,7 @@
 
   function generateEmbedCode() {
     let embedCode = `
-  <script src="${cdnUrl}"><\/script>
+  <script type="module" src="${cdnUrl}"><\/script>
   <gforms-mirror 
     id="gform"
     formsUrl="${formsUrl}"    
