@@ -1,13 +1,13 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import type { Form, Translations } from "../../gas/types";
   import GForm from "./GForm.svelte";
   export let formsUrl: string = "";
   export let formsId: string = "";
   export let appsScriptUrl: string = "";
   export let translations: Translations = {};
-  export let translationsUrl: string = "";
 
-  let data: Form;
+  export let data: Form;
 
   async function loadForm() {
     try {
@@ -35,44 +35,51 @@
     } finally {
       loading = false;
     }
-    if (translationsUrl) {
-      loading = true;
-      try {
-        const response = await fetch(translationsUrl, {
-          method: "GET",
-          redirect: "follow", // ✅ Ensures it follows redirects
-        });
+    let translationsUrl = `${appsScriptUrl}?translations=1`;
+    if (formsId) {
+      translationsUrl += `&formId=${encodeURIComponent(formsId)}`;
+    } else {
+      translationsUrl += `&formUrl=${encodeURIComponent(formsUrl)}`;
+    }
 
-        if (!response.ok) {
-          throw new Error(
-            `Failed to load translations: ${response.statusText}`
-          );
-        }
+    loading = true;
+    try {
+      console.log("Fetch transalations from", translationsUrl);
+      const response = await fetch(translationsUrl, {
+        method: "GET",
+        redirect: "follow", // ✅ Ensures it follows redirects
+      });
 
-        translations = await response.json(); // ✅ Parse JSON response
-        console.log("Translations Loaded:", translations);
-      } catch (error) {
-        console.error(
-          "Error loading translations from URL",
-          translationsUrl,
-          error
-        );
+      if (!response.ok) {
+        throw new Error(`Failed to load translations: ${response.statusText}`);
       }
+
+      translations = await response.json(); // ✅ Parse JSON response
+      console.log("Translations Loaded:", translations);
+    } catch (error) {
+      console.error(
+        "Error loading translations from URL",
+        translationsUrl,
+        error
+      );
     }
   }
   let loading = false;
+
+  onMount(() => {
+    loadForm();
+  });
 </script>
 
-<div class="debug">
-  <p>FormsUrl: {formsUrl}</p>
-  <p>FormsId: {formsId}</p>
-  <p>AppsScriptUrl: {appsScriptUrl}</p>
-</div>
-<button
-  disabled={loading}
-  class="bg-primary hover:bg-primaryDark text-white font-bold py-2 px-4 rounded"
-  on:click={loadForm}>Load</button
->
 {#if data}
   <GForm form={data} postUrl={appsScriptUrl} {translations} lang="en" />
+{/if}
+{#if formsUrl || translationsUrl}
+  <button
+    disabled={loading}
+    class="bg-primary hover:bg-primaryDark text-white font-bold py-2 px-4 rounded"
+    on:click={loadForm}
+  >
+    &#x21bb; <!-- Unicode symbol for refresh arrow -->
+  </button>
 {/if}
