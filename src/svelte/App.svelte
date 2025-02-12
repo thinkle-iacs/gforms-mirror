@@ -1,72 +1,127 @@
 <script lang="ts">
-  import TranslationTest from "./TranslationTest.svelte";
-  import GFormMirror from "./GForm/GFormMirror.svelte";
-  import GForm from "./GForm/GForm.svelte";
-  import { parseContext } from "./lib/parseContext";
-  import { GoogleAppsScript } from "./gasApi";
+  import TranslationManager from "./TranslationManager.svelte";
 
+  import CodePreview from "./CodePreview.svelte";
+  import type { Translations, Form, Settings } from "../gas/types";
+  import GFormMirror from "./GForm/GFormMirror.svelte";
+  import { GoogleAppsScript } from "./gasApi";
   import { onMount } from "svelte";
+
   let email;
-  let contextString = `<? context ?>`;
-  let context = parseContext(contextString);
   let appsScriptUrl = "";
-  import { ALL_TESTS } from "../gas/consts";
+  let translationData: Translations;
+  let formData: Form;
   let formsUrl =
     "https://docs.google.com/forms/d/1xh9cSzZvDqV9cm0n5ph4L4KwFx00ZQPkY8O3X6-nNLY/edit";
+  let formId: string;
+  let updateKey = 0;
+
+  $: if (translationData) {
+    updateKey++;
+  }
+  $: if (formData) {
+    updateKey++;
+  }
+
   onMount(async () => {
     email = await GoogleAppsScript.getActiveUserEmail();
     appsScriptUrl = await GoogleAppsScript.getAppsScriptUrl();
   });
 
-  let loadMode = false;
-  let data = null;
   async function loadData() {
-    console.log("Grabbing data...");
-    data = await GoogleAppsScript.getFormData(null, formsUrl);
-    console.log("Data is ", data);
+    console.log("Grabbing form data...");
+    //formData = await GoogleAppsScript.getFormData(null, formsUrl);
+    const response = await fetch(
+      appsScriptUrl + "?getFormData=1&formUrl=" + formsUrl,
+      {
+        method: "GET",
+        redirect: "follow", // ✅ Ensures it follows redirects
+      }
+    );
+    if (!response.ok) {
+      throw new Error(`Failed to load form: ${response.statusText}`);
+    }
+    formData = await response.json(); // ✅ Parse JSON response
+    formId = formData.id;
+    console.log("Loaded Form Data:", formData);
   }
+
+  let settings: Settings = {
+    styleVars: {},
+    embedData: true,
+    embedTranslations: true,
+  };
+  let showTranslation = false;
 </script>
 
-<main
-  class="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-6"
->
-  <div class="bg-white shadow-lg rounded-lg p-6 max-w-lg w-full">
-    <h1 class="text-2xl font-semibold text-gray-800">Hello, {email}</h1>
-    <p class="text-gray-600 mt-2">We have an Apps Script URL of:</p>
-    <p
-      class="text-sm font-mono bg-gray-200 text-gray-800 p-2 rounded mt-1 break-all"
-    >
-      {appsScriptUrl}
+<main class="min-h-screen flex flex-col items-center bg-gray-100 p-8">
+  <div class="bg-white shadow-md rounded-lg p-6 max-w-3xl w-full">
+    <h1 class="text-2xl font-bold text-gray-900">GForms Mirror</h1>
+    <p class="text-gray-600">
+      Enter a Google Form URL to generate an embeddable web component.
     </p>
 
-    <label class="block mt-4">
-      <span class="text-gray-700 font-medium">Form URL:</span>
+    <div class="mt-4">
+      <label class="block text-gray-700 font-medium">Google Form URL</label>
       <input
         type="text"
         bind:value={formsUrl}
-        class="mt-2 w-full px-3 py-2 border rounded-md shadow-sm focus:ring focus:ring-blue-300 focus:outline-none"
-        placeholder="Enter Google Form URL..."
+        class="w-full mt-2 p-2 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300 focus:outline-none"
+        placeholder="Paste Google Form URL here..."
       />
-    </label>
-
+    </div>
     <button
-      on:click={() => loadData()}
-      class="mt-4 w-full bg-blue-500 text-white py-2 rounded-md font-medium hover:bg-blue-600 transition"
+      on:click={loadData}
+      class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
+      class:bg-gray-300={formId}>Get Form Data</button
     >
-      Load
-    </button>
-    <TranslationTest />
+    {#if formId}
+      <button
+        on:click={() => (showTranslation = !showTranslation)}
+        class="mt-4 px-4 py-2 rounded-md focus:outline-none transition-colors duration-300"
+        class:bg-blue-500={showTranslation}
+        class:bg-gray-300={!showTranslation}
+      >
+        Translations
+      </button>{/if}
 
-    {#if data}
+    <div class:hidden={!showTranslation}>
+      {#if formId}
+        <TranslationManager
+          {formId}
+          {appsScriptUrl}
+          onTranslationsUpdated={(translations) => {
+            console.log("Updating translation data!");
+            translationData = translations;
+          }}
+        ></TranslationManager>
+      {/if}
+    </div>
+
+    {#if formsUrl}
       <div class="mt-6 border-t pt-4">
-        <h2>With Data From Apps Script...</h2>
-        <GForm form={data} postCallback={console.log} />
+        <h2 class="text-xl font-semibold text-gray-900">
+          Generated Embed Code
+        </h2>
+        <CodePreview
+          {formsUrl}
+          {appsScriptUrl}
+          data={formData}
+          {settings}
+          translations={translationData}
+        />
       </div>
-    {/if}
-    {#if appsScriptUrl && formsUrl}
+
       <div class="mt-6 border-t pt-4">
-        <h2>With Full Loading...</h2>
-        <GFormMirror {appsScriptUrl} {formsUrl} />
+        <h2 class="text-xl font-semibold text-gray-900">Live Preview</h2>
+        {#key formsUrl + updateKey}
+          <GFormMirror
+            {formsUrl}
+            {appsScriptUrl}
+            data={formData}
+            translations={translationData}
+          />
+        {/key}
       </div>
     {/if}
   </div>
