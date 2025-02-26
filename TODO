@@ -1,4 +1,9 @@
-Next up, we're working towards this:
+Next up: we have this working as a test now already, so go us!
+-> Note: encapsulation + google translate are at odds, so we can't really prevent "leakage" of external website stuff into us.
+-> Next steps: Finalize UI for embedding. Come up with a useful hosting solution.
+
+
+Next up, we're working towards this: -- we actually 
 
     < gforms - mirror id = "my-form" appsScriptUrl = "https://script.google.com/macros/s/XYZ/exec" ></gforms - mirror >
 
