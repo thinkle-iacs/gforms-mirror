@@ -77,15 +77,23 @@
   });
 </script>
 
-{#if data}
-  <GForm form={data} postUrl={appsScriptUrl} {translations} lang="en" />
-{/if}
-{#if formsUrl}
-  <button
-    disabled={loading}
-    class="bg-primary hover:bg-primaryDark text-white font-bold py-2 px-4 rounded"
-    on:click={loadForm}
-  >
-    &#x21bb; <!-- Unicode symbol for refresh arrow -->
-  </button>
-{/if}
+<div class="gform-wrapper">
+  {#if data}
+    <GForm form={data} postUrl={appsScriptUrl} {translations} lang="en" />
+  {/if}
+  {#if formsUrl}
+    <button
+      disabled={loading}
+      class="bg-primary hover:bg-primaryDark text-white font-bold py-2 px-4 rounded"
+      on:click={loadForm}
+    >
+      &#x21bb; <!-- Unicode symbol for refresh arrow -->
+    </button>
+  {/if}
+</div>
+
+<style>
+  .gform-wrapper :global(*) {
+    all: reset;
+  }
+</style>

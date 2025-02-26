@@ -124,7 +124,7 @@
 </script>
 
 {#if form}
-  <main>
+  <section>
     <TranslationSelector {translations} {form} onChange={onLanguageChange} />
 
     <form
@@ -199,7 +199,7 @@
         {/if}
       </div>
     {/if}
-  </main>
+  </section>
 {/if}
 
 <style>
@@ -312,11 +312,13 @@
   .submit-again-button:hover {
     background: var(--secondary-color);
   }
-  main {
+  section {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    padding: 0;
+    margin: 0;
   }
   .hidden {
     visibility: hidden;

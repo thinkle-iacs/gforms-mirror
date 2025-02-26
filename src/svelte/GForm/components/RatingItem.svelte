@@ -11,13 +11,9 @@
   };
 </script>
 
-<div class="flex space-x-1">
+<div>
   {#each Array(max).fill(0) as _, i}
-    <label
-      class="cursor-pointer relative"
-      class:selected={value > i}
-      class:unselected={value <= i}
-    >
+    <label class:selected={value > i} class:unselected={value <= i}>
       <input
         type="radio"
         {name}
@@ -26,10 +22,7 @@
         class="sr-only peer"
         on:input
       />
-      <span
-        class="text-2xl transition-transform duration-200 ease-in-out"
-        aria-hidden="true"
-      >
+      <span aria-hidden="true">
         {iconMap[icon]}
       </span>
     </label>

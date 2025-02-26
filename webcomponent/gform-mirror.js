@@ -780,7 +780,7 @@ const getText = (word, translations, lang = "en") => {
     return word;
   }
 };
-function add_css$5(target) {
+function add_css$6(target) {
   append_styles(target, "svelte-f2gsno", "span.svelte-f2gsno{display:contents}");
 }
 function create_fragment$6(ctx) {
@@ -875,7 +875,7 @@ function instance$6($$self, $$props, $$invalidate) {
 class T extends SvelteComponent {
   constructor(options) {
     super();
-    init(this, options, instance$6, create_fragment$6, safe_not_equal, { text: 0, lang: 3, translations: 4 }, add_css$5);
+    init(this, options, instance$6, create_fragment$6, safe_not_equal, { text: 0, lang: 3, translations: 4 }, add_css$6);
   }
   get text() {
     return this.$$.ctx[0];
@@ -900,7 +900,7 @@ class T extends SvelteComponent {
   }
 }
 create_custom_element(T, { "text": {}, "lang": {}, "translations": {} }, [], [], true);
-function add_css$4(target) {
+function add_css$5(target) {
   append_styles(target, "svelte-lni2oa", ".translation-container.svelte-lni2oa{margin-top:1rem}.button-group.svelte-lni2oa{display:flex;flex-wrap:wrap;gap:0.5rem}.lang-button.svelte-lni2oa{padding:0.5rem 1rem;font-size:0.875rem;border:none;border-radius:6px;cursor:pointer;transition:background 0.2s ease-in-out,\n      transform 0.1s ease-in-out;text-transform:capitalize}.lang-button.primary.svelte-lni2oa{background-color:var(--primary-color, #2563eb);color:white}.lang-button.primary.svelte-lni2oa:hover{background-color:var(--primary-dark, #1d4ed8);transform:scale(1.05)}.lang-button.secondary.svelte-lni2oa{background-color:var(--text-color, #6b7280);color:white}.lang-button.secondary.svelte-lni2oa:hover{background-color:var(--muted-text, #4b5563);transform:scale(1.05)}.google-translate-container.svelte-lni2oa{margin-top:1rem}.hidden.svelte-lni2oa{display:none}");
 }
 function get_each_context$4(ctx, list, i) {
@@ -1488,7 +1488,7 @@ class TranslationSelector extends SvelteComponent {
         onChange: 5,
         form: 6
       },
-      add_css$4
+      add_css$5
     );
   }
   get translations() {
@@ -1521,7 +1521,7 @@ class TranslationSelector extends SvelteComponent {
   }
 }
 create_custom_element(TranslationSelector, { "translations": {}, "sourceLanguage": {}, "onChange": {}, "form": {} }, [], [], true);
-function add_css$3(target) {
+function add_css$4(target) {
   append_styles(target, "svelte-zcceq9", ".sr-only.svelte-zcceq9.svelte-zcceq9{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0, 0, 0, 0);white-space:nowrap;border-width:0}span.svelte-zcceq9.svelte-zcceq9{display:inline-block;transform:scale(0.5);transition:transform 200ms}.selected.svelte-zcceq9 span.svelte-zcceq9{transform:scale(1)}label.svelte-zcceq9:hover span.svelte-zcceq9,.unselected.svelte-zcceq9.svelte-zcceq9:has(~ label:hover span){transform:scale(1.1)}label.svelte-zcceq9:hover~label.selected.svelte-zcceq9{transform:scale(0.75)}.peer.svelte-zcceq9:focus-visible+span.svelte-zcceq9{outline:2px solid #4f46e5;outline-offset:2px}");
 }
 function get_each_context$3(ctx, list, i) {
@@ -1570,9 +1570,9 @@ function create_each_block$3(ctx) {
       ctx[10] + 1;
       set_input_value(input, input.__value);
       attr(input, "class", "sr-only peer svelte-zcceq9");
-      attr(span, "class", "text-2xl transition-transform duration-200 ease-in-out svelte-zcceq9");
       attr(span, "aria-hidden", "true");
-      attr(label, "class", "cursor-pointer relative svelte-zcceq9");
+      attr(span, "class", "svelte-zcceq9");
+      attr(label, "class", "svelte-zcceq9");
       toggle_class(
         label,
         "selected",
@@ -1685,7 +1685,6 @@ function create_fragment$4(ctx) {
       for (let i = 0; i < each_blocks.length; i += 1) {
         each_blocks[i].c();
       }
-      attr(div, "class", "flex space-x-1");
     },
     m(target, anchor) {
       insert(target, div, anchor);
@@ -1771,7 +1770,7 @@ function instance$4($$self, $$props, $$invalidate) {
 class RatingItem extends SvelteComponent {
   constructor(options) {
     super();
-    init(this, options, instance$4, create_fragment$4, safe_not_equal, { max: 1, icon: 2, value: 0, name: 3 }, add_css$3);
+    init(this, options, instance$4, create_fragment$4, safe_not_equal, { max: 1, icon: 2, value: 0, name: 3 }, add_css$4);
   }
   get max() {
     return this.$$.ctx[1];
@@ -1803,7 +1802,7 @@ class RatingItem extends SvelteComponent {
   }
 }
 create_custom_element(RatingItem, { "max": {}, "icon": {}, "value": {}, "name": {} }, [], [], true);
-function add_css$2(target) {
+function add_css$3(target) {
   append_styles(target, "svelte-i7e7jn", ".form-item.svelte-i7e7jn{margin-bottom:1.5rem}.question-title.svelte-i7e7jn{font-size:1.125rem;font-weight:600;color:var(--text-color, #1f2937);margin-bottom:0.5rem}.question-description.svelte-i7e7jn{font-size:0.875rem;color:var(--muted-text, #6b7280);margin-bottom:0.75rem}.checkbox-group.svelte-i7e7jn,.radio-group.svelte-i7e7jn{display:flex;flex-direction:column;gap:0.5rem}.checkbox-label.svelte-i7e7jn,.radio-label.svelte-i7e7jn{display:flex;align-items:center;gap:0.5rem;cursor:pointer}.choice-text.svelte-i7e7jn{color:var(--text-color, #1f2937)}.checkbox-input.svelte-i7e7jn,.radio-input.svelte-i7e7jn{width:1.25rem;height:1.25rem;border:2px solid var(--input-border-color, #d1d5db);border-radius:50%;cursor:pointer;transition:transform 0.2s ease-in-out}.checkbox-input.svelte-i7e7jn:hover,.radio-input.svelte-i7e7jn:hover{transform:scale(1.1)}.checkbox-input.svelte-i7e7jn:checked,.radio-input.svelte-i7e7jn:checked{background-color:var(--primary-color, #2563eb);border-color:var(--primary-color, #2563eb);box-shadow:0 0 5px var(--primary-color, #2563eb)}.input-field.svelte-i7e7jn{width:100%;padding:0.6rem;border:1px solid var(--input-border-color, #d1d5db);border-radius:6px;background-color:var(--input-bg-color, #f9fafb);color:var(--input-text-color, #111827);font-family:var(--input-font, sans-serif);transition:all 0.2s ease-in-out}.input-field.svelte-i7e7jn:focus{outline:none;border-color:var(--input-focus-color, #2563eb);box-shadow:0 0 6px var(--input-focus-color, #2563eb)}.textarea-field.svelte-i7e7jn{min-height:100px;resize:vertical}.input-range.svelte-i7e7jn{width:100%;padding:0.5rem;border:none;cursor:pointer}.dropdown.svelte-i7e7jn{width:100%;padding:0.6rem;border:1px solid var(--input-border-color, #d1d5db);border-radius:6px;background-color:var(--input-bg-color, #f9fafb);color:var(--input-text-color, #111827);font-family:var(--input-font, sans-serif);appearance:none}.dropdown.svelte-i7e7jn:focus{outline:none;border-color:var(--input-focus-color, #2563eb);box-shadow:0 0 6px var(--input-focus-color, #2563eb)}.input-field.svelte-i7e7jn:hover,.dropdown.svelte-i7e7jn:hover{border-color:var(--primary-dark, #1d4ed8)}.input-field.svelte-i7e7jn:focus,.dropdown.svelte-i7e7jn:focus{border-color:var(--primary-color, #2563eb)}.error-message.svelte-i7e7jn{background-color:var(--error-bg, #fef2f2);border:1px solid var(--error-color, #dc2626);color:var(--error-color, #dc2626);padding:0.5rem;border-radius:6px;font-size:0.875rem;margin-top:0.5rem}.error.svelte-i7e7jn{border:1px solid var(--error-color, #dc2626);padding:0.5rem;border-radius:6px}");
 }
 function get_each_context_2(ctx, list, i) {
@@ -2997,7 +2996,7 @@ class GFormItem extends SvelteComponent {
         errorMessage: 3,
         translations: 4
       },
-      add_css$2
+      add_css$3
     );
   }
   get item() {
@@ -3044,7 +3043,7 @@ class GFormItem extends SvelteComponent {
   }
 }
 create_custom_element(GFormItem, { "item": {}, "onInputChange": {}, "setChoice": {}, "lang": {}, "errorMessage": {}, "translations": {} }, [], [], true);
-function add_css$1(target) {
+function add_css$2(target) {
   append_styles(target, "svelte-1kil0we", ".page-container.svelte-1kil0we{max-width:42rem;margin:0 auto;padding:1.5rem;background-color:var(--bg-color, #ffffff);color:var(--text-color, #1f2937);box-shadow:0 4px 6px rgba(0, 0, 0, 0.1);border-radius:8px;transition:opacity 0.3s ease-in-out}.page-title.svelte-1kil0we{font-size:1.5rem;font-weight:600;color:var(--text-color, #1f2937);margin-bottom:0.75rem}.page-description.svelte-1kil0we{font-size:0.875rem;color:var(--muted-text, #6b7280);margin-bottom:1rem}.nav-buttons.svelte-1kil0we{display:flex;justify-content:space-between;margin-top:1.5rem}.nav-button.svelte-1kil0we{padding:0.5rem 1rem;border-radius:6px;font-weight:500;font-size:1rem;transition:all 0.2s ease-in-out;cursor:pointer;border:none;outline:none}.back-button.svelte-1kil0we{background-color:var(--muted-bg, #e5e7eb);color:var(--text-color, #1f2937)}.back-button.svelte-1kil0we:hover{background-color:var(--muted-hover, #d1d5db)}.next-button.svelte-1kil0we{background-color:var(--primary-color, #2563eb);color:#ffffff}.next-button.svelte-1kil0we:hover{background-color:var(--primary-dark, #1d4ed8)}.next-button.svelte-1kil0we:disabled{background-color:var(--disabled-bg, #9ca3af);cursor:not-allowed}.nav-button.svelte-1kil0we:focus{outline:2px solid var(--input-focus-color, #2563eb);outline-offset:2px}.hidden.svelte-1kil0we{visibility:hidden}");
 }
 function get_each_context$1(ctx, list, i) {
@@ -3833,7 +3832,7 @@ class GPage extends SvelteComponent {
         lang: 5,
         translations: 6
       },
-      add_css$1
+      add_css$2
     );
   }
   get page() {
@@ -3894,8 +3893,8 @@ class GPage extends SvelteComponent {
   }
 }
 create_custom_element(GPage, { "page": {}, "isActive": { "type": "Boolean" }, "isFirst": { "type": "Boolean" }, "isSubmitting": { "type": "Boolean" }, "onBack": {}, "onGoto": {}, "lang": {}, "translations": {} }, [], [], true);
-function add_css(target) {
-  append_styles(target, "svelte-1hpprge", ':host,:root{--primary-color:#2563eb;--secondary-color:#9333ea;--success-color:#16a34a;--error-color:#dc2626;--primary-dark:color-mix(in srgb, var(--primary-color) 80%, black 20%);--secondary-dark:color-mix(in srgb, var(--secondary-color) 80%, black 20%);--bg-color:#ffffff;--text-color:#1f2937;--muted-text:color-mix(in srgb, var(--text-color) 70%, white 30%);--input-bg-color:#f9fafb;--input-text-color:#111827;--input-border-color:#d1d5db;--input-focus-color:#2563eb;--input-placeholder-color:#9ca3af;--font-family:"Inter", sans-serif;--input-font:"Inter", sans-serif}[data-theme="dark"]{--bg-color:#1f2937;--text-color:#e5e7eb;--muted-text:color-mix(in srgb, var(--text-color) 70%, black 30%);--input-bg-color:#374151;--input-text-color:#f3f4f6;--input-border-color:#4b5563;--input-focus-color:#60a5fa}[data-theme="transparent"]{--bg-color:transparent;--text-color:inherit}.form-container.svelte-1hpprge{background:var(--bg-color);color:var(--text-color);font-family:var(--font-family);padding:1.5rem;border-radius:8px;box-shadow:0 4px 6px rgba(0, 0, 0, 0.1)}.form-title.svelte-1hpprge{font-size:1.75rem;font-weight:600;color:var(--primary-color)}.form-link.svelte-1hpprge{color:var(--primary-color);font-size:0.875rem;text-decoration:underline;cursor:pointer}.page-list.svelte-1hpprge{margin-top:1rem}.error-message.svelte-1hpprge{background:#fde2e2;border:1px solid var(--error-color);padding:0.75rem;color:var(--error-color);border-radius:6px;margin-top:1rem}.success-container.svelte-1hpprge{text-align:center;padding:1.5rem;border:1px solid var(--text-color);border-radius:8px;box-shadow:0 4px 6px rgba(0, 0, 0, 0.1)}.success-title.svelte-1hpprge{font-size:1.5rem;font-weight:600;color:var(--success-color)}.edit-response-link.svelte-1hpprge{color:var(--secondary-color);text-decoration:underline;margin-top:0.5rem}.submit-again-button.svelte-1hpprge{background:var(--primary-color);color:white;padding:0.75rem 1.5rem;border-radius:6px;cursor:pointer;margin-top:1rem}.submit-again-button.svelte-1hpprge:hover{background:var(--secondary-color)}main.svelte-1hpprge{display:flex;flex-direction:column;align-items:center;justify-content:center}.hidden.svelte-1hpprge{visibility:hidden;display:none}');
+function add_css$1(target) {
+  append_styles(target, "svelte-ppr9db", ':host,:root{--primary-color:#2563eb;--secondary-color:#9333ea;--success-color:#16a34a;--error-color:#dc2626;--primary-dark:color-mix(in srgb, var(--primary-color) 80%, black 20%);--secondary-dark:color-mix(in srgb, var(--secondary-color) 80%, black 20%);--bg-color:#ffffff;--text-color:#1f2937;--muted-text:color-mix(in srgb, var(--text-color) 70%, white 30%);--input-bg-color:#f9fafb;--input-text-color:#111827;--input-border-color:#d1d5db;--input-focus-color:#2563eb;--input-placeholder-color:#9ca3af;--font-family:"Inter", sans-serif;--input-font:"Inter", sans-serif}[data-theme="dark"]{--bg-color:#1f2937;--text-color:#e5e7eb;--muted-text:color-mix(in srgb, var(--text-color) 70%, black 30%);--input-bg-color:#374151;--input-text-color:#f3f4f6;--input-border-color:#4b5563;--input-focus-color:#60a5fa}[data-theme="transparent"]{--bg-color:transparent;--text-color:inherit}.form-container.svelte-ppr9db{background:var(--bg-color);color:var(--text-color);font-family:var(--font-family);padding:1.5rem;border-radius:8px;box-shadow:0 4px 6px rgba(0, 0, 0, 0.1)}.form-title.svelte-ppr9db{font-size:1.75rem;font-weight:600;color:var(--primary-color)}.form-link.svelte-ppr9db{color:var(--primary-color);font-size:0.875rem;text-decoration:underline;cursor:pointer}.page-list.svelte-ppr9db{margin-top:1rem}.error-message.svelte-ppr9db{background:#fde2e2;border:1px solid var(--error-color);padding:0.75rem;color:var(--error-color);border-radius:6px;margin-top:1rem}.success-container.svelte-ppr9db{text-align:center;padding:1.5rem;border:1px solid var(--text-color);border-radius:8px;box-shadow:0 4px 6px rgba(0, 0, 0, 0.1)}.success-title.svelte-ppr9db{font-size:1.5rem;font-weight:600;color:var(--success-color)}.edit-response-link.svelte-ppr9db{color:var(--secondary-color);text-decoration:underline;margin-top:0.5rem}.submit-again-button.svelte-ppr9db{background:var(--primary-color);color:white;padding:0.75rem 1.5rem;border-radius:6px;cursor:pointer;margin-top:1rem}.submit-again-button.svelte-ppr9db:hover{background:var(--secondary-color)}section.svelte-ppr9db{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0;margin:0}.hidden.svelte-ppr9db{visibility:hidden;display:none}');
 }
 function get_each_context(ctx, list, i) {
   const child_ctx = ctx.slice();
@@ -3903,7 +3902,7 @@ function get_each_context(ctx, list, i) {
   return child_ctx;
 }
 function create_if_block$1(ctx) {
-  let main;
+  let section;
   let translationselector;
   let t0;
   let form_1;
@@ -3986,7 +3985,7 @@ function create_if_block$1(ctx) {
   );
   return {
     c() {
-      main = element("main");
+      section = element("section");
       create_component(translationselector.$$.fragment);
       t0 = space();
       form_1 = element("form");
@@ -4008,25 +4007,25 @@ function create_if_block$1(ctx) {
       t8 = space();
       if (if_block1)
         if_block1.c();
-      attr(h1, "class", "form-title svelte-1hpprge");
-      attr(a, "class", "form-link svelte-1hpprge");
+      attr(h1, "class", "form-title svelte-ppr9db");
+      attr(a, "class", "form-link svelte-ppr9db");
       attr(a, "href", a_href_value = /*form*/
       ctx[1].publishedUrl);
-      attr(div, "class", "page-list svelte-1hpprge");
-      attr(form_1, "class", "form-container svelte-1hpprge");
+      attr(div, "class", "page-list svelte-ppr9db");
+      attr(form_1, "class", "form-container svelte-ppr9db");
       toggle_class(
         form_1,
         "hidden",
         /*submitted*/
         ctx[8]
       );
-      attr(main, "class", "svelte-1hpprge");
+      attr(section, "class", "svelte-ppr9db");
     },
     m(target, anchor) {
-      insert(target, main, anchor);
-      mount_component(translationselector, main, null);
-      append(main, t0);
-      append(main, form_1);
+      insert(target, section, anchor);
+      mount_component(translationselector, section, null);
+      append(section, t0);
+      append(section, form_1);
       append(form_1, h1);
       mount_component(t1, h1, null);
       append(form_1, t2);
@@ -4042,12 +4041,12 @@ function create_if_block$1(ctx) {
         }
       }
       ctx[18](form_1);
-      append(main, t7);
+      append(section, t7);
       if (if_block0)
-        if_block0.m(main, null);
-      append(main, t8);
+        if_block0.m(section, null);
+      append(section, t8);
       if (if_block1)
-        if_block1.m(main, null);
+        if_block1.m(section, null);
       current = true;
     },
     p(ctx2, dirty) {
@@ -4138,7 +4137,7 @@ function create_if_block$1(ctx) {
           if_block0 = create_if_block_5(ctx2);
           if_block0.c();
           transition_in(if_block0, 1);
-          if_block0.m(main, t8);
+          if_block0.m(section, t8);
         }
       } else if (if_block0) {
         group_outros();
@@ -4161,7 +4160,7 @@ function create_if_block$1(ctx) {
           if_block1 = create_if_block_1$1(ctx2);
           if_block1.c();
           transition_in(if_block1, 1);
-          if_block1.m(main, null);
+          if_block1.m(section, null);
         }
       } else if (if_block1) {
         group_outros();
@@ -4198,7 +4197,7 @@ function create_if_block$1(ctx) {
     },
     d(detaching) {
       if (detaching) {
-        detach(main);
+        detach(section);
       }
       destroy_component(translationselector);
       destroy_component(t1);
@@ -4328,7 +4327,7 @@ function create_if_block_5(ctx) {
     c() {
       div = element("div");
       create_component(t.$$.fragment);
-      attr(div, "class", "error-message svelte-1hpprge");
+      attr(div, "class", "error-message svelte-ppr9db");
     },
     m(target, anchor) {
       insert(target, div, anchor);
@@ -4372,10 +4371,24 @@ function create_if_block_5(ctx) {
 function create_if_block_1$1(ctx) {
   let div;
   let h2;
+  let t0;
   let t1;
   let t2;
   let t3;
   let current;
+  t0 = new T({
+    props: {
+      text: "Form submitted successfully!",
+      lang: (
+        /*lang*/
+        ctx[0]
+      ),
+      translations: (
+        /*translations*/
+        ctx[2]
+      )
+    }
+  });
   let if_block0 = (
     /*form*/
     ctx[1].confirmationMessage && create_if_block_4(ctx)
@@ -4392,7 +4405,7 @@ function create_if_block_1$1(ctx) {
     c() {
       div = element("div");
       h2 = element("h2");
-      h2.textContent = "Form submitted successfully!";
+      create_component(t0.$$.fragment);
       t1 = space();
       if (if_block0)
         if_block0.c();
@@ -4402,12 +4415,13 @@ function create_if_block_1$1(ctx) {
       t3 = space();
       if (if_block2)
         if_block2.c();
-      attr(h2, "class", "success-title svelte-1hpprge");
-      attr(div, "class", "success-container svelte-1hpprge");
+      attr(h2, "class", "success-title svelte-ppr9db");
+      attr(div, "class", "success-container svelte-ppr9db");
     },
     m(target, anchor) {
       insert(target, div, anchor);
       append(div, h2);
+      mount_component(t0, h2, null);
       append(div, t1);
       if (if_block0)
         if_block0.m(div, null);
@@ -4420,6 +4434,16 @@ function create_if_block_1$1(ctx) {
       current = true;
     },
     p(ctx2, dirty) {
+      const t0_changes = {};
+      if (dirty & /*lang*/
+      1)
+        t0_changes.lang = /*lang*/
+        ctx2[0];
+      if (dirty & /*translations*/
+      4)
+        t0_changes.translations = /*translations*/
+        ctx2[2];
+      t0.$set(t0_changes);
       if (
         /*form*/
         ctx2[1].confirmationMessage
@@ -4493,12 +4517,14 @@ function create_if_block_1$1(ctx) {
     i(local) {
       if (current)
         return;
+      transition_in(t0.$$.fragment, local);
       transition_in(if_block0);
       transition_in(if_block1);
       transition_in(if_block2);
       current = true;
     },
     o(local) {
+      transition_out(t0.$$.fragment, local);
       transition_out(if_block0);
       transition_out(if_block1);
       transition_out(if_block2);
@@ -4508,6 +4534,7 @@ function create_if_block_1$1(ctx) {
       if (detaching) {
         detach(div);
       }
+      destroy_component(t0);
       if (if_block0)
         if_block0.d();
       if (if_block1)
@@ -4604,7 +4631,7 @@ function create_if_block_3(ctx) {
       p = element("p");
       a = element("a");
       create_component(t.$$.fragment);
-      attr(a, "class", "edit-response-link svelte-1hpprge");
+      attr(a, "class", "edit-response-link svelte-ppr9db");
       attr(
         a,
         "href",
@@ -4684,7 +4711,7 @@ function create_if_block_2(ctx) {
     c() {
       button = element("button");
       create_component(t.$$.fragment);
-      attr(button, "class", "submit-again-button svelte-1hpprge");
+      attr(button, "class", "submit-again-button svelte-ppr9db");
     },
     m(target, anchor) {
       insert(target, button, anchor);
@@ -4983,7 +5010,7 @@ class GForm extends SvelteComponent {
         postAgainText: 4,
         lang: 0
       },
-      add_css
+      add_css$1
     );
   }
   get form() {
@@ -5030,6 +5057,9 @@ class GForm extends SvelteComponent {
   }
 }
 create_custom_element(GForm, { "form": {}, "translations": {}, "postUrl": {}, "allowPostAgain": { "type": "Boolean" }, "postAgainText": {}, "lang": {} }, [], [], true);
+function add_css(target) {
+  append_styles(target, "svelte-dgq2d7", ".gform-wrapper.svelte-dgq2d7 *{all:reset}");
+}
 function create_if_block_1(ctx) {
   let gform;
   let current;
@@ -5132,8 +5162,8 @@ function create_if_block(ctx) {
   };
 }
 function create_fragment(ctx) {
+  let div;
   let t;
-  let if_block1_anchor;
   let current;
   let if_block0 = (
     /*data*/
@@ -5145,20 +5175,21 @@ function create_fragment(ctx) {
   );
   return {
     c() {
+      div = element("div");
       if (if_block0)
         if_block0.c();
       t = space();
       if (if_block1)
         if_block1.c();
-      if_block1_anchor = empty();
+      attr(div, "class", "gform-wrapper svelte-dgq2d7");
     },
     m(target, anchor) {
+      insert(target, div, anchor);
       if (if_block0)
-        if_block0.m(target, anchor);
-      insert(target, t, anchor);
+        if_block0.m(div, null);
+      append(div, t);
       if (if_block1)
-        if_block1.m(target, anchor);
-      insert(target, if_block1_anchor, anchor);
+        if_block1.m(div, null);
       current = true;
     },
     p(ctx2, [dirty]) {
@@ -5176,7 +5207,7 @@ function create_fragment(ctx) {
           if_block0 = create_if_block_1(ctx2);
           if_block0.c();
           transition_in(if_block0, 1);
-          if_block0.m(t.parentNode, t);
+          if_block0.m(div, t);
         }
       } else if (if_block0) {
         group_outros();
@@ -5194,7 +5225,7 @@ function create_fragment(ctx) {
         } else {
           if_block1 = create_if_block(ctx2);
           if_block1.c();
-          if_block1.m(if_block1_anchor.parentNode, if_block1_anchor);
+          if_block1.m(div, null);
         }
       } else if (if_block1) {
         if_block1.d(1);
@@ -5213,13 +5244,12 @@ function create_fragment(ctx) {
     },
     d(detaching) {
       if (detaching) {
-        detach(t);
-        detach(if_block1_anchor);
+        detach(div);
       }
       if (if_block0)
-        if_block0.d(detaching);
+        if_block0.d();
       if (if_block1)
-        if_block1.d(detaching);
+        if_block1.d();
     }
   };
 }
@@ -5285,13 +5315,21 @@ function instance($$self, $$props, $$invalidate) {
 class GFormMirror extends SvelteComponent {
   constructor(options) {
     super();
-    init(this, options, instance, create_fragment, safe_not_equal, {
-      formsUrl: 2,
-      formsId: 6,
-      appsScriptUrl: 3,
-      translations: 0,
-      data: 1
-    });
+    init(
+      this,
+      options,
+      instance,
+      create_fragment,
+      safe_not_equal,
+      {
+        formsUrl: 2,
+        formsId: 6,
+        appsScriptUrl: 3,
+        translations: 0,
+        data: 1
+      },
+      add_css
+    );
   }
   get formsUrl() {
     return this.$$.ctx[2];
