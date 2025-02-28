@@ -31,12 +31,18 @@
       id: "start",
       description: form.description,
       items: [],
+      defaultNextPage: "", // This will be populated later
     };
 
     for (const item of form.items) {
       if (item.type === "pageBreak") {
         pages.push(currentPage);
-        currentPage = { id: item.id, items: [], title: item.title };
+        currentPage = {
+          id: item.id,
+          items: [],
+          title: item.title,
+          description: item.description,
+        };
       } else {
         currentPage.items.push(item);
       }
@@ -53,6 +59,7 @@
   function goBack() {
     if (pageHistory.length > 0) {
       currentPageId = pageHistory.pop();
+      pageHistory = [...pageHistory]; // Trigger reactivity
     }
   }
 
@@ -101,7 +108,7 @@
     if (nextPageId === "submit") {
       submitForm();
     } else {
-      pageHistory.push(currentPageId);
+      pageHistory = [...pageHistory, currentPageId];
       currentPageId = nextPageId;
     }
   }
