@@ -1,9 +1,14 @@
+Next Up Immediately:
+
+- Troubleshoot bugs that I think are related to "Collect email addresses" and "Send responders a copy of their response"
+  -- in theory, if we have "Responder input" for collect email, this maybe can work? Or if not, we should display a
+  warning when a user tries to enable a form for which our add-on will fail.
+
 Next up: we have this working as a test now already, so go us!
 -> Note: encapsulation + google translate are at odds, so we can't really prevent "leakage" of external website stuff into us.
 -> Next steps: Finalize UI for embedding. Come up with a useful hosting solution.
 
-
-Next up, we're working towards this: -- we actually 
+Next up, we're working towards this: -- we actually
 
     < gforms - mirror id = "my-form" appsScriptUrl = "https://script.google.com/macros/s/XYZ/exec" ></gforms - mirror >
 
