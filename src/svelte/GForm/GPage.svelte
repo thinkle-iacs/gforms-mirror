@@ -20,11 +20,19 @@
 
   function setChoice(item: ChoiceFormItem, idx: number) {
     if (!item.choicesNavigation) return;
-    if (!item.choicesNavigation[idx]) return;
-    nextPageId =
-      item.choicesNavigation[idx].type === "page"
-        ? item.choicesNavigation[idx].id
-        : "submit";
+    const navOption = item.choicesNavigation[idx];
+    if (!navOption) {
+      // default to "continue"
+      nextPageId = page.defaultNextPage;
+    } else if (navOption.type == "page" && navOption.id) {
+      nextPageId = navOption.id;
+    } else if (navOption.type == "submit") {
+      nextPageId = "submit";
+    } else {
+      console.log("Unrecognized nav type: ", navOption, navOption.type);
+      // default to "continue"
+      nextPageId = page.defaultNextPage;
+    }
   }
 
   function onInputChange(id: string, value: any) {
